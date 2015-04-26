@@ -9,6 +9,7 @@
     "url": "https://github.com/if1live/kisaragi.git"
   },
   "scripts": {
+    "pretest": "jshint *.js lib/ test",
     "test": "vows --spec",
     "start": "node app.js"
   },
@@ -20,6 +21,9 @@
     "grunt": "*",
     "grunt-cli": "*",
     "grunt-bower-task": "*",
-    "grunt-bowercopy": "*"
+    "grunt-bowercopy": "*",
+    "jshint": "2.7.0",
+    "istanbul": "0.3.13",
+    "codeclimate-test-reporter": "*"
   }
 }
