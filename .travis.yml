@@ -6,10 +6,12 @@ node_js:
 sudo: false
 
 before_script:
+  - cd server
   - npm install -g bower
   - npm install -g grunt-cli
-  - cd server && npm install
+  - npm install
+  - bower install
 
 script:
-  - cd server && npm test
+  - npm test
   
