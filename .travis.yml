@@ -14,4 +14,5 @@ before_script:
 
 script:
   - npm test
-  
+  - istanbul cover test/*.js
+  - CODECLIMATE_REPO_TOKEN=6332e7fe310bfe4c5fd8689006abea4bd3c74cfaed6b9aa071bd9fbf932c195f codeclimate < coverage/lcov.info
