@@ -7,6 +7,7 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var gameloop = require('node-gameloop');
 
 var game = require('./lib/game');
 
@@ -62,3 +63,8 @@ io.on('connection', function(socket) {
 http.listen(app.get('port'), function() {
   console.log('http listening on *:' + app.get('port'));
 });
+
+// game loop
+var loopId = gameloop.setGameLoop(function(delta) {
+  world.update(delta);
+}, 1000/60);
