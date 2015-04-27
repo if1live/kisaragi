@@ -1,11 +1,28 @@
 var socket = io();
-$('form').submit(function() {
-  socket.emit('chat message', [$('#m').val()]);
-  $('#m').val('');
-  return false;
+
+function dumpCommunication(cmd, obj) {
+  console.log(cmd + " : " + JSON.stringify(obj));
+}
+
+socket.on('ping', function(obj) {
+  var now = Date.now();
+  var prev = obj.timestamp;
+  var diff = now - prev;
+  console.log("ping : " + diff + "ms");
 });
 
-socket.on('chat message', function(obj) {
-  var msg = obj.msg;
-  $('#messages').append($('<li>').text(msg));
+function ping() {
+  var timestamp = Date.now();
+  socket.emit('ping', {timestamp:timestamp});
+}
+
+socket.on('echo', function(ctx) {
+  dumpCommunication('echo', ctx);
 });
+
+function echo(ctx) {
+  socket.emit('echo', ctx);
+}
+
+// main
+ping();

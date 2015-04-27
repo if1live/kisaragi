@@ -10,8 +10,9 @@ module.exports = function(grunt) {
       glob: {
         files: {
           'publish/libs/js': [
-            'jquery/dist/*.js',
-            'socket.io-client/socket.io.js'
+            'socket.io-client/socket.io.js',
+            'phaser/build/phaser.min.js',
+            'jquery/dist/*.js'
           ]
         }
       }

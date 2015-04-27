@@ -2,39 +2,55 @@
 var HTTP_PORT = 3000;
 
 // code start
+var serveStatic = require('serve-static');
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+var game = require('./lib/game');
+
 // all environments
 app.set('port', HTTP_PORT);
 app.set('view engine', 'ejs');
-app.use(express.static(__dirname + '/publish'));
-app.use('/static', express.static('static'));
+app.use(serveStatic(__dirname + '/static'));
+app.use(serveStatic(__dirname + '/publish'));
 
-// TODO Game World
-var g_count = 0;
-
-//app.get('/', function(req, res) {
-//  g_count += 1;
-//  res.send("hello world = " + g_count);
-//});
+// Game World
+var server = new game.Server(io);
+var world = new game.World();
 
 app.get('/', function(req, res) {
-  res.render('index')
+  res.render('index');
 });
 
-io.on('connection', function(socket) {
-  console.log('a user connected');
+app.get('/admin', function(req, res) {
+  res.render('admin');
+});
 
-  socket.on('disconnect', function() {
-    console.log('user disconnected');
+
+io.on('connection', function(socket) {
+  var client = server.connectClient(socket);
+  console.log(`[Client=${client.uid}] connected`);
+
+  var user = world.createUser(client);
+  world.addUser(user);
+
+  socket.on('ping', function(obj) {
+    socket.emit('ping', obj);
   });
 
-  socket.on('chat message', function(msg) {
-    console.log('message : ' + msg);
-    io.emit('chat message', {"msg": msg});
+  socket.on('echo', function(obj) {
+    socket.emit('echo', obj);
+  });
+
+  socket.on('disconnect', function(x) {
+    var client = server.findClient({socket: socket});
+    var user = world.findUser(function(x) { return x === client; });
+    world.removeUser(user);
+    server.disconnectClient(client);
+
+    console.log(`[Client=${client.uid}] disconnected`);
   });
 });
 
