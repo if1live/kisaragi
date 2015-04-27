@@ -9,7 +9,9 @@ var io = require('socket.io')(http);
 
 // all environments
 app.set('port', HTTP_PORT);
+app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/publish'));
+app.use('/static', express.static('static'));
 
 // TODO Game World
 var g_count = 0;
@@ -20,7 +22,7 @@ var g_count = 0;
 //});
 
 app.get('/', function(req, res) {
-  res.sendFile(__dirname + '/index.html');
+  res.render('index')
 });
 
 io.on('connection', function(socket) {
