@@ -25,7 +25,11 @@ app.get('/', function(req, res) {
 });
 
 app.get('/admin', function(req, res) {
-  res.render('admin');
+  res.render('admin', {
+    world: world,
+    server: server,
+    helper: new game.AdminHelper()
+  });
 });
 
 
