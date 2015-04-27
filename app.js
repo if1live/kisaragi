@@ -39,26 +39,36 @@ io.on('connection', function(socket) {
   console.log(`[Client=${client.uid}] connected`);
 
   var user = world.createUser(client);
-  world.addUser(user);
+  client.onEvent('connect', world, user, {});
 
-  socket.on('ping', function(obj) {
-    socket.emit('ping', obj);
-  });
-
-  socket.on('echo', function(obj) {
-    socket.emit('echo', obj);
-  });
-
-  socket.on('disconnect', function(x) {
+  socket.on('disconnect', function() {
     var client = server.findClient({socket: socket});
-    var user = world.findUser(function(x) { return x === client; });
-    world.removeUser(user);
-    server.disconnectClient(client);
+    var user = client.user;
+    client.onEvent('disconnect', world, user, {});
 
+    server.disconnectClient(user);
     console.log(`[Client=${client.uid}] disconnected`);
   });
-});
 
+
+  var cmdList = [
+    // for game
+
+    // for development
+    'ping',
+    'echo'
+  ];
+
+  function registerCommand(cmd) {
+    socket.on(cmd, function(obj) {
+      var client = server.findClient({socket: socket});
+      client.onEvent(cmd, world, client.user, obj);
+    });
+  }
+  for(var i = 0 ; i < cmdList.length ; i += 1) {
+    registerCommand(cmdList[i]);
+  }
+});
 
 http.listen(app.get('port'), function() {
   console.log('http listening on *:' + app.get('port'));

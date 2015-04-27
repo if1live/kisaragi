@@ -32,7 +32,7 @@
   "lastsemic": false,
   "laxbreak": true,
   "laxcomma": false,
-  "loopfunc": false,
+  "loopfunc": true,
   "multistr": false,
   "notypeof": false,
   "proto": false,
