@@ -10,15 +10,18 @@ var io = require('socket.io')(http);
 var gameloop = require('node-gameloop');
 
 var game = require('./lib/game');
+var network = require('./lib/network');
 
 // all environments
 app.set('port', HTTP_PORT);
 app.set('view engine', 'ejs');
 app.use(serveStatic(__dirname + '/static'));
 app.use(serveStatic(__dirname + '/publish'));
+// http://stackoverflow.com/questions/12488930/dump-an-object-in-ejs-templates-from-express3-x-views
+app.locals.inspect = require('util').inspect;
 
 // Game World
-var server = new game.Server(io);
+var server = new network.Server(io);
 var world = new game.World();
 
 app.get('/', function(req, res) {
@@ -36,10 +39,9 @@ app.get('/admin', function(req, res) {
 
 io.on('connection', function(socket) {
   var client = server.connectClient(socket);
-  console.log(`[Client=${client.uid}] connected`);
-
   var user = world.createUser(client);
   client.onEvent('connect', world, user, {});
+  console.log(`[User=${user.id}] connected`);
 
   socket.on('disconnect', function() {
     var client = server.findClient({socket: socket});
@@ -47,7 +49,7 @@ io.on('connection', function(socket) {
     client.onEvent('disconnect', world, user, {});
 
     server.disconnectClient(user);
-    console.log(`[Client=${client.uid}] disconnected`);
+    console.log(`[User=${user.id}] disconnected`);
   });
 
 

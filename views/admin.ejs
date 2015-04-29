@@ -27,7 +27,8 @@
       <h2>User/Client</h2>
       <table class="table table-hover table-striped">
         <tr>
-          <th>uid</th>
+          <th>id</th>
+          <th>uuid</th>
           <th>IP</th>
           <th>Pos</th>
         </tr>
@@ -35,7 +36,8 @@
           <% var user = world.userList[i]; %>
           <% var client = user.client; %>
           <tr>
-            <td><%= client.uid %></td>
+            <td><%= user.id %></td>
+            <td><%= client.uuid %></td>
             <td><%= client.getAddress() %></td>
             <td><%= user.pos %></td>
           </tr>

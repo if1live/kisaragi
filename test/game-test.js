@@ -2,73 +2,6 @@ var vows = require('vows');
 var assert = require('assert');
 var game = require('../lib/game');
 
-vows.describe('Server').addBatch({
-  'getNextId': {
-    topic: new game.Server(null),
-    'success': function(topic) {
-      assert.equal(topic.getNextId(), 1);
-      assert.equal(topic.getNextId(), 2);
-      assert.equal(topic.getNextId(), 3);
-    }
-  },
-
-  'connectClient': {
-    topic: new game.Server(null),
-    'empty': function(topic) {
-      assert.equal(topic.clientList.length, 0);
-    },
-    'success': function(topic) {
-      var client_1 = topic.connectClient('foo');
-      assert.equal(topic.clientList.length, 1);
-
-      var client_2 = topic.connectClient('bar');
-      assert.equal(topic.clientList.length, 2);
-    }
-  },
-  'findClient': {
-    'uid - found': {
-      topic: new game.Server(null),
-      'success': function(topic) {
-        var client = topic.connectClient('foo');
-        assert.equal(topic.findClient({uid: client.uid}), client);
-      }
-    },
-    'uid - not found': {
-      topic: new game.Server(null),
-      'null': function(topic) {
-        var client = topic.connectClient('foo');
-        assert.equal(topic.findClient({uid: 999}), null);
-      }
-    },
-    'socket - found': {
-      topic: new game.Server(null),
-      'success': function(topic) {
-        var client = topic.connectClient('foo');
-        assert.equal(topic.findClient({socket: 'foo'}), client);
-      }
-    },
-    'socket - not found': {
-      topic: new game.Server(null),
-      'null': function(topic) {
-        var client = topic.connectClient('foo');
-        assert.equal(topic.findClient({socket: '????'}), null);
-      }
-    }
-  },
-  'disconnectClient': {
-    topic: new game.Server(null),
-    'remove from list': function(topic) {
-      var client_a = topic.connectClient('foo');
-      var client_b = topic.connectClient('bar');
-
-      assert.equal(topic.clientList.length, 2);
-
-      topic.disconnectClient(client_b.socket);
-      assert.equal(topic.clientList.length, 1);
-      assert.equal(topic.clientList[0], client_a);
-    }
-  }
-}).export(module);
 
 vows.describe('User').addBatch({
 
@@ -85,11 +18,47 @@ vows.describe('World').addBatch({
     }
   },
   'addUser': {
+    '1 time': {
+      topic: new game.World(),
+      'success': function(topic) {
+        var user = topic.createUser('foo');
+        topic.addUser(user);
+        assert.equal(topic.userList.length, 1);
+        assert.equal(user.id, 1);
+      }
+    },
+    'multiple time': {
+      topic: new game.World(),
+      'success': function(topic) {
+        var user_a = topic.createUser('foo');
+        var user_b = topic.createUser('bar');
+        topic.addUser(user_a);
+        topic.addUser(user_b);
+
+        assert.equal(user_a.id, 1);
+        assert.equal(user_b.id, 2);
+      }
+    }
+  },
+  'removeUser': {
     topic: new game.World(),
     'success': function(topic) {
-      var user = topic.createUser('foo');
-      topic.addUser(user);
-      assert.equal(topic.userList.length, 1);
+      var user_a = topic.createUser('foo');
+      var user_b = topic.createUser('bar');
+      topic.addUser(user_a);
+      topic.addUser(user_b);
+
+      topic.removeUser(user_a);
+      assert.equal(topic.userList[0].id, user_b.id);
     }
-  }
+  },
+  'getNextId': {
+    topic: new game.World(null),
+    'success': function(topic) {
+      assert.equal(topic.getNextId(), 1);
+      assert.equal(topic.getNextId(), 2);
+      assert.equal(topic.getNextId(), 3);
+    }
+  },
+
 }).export(module);

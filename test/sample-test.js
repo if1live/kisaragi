@@ -9,4 +9,4 @@ vows.describe('sample').addBatch({
       assert.equal(topic, Infinity);
     }
   }
-}).run();
+}).export(module);

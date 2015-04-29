@@ -11,4 +11,4 @@ vows.describe('base').addBatch({
       assert.equal(topic, true);
     }
   }
-}).run();
+}).export(module);
