@@ -58,7 +58,8 @@ io.on('connection', function(socket) {
 
     // for development
     'ping',
-    'echo'
+    'echo',
+    'echo_all'
   ];
 
   function registerCommand(cmd) {

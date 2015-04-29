@@ -24,5 +24,13 @@ function echo(ctx) {
   socket.emit('echo', ctx);
 }
 
+socket.on('echo_all', function(ctx) {
+  dumpCommunication('echo_all', ctx);
+});
+
+function echo_all(ctx) {
+  socket.emit('echo_all', ctx);
+}
+
 // main
 ping();
