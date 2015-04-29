@@ -4,6 +4,10 @@ function dumpCommunication(cmd, obj) {
   console.log(cmd + " : " + JSON.stringify(obj));
 }
 
+socket.on('login', function(obj) {
+  dumpCommunication('login', obj);
+});
+
 socket.on('ping', function(obj) {
   var now = Date.now();
   var prev = obj.timestamp;
