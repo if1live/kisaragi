@@ -1,5 +1,5 @@
 // constants
-var HTTP_PORT = 3000;
+var HTTP_PORT = 8001;
 
 // code start
 var serveStatic = require('serve-static');
