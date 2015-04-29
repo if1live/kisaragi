@@ -11,6 +11,7 @@
   "scripts": {
     "pretest": "jshint app.js lib/ test/",
     "test": "vows --spec",
+    "prestart": "jshint app.js lib/ test/",
     "start": "nodemon app.js"
   },
   "dependencies": {
