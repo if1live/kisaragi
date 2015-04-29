@@ -60,5 +60,20 @@ vows.describe('World').addBatch({
       assert.equal(topic.getNextId(), 3);
     }
   },
-
+  'findUser': {
+    'exist': {
+      topic: new game.World(),
+      'success': function(topic) {
+        var user = topic.createUser('foo');
+        topic.addUser(user);
+        assert.equal(topic.findUser(user.id), user);
+      }
+    },
+    'not exist': {
+      topic: new game.World(),
+      'null': function(topic) {
+        assert.equal(topic.findUser(999), null);
+      }
+    }
+  }
 }).export(module);
