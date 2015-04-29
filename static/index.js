@@ -6,6 +6,17 @@ function dumpCommunication(cmd, obj) {
 
 socket.on('login', function(obj) {
   dumpCommunication('login', obj);
+
+  socket.emit('requestMap', {});
+  socket.emit('requestUserList', {});
+});
+
+socket.on('requestMap', function(obj) {
+  dumpCommunication('requestMap', obj);
+});
+
+socket.on('moveOccur', function(obj) {
+  dumpCommunication('moveOccur', obj);
 });
 
 socket.on('ping', function(obj) {
@@ -34,6 +45,13 @@ socket.on('echo_all', function(ctx) {
 
 function echo_all(ctx) {
   socket.emit('echo_all', ctx);
+}
+
+function requestMove(y, x) {
+  socket.emit('requestMove', {
+    x: x,
+    y: y
+  });
 }
 
 // main

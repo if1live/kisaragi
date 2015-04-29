@@ -7,6 +7,10 @@ vows.describe('User').addBatch({
 
 }).export(module);
 
+vows.describe('Enemy').addBatch({
+
+}).export(module);
+
 vows.describe('World').addBatch({
   'createUser': {
     topic: new game.World(),
@@ -74,6 +78,35 @@ vows.describe('World').addBatch({
       'null': function(topic) {
         assert.equal(topic.findUser(999), null);
       }
+    }
+  },
+  'findGameObject': {
+    'enemy': {
+      topic: new game.World(),
+      'success': function(topic) {
+        var user = topic.createUser('foo');
+        topic.addUser(user);
+
+        var enemy = topic.generateEnemy();
+        assert.equal(topic.findGameObject(enemy.id), enemy);
+      }
+    },
+    'user': {
+      topic: new game.World(),
+      'success': function(topic) {
+        var user = topic.createUser('foo');
+        topic.addUser(user);
+
+        var enemy = topic.generateEnemy();
+        assert.equal(topic.findGameObject(user.id), user);
+      }
+    }
+  },
+  'generateEnemy': {
+    topic: new game.World(),
+    'success': function(topic) {
+      var enemy = topic.generateEnemy();
+      assert.equal(topic.enemyList.length, 1);
     }
   }
 }).export(module);

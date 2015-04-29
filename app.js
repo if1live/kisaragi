@@ -55,6 +55,12 @@ io.on('connection', function(socket) {
 
   var cmdList = [
     // for game
+    // 게임 기본 정보 요청
+    'requestMap',
+    'requestUserList',
+
+    // 이동
+    'requestMove',
 
     // for development
     'ping',
