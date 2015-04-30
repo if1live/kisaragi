@@ -11,6 +11,7 @@ var gameloop = require('node-gameloop');
 
 var game = require('./lib/game');
 var network = require('./lib/network');
+var admin = require('./lib/admin');
 
 // all environments
 app.set('port', HTTP_PORT);
@@ -32,7 +33,7 @@ app.get('/admin', function(req, res) {
   res.render('admin', {
     world: world,
     server: server,
-    helper: new game.AdminHelper()
+    helper: new admin.AdminHelper()
   });
 });
 
