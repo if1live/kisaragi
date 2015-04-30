@@ -1,4 +1,14 @@
-require(['underscore', 'jquery', 'socket.io', ], function(_, $, io) {
+require([
+  'underscore', 
+  'jquery', 
+  'socket.io', 
+  'game.js'
+  ], function(_, $, io, game) {
+  console.log(game);
+  // game library test
+  (new game.User()).foo();
+  
+  // network & handler
   var socket = io();
   
   function dumpCommunication(cmd, obj) {
