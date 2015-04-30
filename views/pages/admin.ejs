@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Kisaragi Admin</title>
+		
+		<% include ../partials/head %>
+		
+		<link rel="stylesheet" href="/libs/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/libs/css/bootstrap-theme.min.css">
+		<link rel="stylesheet" href="/admin.css">
+	</head>
+	<body>
+	<div class="container">
+		<h1>Kisaragi Admin</h1>
+		<h2>Summary</h2>
+		<dl class="dl-horizontal">
+			<dt>tick</dt>
+			<dd><%= world.tickCount %></dd>
+			<dt>running time</dt>
+			<dd><%= world.getRunningTime() %> second</dd>
+			<dt>world user count</dt>
+			<dd><%= world.getUserCount() %></dd>
+		</dl>
+
+		<h2>User/Client</h2>
+		<table class="table table-hover table-striped">
+			<tr>
+				<th>id</th>
+				<th>uuid</th>
+				<th>IP</th>
+				<th>Pos</th>
+			</tr>
+			<% for(var i = 0 ; i < world.userList.length ; i++) { %>
+			<% var user = world.userList[i]; %>
+			<% var client = user.client; %>
+			<tr>
+				<td><%= user.id %></td>
+				<td><%= client.uuid %></td>
+				<td><%= client.getAddress() %></td>
+				<td><%= user.pos %></td>
+			</tr>
+			<% } %>
+		</table>
+
+		<h2>World</h2>
+		<p class="admin-map">
+			<% for(var y = world.height - 1 ; y >= 0 ; --y) { %>
+			<% for(var x = 0 ; x < world.width ; ++x) { %>
+			<%= helper.gameObjectToChar(world.getObject(y, x)) %>
+			<% } %>
+			<br/>
+			<% } %>
+		</p>
+
+		<script src="/libs/js/jquery.min.js"></script>
+		<script src="/libs/js/bootstrap.min.js"></script>
+		</div>
+	</body>
+</html>

@@ -26,11 +26,19 @@ var server = new network.Server(io);
 var world = new game.World();
 
 app.get('/', function(req, res) {
-  res.render('index');
+  res.render('pages/index');
+});
+
+app.get('/dev', function(req, res) {
+  res.render('pages/dev');
+});
+
+app.get('/game', function(req, res) {
+  res.render('pages/game');
 });
 
 app.get('/admin', function(req, res) {
-  res.render('admin', {
+  res.render('pages/admin', {
     world: world,
     server: server,
     helper: new admin.AdminHelper()
