@@ -12,10 +12,42 @@ socket.on('login', function(obj) {
 });
 
 socket.on('requestMap', function(obj) {
-  dumpCommunication('requestMap', obj);
+  var html = '<table><tbody>' + _.reduce(obj.data, function(memo, row) {
+    return memo + '<tr>' + _.reduce(row, function(memo, cell) {
+      return memo + '<td>–</td>';
+    }, '') + '</tr>';
+  }, '') + '</tbody></table>';
+  
+  $("#game").html(html);
+//  dumpCommunication('requestMap', obj);
 });
 
+var users = new Object();
+
 socket.on('moveOccur', function(obj) {
+  _.each(users, function(user, i) {
+    user.valid = false;
+  });
+  
+  _.each(obj.user_list, function(user, i) {
+    var x = user.pos[0];
+    var y = user.pos[1];
+    
+    if(users[user.id]) {
+      $('#game > table > tbody > tr:nth-child(' + (users[user.id].x + 1) + ') > td:nth-child(' + (users[user.id].y + 1) + ')').html('–');
+    }
+    users[user.id] = { 'id': user.id, 'x': x, 'y': y, 'valid': true };
+  });
+  
+  _.each(users, function(user, i) {
+    if(user.valid) {
+      $('#game > table > tbody > tr:nth-child(' + (user.x + 1) + ') > td:nth-child(' + (user.y + 1) + ')').html(user.id);
+    }
+    else {
+      delete users[i];
+    }
+  });
+  
   dumpCommunication('moveOccur', obj);
 });
 

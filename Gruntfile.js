@@ -13,7 +13,8 @@ module.exports = function(grunt) {
             'socket.io-client/socket.io.js',
             'phaser/build/phaser.min.js',
             'bootstrap/dist/js/*.js',
-            'jquery/dist/*.js'
+            'jquery/dist/*.js',
+            'underscore/*.js'
           ],
           'publish/libs/css': [
             'bootstrap/dist/css/*.css',
