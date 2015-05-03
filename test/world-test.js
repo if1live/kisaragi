@@ -1,10 +1,65 @@
 var vows = require('vows');
 var assert = require('assert');
-var game = require('../lib/game');
+var World = require('../lib/world');
 
 vows.describe('World').addBatch({
+  'getNextId': {
+    topic: new World(null),
+    'success': function(topic) {
+      assert.equal(topic.getNextId(), 1);
+      assert.equal(topic.getNextId(), 2);
+      assert.equal(topic.getNextId(), 3);
+    }
+  },
+  // General
+  'objectList': {
+    'not exist': {
+      topic: new World(),
+      'success': function(topic) {
+        assert.equal(topic.objectList('sample').length, 0);
+      }
+    },
+    'exist': {
+      topic: new World(),
+      'success': function(topic) {
+        topic.objectList('sample').push({});
+        assert.equal(topic.objectList('sample').length, 1);
+      }
+    }
+  },
+  'allObjectList': {
+    topic: new World(),
+    'success': function(topic) {
+      topic.objectList('foo').push({});
+      topic.objectList('bar').push({});
+      assert.equal(topic.allObjectList().length, 2);
+    }
+  },
+  'findObject': {
+    'enemy': {
+      topic: new World(),
+      'success': function(topic) {
+        var user = topic.createUser('foo');
+        topic.addUser(user);
+
+        var enemy = topic.generateEnemy();
+        assert.equal(topic.findObject(enemy.id), enemy);
+      }
+    },
+    'user': {
+      topic: new World(),
+      'success': function(topic) {
+        var user = topic.createUser('foo');
+        topic.addUser(user);
+
+        topic.generateEnemy();
+        assert.equal(topic.findObject(user.id), user);
+      }
+    }
+  },
+  // User
   'createUser': {
-    topic: new game.World(),
+    topic: new World(),
     'success': function(topic) {
       var client = {};
       var user = topic.createUser(client);
@@ -14,16 +69,16 @@ vows.describe('World').addBatch({
   },
   'addUser': {
     '1 time': {
-      topic: new game.World(),
+      topic: new World(),
       'success': function(topic) {
         var user = topic.createUser('foo');
         topic.addUser(user);
-        assert.equal(topic.userList.length, 1);
+        assert.equal(topic.objectList('user').length, 1);
         assert.equal(user.id, 1);
       }
     },
     'multiple time': {
-      topic: new game.World(),
+      topic: new World(),
       'success': function(topic) {
         var user_a = topic.createUser('foo');
         var user_b = topic.createUser('bar');
@@ -36,7 +91,7 @@ vows.describe('World').addBatch({
     }
   },
   'removeUser': {
-    topic: new game.World(),
+    topic: new World(),
     'success': function(topic) {
       var user_a = topic.createUser('foo');
       var user_b = topic.createUser('bar');
@@ -44,20 +99,12 @@ vows.describe('World').addBatch({
       topic.addUser(user_b);
 
       topic.removeUser(user_a);
-      assert.equal(topic.userList[0].id, user_b.id);
-    }
-  },
-  'getNextId': {
-    topic: new game.World(null),
-    'success': function(topic) {
-      assert.equal(topic.getNextId(), 1);
-      assert.equal(topic.getNextId(), 2);
-      assert.equal(topic.getNextId(), 3);
+      assert.equal(topic.objectList('user')[0].id, user_b.id);
     }
   },
   'findUser': {
     'exist': {
-      topic: new game.World(),
+      topic: new World(),
       'success': function(topic) {
         var user = topic.createUser('foo');
         topic.addUser(user);
@@ -65,39 +112,18 @@ vows.describe('World').addBatch({
       }
     },
     'not exist': {
-      topic: new game.World(),
+      topic: new World(),
       'null': function(topic) {
         assert.equal(topic.findUser(999), null);
       }
     }
   },
-  'findGameObject': {
-    'enemy': {
-      topic: new game.World(),
-      'success': function(topic) {
-        var user = topic.createUser('foo');
-        topic.addUser(user);
-
-        var enemy = topic.generateEnemy();
-        assert.equal(topic.findGameObject(enemy.id), enemy);
-      }
-    },
-    'user': {
-      topic: new game.World(),
-      'success': function(topic) {
-        var user = topic.createUser('foo');
-        topic.addUser(user);
-
-        var enemy = topic.generateEnemy();
-        assert.equal(topic.findGameObject(user.id), user);
-      }
-    }
-  },
+  // Enemy
   'generateEnemy': {
-    topic: new game.World(),
+    topic: new World(),
     'success': function(topic) {
-      var enemy = topic.generateEnemy();
-      assert.equal(topic.enemyList.length, 1);
+      topic.generateEnemy();
+      assert.equal(topic.objectList('enemy').length, 1);
     }
   }
 }).export(module);

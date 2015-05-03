@@ -1,6 +1,6 @@
 var vows = require('vows');
 var assert = require('assert');
-var game = require('../lib/game');
+var User = require('../lib/user');
 
 
 vows.describe('User').addBatch({

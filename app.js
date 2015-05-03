@@ -10,8 +10,7 @@ var io = require('socket.io')(http);
 var gameloop = require('node-gameloop');
 
 var globals = require('./lib/globals');
-
-var game = require('./lib/game');
+var World = require('./lib/world');
 var network = require('./lib/network');
 var admin = require('./lib/admin');
 
@@ -26,7 +25,8 @@ app.locals.inspect = require('util').inspect;
 
 // Game World
 var server = new network.Server(io);
-var world = new game.World();
+var world = new World();
+
 
 app.get('/', function(req, res) {
   res.render('pages/index');
