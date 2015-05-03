@@ -9,6 +9,8 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var gameloop = require('node-gameloop');
 
+var globals = require('./lib/globals');
+
 var game = require('./lib/game');
 var network = require('./lib/network');
 var admin = require('./lib/admin');
@@ -18,6 +20,7 @@ app.set('port', HTTP_PORT);
 app.set('view engine', 'ejs');
 app.use(serveStatic(__dirname + '/static'));
 app.use(serveStatic(__dirname + '/publish'));
+app.use(serveStatic(__dirname + '/lib'));
 // http://stackoverflow.com/questions/12488930/dump-an-object-in-ejs-templates-from-express3-x-views
 app.locals.inspect = require('util').inspect;
 
@@ -99,4 +102,4 @@ var loopId = gameloop.setGameLoop(function(delta) {
   io.sockets.emit('moveOccur', {
     'user_list': world.getUserList()
   });
-}, 1000/60);
+}, 1000/globals.targetFps);

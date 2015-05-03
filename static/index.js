@@ -117,3 +117,4 @@ function requestMove(x, y) {
 
 // main
 ping();
+
