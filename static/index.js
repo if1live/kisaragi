@@ -15,6 +15,10 @@ $('.cmd-move').click(function() {
   }
 });
 
+// share game world
+var world = new World();
+var level = world.level;
+
 // network & handler
 var socket = io();
 
@@ -33,21 +37,17 @@ socket.on('login', function(obj) {
   socket.emit('requestUserList', {});
 });
 
-var mapWidth = null;
-var mapHeight = null;
-
 socket.on('requestMap', function(obj) {
-  mapWidth = obj.width;
-  mapHeight = obj.height;
+  // object synchronize by serializer/deserializer
+  level.serializer().deserialize(obj);
   
-  var html = '<table><tbody>' + _.reduce(obj.data, function(memo, row, y) {
+  var html = '<table><tbody>' + _.reduce(level.data, function(memo, row, y) {
     return memo + '<tr>' + _.reduce(row, function(memo, cell, x) {
-      return memo + '<td data-coords="[' + x + ', ' + (mapHeight - y - 1) + ']">–</td>';
+      return memo + '<td data-coords="[' + x + ', ' + (level.height - y - 1) + ']">–</td>';
     }, '') + '</tr>';
   }, '') + '</tbody></table>';
   
   $("#game").html(html);
-//  dumpCommunication('requestMap', obj);
 });
 
 var users = new Object();
