@@ -25,6 +25,14 @@ vows.describe('Level').addBatch({
         assert.equal(topic.tile(10, -10, 1), false);
       }
     }
+  },
+  'filterPosition': {
+    topic: new Level(2, 3),
+    'success': function(topic) {
+      assert.deepEqual(topic.filterPosition(-1, -1), [0, 0]);
+      assert.deepEqual(topic.filterPosition(100, 100), [1, 2]);
+      assert.deepEqual(topic.filterPosition(1, 2), [1, 2]);
+    }
   }
 }).export(module);
 
