@@ -40,9 +40,9 @@ socket.on('requestMap', function(obj) {
   mapWidth = obj.width;
   mapHeight = obj.height;
   
-  var html = '<table><tbody>' + _.reduce(obj.data, function(memo, row) {
-    return memo + '<tr>' + _.reduce(row, function(memo, cell) {
-      return memo + '<td>–</td>';
+  var html = '<table><tbody>' + _.reduce(obj.data, function(memo, row, y) {
+    return memo + '<tr>' + _.reduce(row, function(memo, cell, x) {
+      return memo + '<td data-coords="[' + x + ', ' + (mapHeight - y - 1) + ']">–</td>';
     }, '') + '</tr>';
   }, '') + '</tbody></table>';
   
@@ -63,14 +63,14 @@ socket.on('moveOccur', function(obj) {
     var y = user.pos[1];
     
     if(users[user.id]) {
-      $('#game > table > tbody > tr:nth-child(' + (mapHeight - users[user.id].y) + ') > td:nth-child(' + (users[user.id].x + 1) + ')').html('–');
+	$('#game td[data-coords=\'[' + users[user.id].x + ', ' + users[user.id].y + ']\']').html('–');
     }
     users[user.id] = { 'id': user.id, 'x': x, 'y': y, 'valid': true };
   });
   
   _.each(users, function(user, i) {
     if(user.valid) {
-      $('#game > table > tbody > tr:nth-child(' + (mapHeight - user.y) + ') > td:nth-child(' + (user.x + 1) + ')').html(user.id);
+      $('#game td[data-coords=\'[' + user.x + ', ' + user.y + ']\']').html(user.id);
     }
     else {
       delete users[i];
