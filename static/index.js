@@ -41,9 +41,9 @@ socket.on('requestMap', function(obj) {
   // object synchronize by serializer/deserializer
   level.serializer().deserialize(obj);
   
-  var html = '<table><tbody>' + _.reduce(level.data, function(memo, row, y) {
+  var html = '<table><tbody>' + _.reduceRight(obj.nodes, function(memo, row, y) {
     return memo + '<tr>' + _.reduce(row, function(memo, cell, x) {
-      return memo + '<td data-coords="[' + x + ', ' + (level.height - y - 1) + ']">–</td>';
+      return memo + '<td data-coords="[' + x + ', ' + y + ']">' + (cell.walkable ? '–' : 'x') + '</td>';
     }, '') + '</tr>';
   }, '') + '</tbody></table>';
   

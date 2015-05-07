@@ -8,6 +8,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var gameloop = require('node-gameloop');
+var PF = require('pathfinding');
 
 var globals = require('./lib/globals');
 var World = require('./lib/world');
@@ -99,7 +100,7 @@ http.listen(app.get('port'), function() {
 var loopId = gameloop.setGameLoop(function(delta) {
   world.update(delta);
   
-  io.sockets.emit('moveOccur', {
-    'user_list': world.getUserList()
-  });
+//  io.sockets.emit('moveOccur', {
+//    'user_list': world.getUserList()
+//  });
 }, 1000/globals.targetFps);

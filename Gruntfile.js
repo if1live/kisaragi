@@ -14,8 +14,10 @@ module.exports = function(grunt) {
             'phaser/build/phaser.min.js',
             'bootstrap/dist/js/*.js',
             'jquery/dist/*.js',
+            'jquery-ui/*.js',
             'underscore/*.js',
-            'requirejs/require.js'
+            'requirejs/require.js',
+            'pathfinding/*.js'
           ],
           'publish/libs/css': [
             'bootstrap/dist/css/*.css',
