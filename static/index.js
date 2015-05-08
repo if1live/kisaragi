@@ -53,6 +53,7 @@ socket.on('requestMap', function(obj) {
 var users = new Object();
 
 socket.on('moveOccur', function(obj) {
+  console.log(users);
   _.each(users, function(user, i) {
     user.valid = false;
   });
@@ -73,6 +74,7 @@ socket.on('moveOccur', function(obj) {
       $('#game td[data-coords=\'[' + user.x + ', ' + user.y + ']\']').html(user.id);
     }
     else {
+      $('#game td[data-coords=\'[' + user.x + ', ' + user.y + ']\']').html('–');
       delete users[i];
     }
   });
