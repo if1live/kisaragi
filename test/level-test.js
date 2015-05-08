@@ -14,7 +14,7 @@ vows.describe('Level').addBatch({
   'tile': {
     topic: new Level(2, 3),
     'get': function(topic) {
-      assert.equal(topic.tile(1, 1), 0);
+      assert.equal(topic.tile(1, 1).walkable, true);
     },
     'set': {
       'success': function(topic) {
