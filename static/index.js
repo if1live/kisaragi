@@ -1,23 +1,33 @@
 // command
+function getCurrentUser() {
+  var filtered = _.filter(users, function(obj) {
+    return obj.id === currUserId;
+  });
+  if(filtered.length > 0) {
+    return filtered[0];
+  } else {
+    return null;
+  }
+}
+
+function movePlayer(dx, dy) {
+  if(!player) {
+    return;
+  }
+  player.moveOneTile(dx, dy);
+}
+
 $('.cmd-move').click(function() {
   var dx = parseInt($(this).data('dx'), 10);
   var dy = parseInt($(this).data('dy'), 10);
-  
-  var filtered = _.filter(users, function(obj) {
-    return obj.id == currUserId;
-  });
-  if(filtered.length > 0) {
-    var user = filtered[0];
-
-    var x = user.x + dx;
-    var y = user.y + dy;
-    requestMove(x, y);
-  }
+  movePlayer(dx, dy);
 });
+
 
 // share game world
 var world = new World();
 var level = world.level;
+var player = null;
 
 // network & handler
 var socket = io();
@@ -28,16 +38,16 @@ function dumpCommunication(cmd, obj) {
 
 var currUserId = null;
 
-socket.on('login', function(obj) {
-  dumpCommunication('login', obj);
+socket.on('s2c_login', function(obj) {
+  dumpCommunication('s2c_login', obj);
   
   currUserId = obj.id;
 
-  socket.emit('requestMap', {});
-  socket.emit('requestUserList', {});
+  socket.emit('c2s_requestMap', {});
+  socket.emit('c2s_requestUserList', {});
 });
 
-socket.on('requestMap', function(obj) {
+socket.on('s2c_responseMap', function(obj) {
   // object synchronize by serializer/deserializer
   level.serializer().deserialize(obj);
   
@@ -52,7 +62,7 @@ socket.on('requestMap', function(obj) {
 
 var users = new Object();
 
-socket.on('moveOccur', function(obj) {
+socket.on('s2c_moveOccur', function(obj) {
   console.log(users);
   _.each(users, function(user, i) {
     user.valid = false;
@@ -79,10 +89,11 @@ socket.on('moveOccur', function(obj) {
     }
   });
   
-  dumpCommunication('moveOccur', obj);
+  player = new Player(getCurrentUser(), socket);
+  //dumpCommunication('moveOccur', obj);
 });
 
-socket.on('ping', function(obj) {
+socket.on('s2c_ping', function(obj) {
   var now = Date.now();
   var prev = obj.timestamp;
   var diff = now - prev;
@@ -91,23 +102,23 @@ socket.on('ping', function(obj) {
 
 function ping() {
   var timestamp = Date.now();
-  socket.emit('ping', {timestamp:timestamp});
+  socket.emit('c2s_ping', {timestamp:timestamp});
 }
 
-socket.on('echo', function(ctx) {
+socket.on('s2c_echo', function(ctx) {
   dumpCommunication('echo', ctx);
 });
 
 function echo(ctx) {
-  socket.emit('echo', ctx);
+  socket.emit('c2s_echo', ctx);
 }
 
-socket.on('echo_all', function(ctx) {
-  dumpCommunication('echo_all', ctx);
+socket.on('s2c_echoAll', function(ctx) {
+  dumpCommunication('echoAll', ctx);
 });
 
-function echo_all(ctx) {
-  socket.emit('echo_all', ctx);
+function echoAll(ctx) {
+  socket.emit('c2s_echoAll', ctx);
 }
 
 function requestMove(x, y) {

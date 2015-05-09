@@ -69,16 +69,16 @@ io.on('connection', function(socket) {
   var cmdList = [
     // for game
     // 게임 기본 정보 요청
-    'requestMap',
-    'requestUserList',
+    'c2s_requestMap',
+    'c2s_requestUserList',
 
     // 이동
-    'requestMove',
+    'c2s_requestMove',
 
     // for development
-    'ping',
-    'echo',
-    'echo_all'
+    'c2s_ping',
+    'c2s_echo',
+    'c2s_echoAll'
   ];
 
   function registerCommand(cmd) {
