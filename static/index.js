@@ -1,7 +1,14 @@
-// command
+// initialize global context
+var socket = io();
+var world = new World();
+var level = world.level;
+var users = new Object();
+var player = null;
+var playerId = null;
+
 function getCurrentUser() {
   var filtered = _.filter(users, function(obj) {
-    return obj.id === currUserId;
+    return obj.id === playerId;
   });
   if(filtered.length > 0) {
     return filtered[0];
@@ -10,39 +17,11 @@ function getCurrentUser() {
   }
 }
 
-function movePlayer(dx, dy) {
-  if(!player) {
-    return;
-  }
-  player.moveOneTile(dx, dy);
-}
-
-$('.cmd-move').click(function() {
-  var dx = parseInt($(this).data('dx'), 10);
-  var dy = parseInt($(this).data('dy'), 10);
-  movePlayer(dx, dy);
-});
-
-
-// share game world
-var world = new World();
-var level = world.level;
-var player = null;
 
 // network & handler
-var socket = io();
-
-function dumpCommunication(cmd, obj) {
-  console.log(cmd + " : " + JSON.stringify(obj));
-}
-
-var currUserId = null;
-
 socket.on('s2c_login', function(obj) {
-  dumpCommunication('s2c_login', obj);
-  
-  currUserId = obj.id;
-
+  // dumpCommunication('s2c_login', obj);
+  playerId = obj.id;
   socket.emit('c2s_requestMap', {});
   socket.emit('c2s_requestUserList', {});
 });
@@ -60,9 +39,9 @@ socket.on('s2c_responseMap', function(obj) {
   $("#game").html(html);
 });
 
-var users = new Object();
-
 socket.on('s2c_moveOccur', function(obj) {
+  world.syncAllObjectList(obj.user_list);
+  
   console.log(users);
   _.each(users, function(user, i) {
     user.valid = false;
@@ -74,7 +53,7 @@ socket.on('s2c_moveOccur', function(obj) {
     var y = user.pos[1];
     
     if(users[user.id]) {
-	$('#game td[data-coords=\'[' + users[user.id].x + ', ' + users[user.id].y + ']\']').html('–');
+      $('#game td[data-coords=\'[' + users[user.id].x + ', ' + users[user.id].y + ']\']').html('–');
     }
     users[user.id] = { 'id': user.id, 'x': x, 'y': y, 'valid': true };
   });
@@ -92,6 +71,22 @@ socket.on('s2c_moveOccur', function(obj) {
   player = new Player(getCurrentUser(), socket);
   //dumpCommunication('moveOccur', obj);
 });
+
+
+// command
+$('.cmd-move').click(function() {
+  if(!player) {
+    return;
+  }
+  var dx = parseInt($(this).data('dx'), 10);
+  var dy = parseInt($(this).data('dy'), 10);
+  player.moveOneTile(dx, dy);
+});
+
+// network test library
+function dumpCommunication(cmd, obj) {
+  console.log(cmd + " : " + JSON.stringify(obj));
+}
 
 socket.on('s2c_ping', function(obj) {
   var now = Date.now();
