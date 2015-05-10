@@ -27,10 +27,11 @@ socket.on('s2c_login', function(obj) {
 });
 
 socket.on('s2c_responseMap', function(obj) {
+console.log(obj);
   // object synchronize by serializer/deserializer
   level.serializer().deserialize(obj);
   
-  var html = '<table><tbody>' + _.reduceRight(obj.nodes, function(memo, row, y) {
+  var html = '<table><tbody>' + _.reduceRight(obj.grid.nodes, function(memo, row, y) {
     return memo + '<tr>' + _.reduce(row, function(memo, cell, x) {
       return memo + '<td data-coords="[' + x + ', ' + y + ']">' + (cell.walkable ? '–' : 'x') + '</td>';
     }, '') + '</tr>';
