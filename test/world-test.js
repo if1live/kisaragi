@@ -22,7 +22,7 @@ vows.describe('World').addBatch({
     'exist': {
       topic: new World(),
       'success': function(topic) {
-        topic.objectList('sample').push({});
+        topic.objectList('sample').push({id: 1});
         assert.equal(topic.objectList('sample').length, 1);
       }
     }
@@ -30,8 +30,8 @@ vows.describe('World').addBatch({
   'allObjectList': {
     topic: new World(),
     'success': function(topic) {
-      topic.objectList('foo').push({});
-      topic.objectList('bar').push({});
+      topic.objectList('foo').push({id: 1});
+      topic.objectList('bar').push({id: 2});
       assert.equal(topic.allObjectList().length, 2);
     }
   },

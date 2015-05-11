@@ -22,5 +22,70 @@ vows.describe('base').addBatch({
       assert.equal(topic.obj.id, 2);
       assert.deepEqual(topic.obj.pos, [3, 4]);
     }
+  },
+  'GameObjectListHelper': {
+    'addObject': {
+      'normal add': {
+        topic: new base.GameObjectListHelper([]),
+        'run': function(topic) {
+          var retval = topic.addObject({id: 1});
+          assert.equal(retval, true);
+          assert.equal(topic.getLength(), 1);
+        }
+      },
+      'duplicated id': {
+        topic: new base.GameObjectListHelper([]),
+        'run': function(topic) {
+          topic.addObject({id: 1});
+          var retval = topic.addObject({id: 1});
+          assert.equal(retval, false);
+          assert.equal(topic.getLength(), 1);
+        }
+      },
+      'null': {
+        topic: new base.GameObjectListHelper([]),
+        'run': function(topic) {
+          var retval = topic.addObject(null);
+          assert.equal(retval, false);
+          assert.equal(topic.getLength(), 0);
+        }
+      }
+    },
+    'findObject': {
+      topic: function() {
+        var list = new base.GameObjectListHelper([]);
+        list.addObject({id: 1});
+        return list;
+      },
+      'success': function(topic) {
+        var obj = topic.findObject(1);
+        assert.equal(obj.id, 1);
+      },
+      'not exist': function(topic) {
+        var obj = topic.findObject(999);
+        assert.equal(obj, null);
+      }
+    },
+    'removeId': {
+      topic: function() {
+        return function() {
+          var list = new base.GameObjectListHelper([]);
+          list.addObject({id: 1});
+          return list;
+        };
+      },
+      'success': function(topicFunc) {
+        var topic = topicFunc();
+        var retval = topic.removeId(1);
+        assert.equal(retval, true);
+        assert.equal(topic.getLength(), 0);
+      },
+      'not exist': function(topicFunc) {
+        var topic = topicFunc();
+        var retval = topic.removeId(9999);
+        assert.equal(retval, false);
+        assert.equal(topic.getLength(), 1);
+      }
+    }
   }
 }).export(module);
