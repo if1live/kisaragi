@@ -29,6 +29,7 @@
     "grunt-cli": "*",
     "grunt-bower-task": "*",
     "grunt-bowercopy": "*",
+    "grunt-vows": "*",
     "jshint": "2.7.0",
     "istanbul": "0.3.13",
     "codeclimate-test-reporter": "*",
