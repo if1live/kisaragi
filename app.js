@@ -26,7 +26,7 @@ app.locals.inspect = require('util').inspect;
 
 // Game World
 var server = new network.Server(io);
-var world = new World();
+var world = new World('svr');
 
 
 app.get('/', function(req, res) {

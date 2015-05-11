@@ -1,6 +1,6 @@
 // initialize global context
 var socket = io();
-var world = new World();
+var world = new World('cli');
 var level = world.level;
 var users = new Object();
 var player = null;
@@ -69,7 +69,10 @@ socket.on('s2c_moveOccur', function(obj) {
     }
   });
   
-  player = new Player(getCurrentUser(), socket);
+  var currUser = getCurrentUser();
+  player = new User('cli', socket);
+  player.id = currUser.id;
+  player.pos = [currUser.x, currUser.y];
   //dumpCommunication('moveOccur', obj);
 });
 

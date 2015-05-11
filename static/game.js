@@ -1,6 +1,6 @@
 // initialize game context
 var socket = io();
-var world = new World();
+var world = new World('cli');
 var level = world.level;
 var users = new Object();
 var player = null;

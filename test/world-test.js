@@ -4,7 +4,7 @@ var World = require('../lib/world');
 
 vows.describe('World').addBatch({
   'getNextId': {
-    topic: new World(null),
+    topic: new World('svr'),
     'success': function(topic) {
       assert.equal(topic.getNextId(), 1);
       assert.equal(topic.getNextId(), 2);
@@ -14,13 +14,13 @@ vows.describe('World').addBatch({
   // General
   'objectList': {
     'not exist': {
-      topic: new World(),
+      topic: new World('svr'),
       'success': function(topic) {
         assert.equal(topic.objectList('sample').length, 0);
       }
     },
     'exist': {
-      topic: new World(),
+      topic: new World('svr'),
       'success': function(topic) {
         topic.objectList('sample').push({id: 1});
         assert.equal(topic.objectList('sample').length, 1);
@@ -28,7 +28,7 @@ vows.describe('World').addBatch({
     }
   },
   'allObjectList': {
-    topic: new World(),
+    topic: new World('svr'),
     'success': function(topic) {
       topic.objectList('foo').push({id: 1});
       topic.objectList('bar').push({id: 2});
@@ -37,7 +37,7 @@ vows.describe('World').addBatch({
   },
   'findObject': {
     'enemy': {
-      topic: new World(),
+      topic: new World('svr'),
       'success': function(topic) {
         var user = topic.createUser('foo');
         topic.addUser(user);
@@ -47,7 +47,7 @@ vows.describe('World').addBatch({
       }
     },
     'user': {
-      topic: new World(),
+      topic: new World('svr'),
       'success': function(topic) {
         var user = topic.createUser('foo');
         topic.addUser(user);
@@ -59,17 +59,17 @@ vows.describe('World').addBatch({
   },
   // User
   'createUser': {
-    topic: new World(),
+    topic: new World('svr'),
     'success': function(topic) {
-      var client = {};
-      var user = topic.createUser(client);
-      assert.equal(user.client, client);
-      assert.equal(client.user, user);
+      var sock = {};
+      var user = topic.createUser(sock);
+      assert.equal(user.sock, sock);
+      assert.equal(sock.user, user);
     }
   },
   'addUser': {
     '1 time': {
-      topic: new World(),
+      topic: new World('svr'),
       'success': function(topic) {
         var user = topic.createUser('foo');
         topic.addUser(user);
@@ -78,7 +78,7 @@ vows.describe('World').addBatch({
       }
     },
     'multiple time': {
-      topic: new World(),
+      topic: new World('svr'),
       'success': function(topic) {
         var user_a = topic.createUser('foo');
         var user_b = topic.createUser('bar');
@@ -91,7 +91,7 @@ vows.describe('World').addBatch({
     }
   },
   'removeUser': {
-    topic: new World(),
+    topic: new World('svr'),
     'success': function(topic) {
       var user_a = topic.createUser('foo');
       var user_b = topic.createUser('bar');
@@ -104,7 +104,7 @@ vows.describe('World').addBatch({
   },
   'findUser': {
     'exist': {
-      topic: new World(),
+      topic: new World('svr'),
       'success': function(topic) {
         var user = topic.createUser('foo');
         topic.addUser(user);
@@ -112,7 +112,7 @@ vows.describe('World').addBatch({
       }
     },
     'not exist': {
-      topic: new World(),
+      topic: new World('svr'),
       'null': function(topic) {
         assert.equal(topic.findUser(999), null);
       }
@@ -120,7 +120,7 @@ vows.describe('World').addBatch({
   },
   // Enemy
   'generateEnemy': {
-    topic: new World(),
+    topic: new World('svr'),
     'success': function(topic) {
       topic.generateEnemy();
       assert.equal(topic.objectList('enemy').length, 1);
