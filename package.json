@@ -12,7 +12,7 @@
     "pretest": "jshint app.js lib/ test/",
     "test": "vows --spec",
     "prestart": "jshint app.js lib/ test/",
-    "start": "nodemon app.js"
+    "start": "node app.js"
   },
   "dependencies": {
     "underscore": "1.8.3",
