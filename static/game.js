@@ -13,6 +13,9 @@ var tileSize = 32;
 var cursors;
 
 // network & handler
+var ping = new network.ClientPing(socket);
+ping.ping();
+
 socket.on('s2c_login', function(obj) {
   // dumpCommunication('s2c_login', obj);
   currUserId = obj.id;
@@ -112,7 +115,7 @@ function preload() {
 }
 
 
-var sprite;
+var marker = null;
 
 
 function create() {
@@ -122,16 +125,33 @@ function create() {
   map.addTilesetImage('ground_1x1');
   
   cursors = game.input.keyboard.createCursorKeys();
+
+  // cursor + tile select
+  marker = game.add.graphics();
+  marker.lineStyle(2, 0x0000ff, 1);
+  marker.drawRect(0, 0, tileSize, tileSize);
   
-  /*
-  var tileX = 5;
-  var tileY = 10;
-  sprite = game.add.sprite(tileX * tileSize, tileY * tileSize, 'phaser');
-  sprite.anchor.set(0, 0);
-  sprite.width = tileSize;
-  sprite.height = tileSize;
-  */
+  game.input.addMoveCallback(updateMarker, this);
 }
+
+
+function updateMarker() {
+  // move tile marker to mouse position
+  marker.x = layer.getTileX(game.input.activePointer.worldX) * tileSize;
+  marker.y = layer.getTileY(game.input.activePointer.worldY) * tileSize;
+  if (game.input.mousePointer.isDown) {
+    // TODO implement move to
+    var data = markerToTileCoord(marker);
+    console.log("selected tile coord : " + data.tileX + "," + data.tileY);
+  }
+}
+
+function markerToTileCoord(marker) {
+  var tileX = marker.x / tileSize;
+  var tileY = level.height - marker.y / tileSize;
+  return { x: tileX, y: tileY };
+}
+
 
 // previous key down state
 var prevUpPressed = false;
@@ -158,7 +178,7 @@ function update() {
     prevDownPressed = false;
     
   }
-  
+
   if(cursors.right.isDown) {
     if(prevRightPressed === false) {
       currUser.moveRight();
@@ -167,7 +187,7 @@ function update() {
   } else {
     prevRightPressed = false;
   }
-  
+
   if(cursors.left.isDown) {
     if(prevLeftPressed === false) {
       currUser.moveLeft();
@@ -180,19 +200,12 @@ function update() {
 
 function render() {
   game.debug.inputInfo(32, 32);
-}
 
-// network helper
-socket.on('s2c_ping', function(obj) {
-  var now = Date.now();
-  var prev = obj.timestamp;
-  var diff = now - prev;
-  console.log("ping : " + diff + "ms");
-});
+  var tileCoord = markerToTileCoord(marker);
+  game.debug.text('Tile Coord : ' + tileCoord.x + ',' + tileCoord.y, 16, 550);
 
-function ping() {
-  var timestamp = Date.now();
-  socket.emit('c2s_ping', {timestamp:timestamp});
+  var pingMsg = sprintf('Ping : avg=%d, max=%d, min=%d, last=%d', ping.average(), ping.max(), ping.min(), ping.last());
+  game.debug.text(pingMsg, 16, 530);
 }
 
 function dumpCommunication(cmd, obj) {
@@ -214,7 +227,3 @@ socket.on('s2c_echoAll', function(ctx) {
 function echoAll(ctx) {
   socket.emit('c2s_echoAll', ctx);
 }
-
-// TODO periodic ping
-ping();
-
