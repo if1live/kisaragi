@@ -26,17 +26,17 @@ socket.on('s2c_login', function(obj) {
 socket.on('s2c_responseMap', function(obj) {
   // object synchronize by serializer/deserializer
   level.serializer().deserialize(obj);
-  
+
   // generate tile map from server data
   // TODO lazy level loading
   if(layer) {
     layer.destroy();
   }
   layer = map.create('level', level.width, level.height, tileSize, tileSize);
-  
+
   var currentTile = 1;
-  _.each(obj.obstacles, function(pos) {
-    map.putTile(currentTile, pos.x, level.height - pos.y - 1, layer);
+  _.each(obj.obstacles, function(obstacle) {
+    map.putTile(currentTile, obstacle.pos[0], level.height - obstacle.pos[1] - 1, layer);
   });
 });
 
@@ -105,8 +105,8 @@ var game = new Phaser.Game(width, height, Phaser.AUTO, 'phaser-example', {
 
 function preload() {
   // dummy sprite
-  game.load.image('user', 'assets/sprites/sora-128x128.png');
-  game.load.image('current_user', 'assets/sprites/sora2-128x128.png');
+  game.load.image('user', 'assets/sprites/kisaragi.png');
+  game.load.image('current_user', 'assets/sprites/mutsuki.png');
   game.load.image('enemy', 'assets/sprites/space-baddie-purple.png');
   game.load.image('item', 'assets/sprites/blue_ball.png');
 
@@ -227,3 +227,4 @@ socket.on('s2c_echoAll', function(ctx) {
 function echoAll(ctx) {
   socket.emit('c2s_echoAll', ctx);
 }
+
