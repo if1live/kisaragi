@@ -153,3 +153,19 @@ function update() {
 function render() {
   game.debug.inputInfo(32, 32);
 }
+
+// network helper
+socket.on('s2c_ping', function(obj) {
+  var now = Date.now();
+  var prev = obj.timestamp;
+  var diff = now - prev;
+  console.log("ping : " + diff + "ms");
+});
+
+function ping() {
+  var timestamp = Date.now();
+  socket.emit('c2s_ping', {timestamp:timestamp});
+}
+// TODO periodic ping
+ping();
+
