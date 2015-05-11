@@ -25,6 +25,10 @@ socket.on('s2c_responseMap', function(obj) {
   level.serializer().deserialize(obj);
   
   // generate tile map from server data
+  // TODO lazy level loading
+  if(layer) {
+    layer.destroy();
+  }
   layer = map.create('level', level.width, level.height, tileSize, tileSize);
   
   var currentTile = 1;
@@ -39,6 +43,14 @@ function getUserSprite(gameObject) {
 
 function getCurrUserSprite(gameObject) {
   return getCommonSprite(gameObject, 'current_user');
+}
+
+function getEnemySprite(gameObject) {
+  return getCommonSprite(gameObject, 'enemy');
+}
+
+function getItemSprite(gameObject) {
+  return getCommonSprite(gameObject, 'item');
 }
 
 function getCommonSprite(gameObject, spriteName) {
@@ -62,17 +74,21 @@ socket.on('s2c_moveOccur', function(obj) {
     var tileY = level.height - gameObject.pos[1] - 1;
     var x = tileX * tileSize;
     var y = tileY * tileSize;
-    
+
+    var sprite = null;
     if(gameObject.category === 'user') {
-      var sprite = null;
       if(gameObject.id === currUserId) {
         sprite = getCurrUserSprite(gameObject);
       } else {
         sprite = getUserSprite(gameObject);
       }
-      sprite.position.x = x;
-      sprite.position.y = y;
+    } else if(gameObject.category === 'enemy') {
+      sprite = getEnemySprite(gameObject);
+    } else if(gameObject.category === 'item') {
+      sprite = getItemSprite(gameObject);
     }
+    sprite.position.x = x;
+    sprite.position.y = y;
   });
 });
 
@@ -88,6 +104,8 @@ function preload() {
   // dummy sprite
   game.load.image('user', 'assets/sprites/sora-128x128.png');
   game.load.image('current_user', 'assets/sprites/sora2-128x128.png');
+  game.load.image('enemy', 'assets/sprites/space-baddie-purple.png');
+  game.load.image('item', 'assets/sprites/blue_ball.png');
 
   // dummy tilemap
   game.load.image('ground_1x1', 'assets/tilemaps/tiles/ground_1x1.png');
