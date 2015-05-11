@@ -30,6 +30,7 @@
     "grunt-bower-task": "*",
     "grunt-bowercopy": "*",
     "grunt-vows": "*",
+    "grunt-nodemon": "*",
     "jshint": "2.7.0",
     "istanbul": "0.3.13",
     "codeclimate-test-reporter": "*",

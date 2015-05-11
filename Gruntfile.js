@@ -59,11 +59,17 @@ module.exports = function(grunt) {
         // This option is grunt's "full" file format.
         src: ["test/*.js"]
       }
+    },
+    nodemon: {
+      dev: {
+        script: 'app.js'
+      }
     }
   });
 
   grunt.loadNpmTasks('grunt-bowercopy');
   grunt.loadNpmTasks("grunt-vows");
+  grunt.loadNpmTasks('grunt-nodemon');
 
 
   // Default task(s).
