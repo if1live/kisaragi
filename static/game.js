@@ -136,6 +136,9 @@ function create() {
 
 
 function updateMarker() {
+  if(!layer) {
+    return;
+  }
   // move tile marker to mouse position
   marker.x = layer.getTileX(game.input.activePointer.worldX) * tileSize;
   marker.y = layer.getTileY(game.input.activePointer.worldY) * tileSize;
