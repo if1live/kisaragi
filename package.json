@@ -31,7 +31,9 @@
     "grunt-bowercopy": "*",
     "grunt-vows": "*",
     "grunt-nodemon": "*",
+    "grunt-contrib-jshint": "*",
     "jshint": "2.7.0",
+    "jshint-stylish": "*",
     "istanbul": "0.3.13",
     "codeclimate-test-reporter": "*",
     "pathfinding": "0.4.17"

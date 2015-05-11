@@ -64,12 +64,19 @@ module.exports = function(grunt) {
       dev: {
         script: 'app.js'
       }
+    },
+    jshint: {
+      all: ['Gruntfile.js', 'lib/*.js', 'test/*.js'],
+      options: {
+        reporter: require('jshint-stylish')
+      }
     }
   });
 
   grunt.loadNpmTasks('grunt-bowercopy');
   grunt.loadNpmTasks("grunt-vows");
   grunt.loadNpmTasks('grunt-nodemon');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
 
 
   // Default task(s).
