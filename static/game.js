@@ -3,8 +3,8 @@ var socket = io();
 var world = new World('cli');
 var level = world.level;
 var users = new Object();
-var player = null;
-var playerId = null;
+var currUser = null;
+var currUserId = null;
 
 // tilemap
 var map;
@@ -15,7 +15,7 @@ var cursors;
 // network & handler
 socket.on('s2c_login', function(obj) {
   // dumpCommunication('s2c_login', obj);
-  playerId = obj.id;
+  currUserId = obj.id;
   socket.emit('c2s_requestMap', {});
   socket.emit('c2s_requestUserList', {});
 });
@@ -28,19 +28,22 @@ socket.on('s2c_responseMap', function(obj) {
   layer = map.create('level', level.width, level.height, tileSize, tileSize);
   
   var currentTile = 1;
-  for(var y = 0 ; y < level.height ; y += 1) {
-    for(var x = 0 ; x < level.width ; x += 1) {
-      var tile = level.tile(x, y);
-      if(tile.walkable === false) {
-        map.putTile(currentTile, x, level.height - y - 1, layer);
-      }
-    }
-  }
+  _.each(obj.obstacles, function(pos) {
+    map.putTile(currentTile, pos.x, level.height - pos.y - 1, layer);
+  });
 });
 
 function getUserSprite(gameObject) {
+  return getCommonSprite(gameObject, 'user');
+}
+
+function getCurrUserSprite(gameObject) {
+  return getCommonSprite(gameObject, 'current_user');
+}
+
+function getCommonSprite(gameObject, spriteName) {
   if(gameObject.sprite === undefined || gameObject.sprite === null) {
-    var sprite = game.add.sprite(-100, -100, 'phaser');
+    var sprite = game.add.sprite(-100, -100, spriteName);
     sprite.anchor.set(0, 0);
     gameObject.sprite = sprite;
     gameObject.sprite.width = tileSize;
@@ -51,7 +54,8 @@ function getUserSprite(gameObject) {
 
 socket.on('s2c_moveOccur', function(obj) {
   world.syncAllObjectList(obj.user_list);
-  player = new Player(world.findObject(playerId), socket);
+  currUser = world.findObject(currUserId);
+  currUser.sock = socket;
   
   _.each(world.allObjectList(), function(gameObject, i) {
     var tileX = gameObject.pos[0];
@@ -60,7 +64,12 @@ socket.on('s2c_moveOccur', function(obj) {
     var y = tileY * tileSize;
     
     if(gameObject.category === 'user') {
-      var sprite = getUserSprite(gameObject);
+      var sprite = null;
+      if(gameObject.id === currUserId) {
+        sprite = getCurrUserSprite(gameObject);
+      } else {
+        sprite = getUserSprite(gameObject);
+      }
       sprite.position.x = x;
       sprite.position.y = y;
     }
@@ -77,8 +86,9 @@ var game = new Phaser.Game(width, height, Phaser.AUTO, 'phaser-example', {
 
 function preload() {
   // dummy sprite
-  game.load.image('phaser', 'assets/sprites/sora-128x128.png');
-  
+  game.load.image('user', 'assets/sprites/sora-128x128.png');
+  game.load.image('current_user', 'assets/sprites/sora-128x128.png');
+
   // dummy tilemap
   game.load.image('ground_1x1', 'assets/tilemaps/tiles/ground_1x1.png');
 }
@@ -114,7 +124,7 @@ var prevRightPressed = false;
 function update() {
   if(cursors.up.isDown) {
     if(prevUpPressed === false) {
-      player.moveUp();
+      currUser.moveUp();
     }
     prevUpPressed = true;
   } else {
@@ -123,7 +133,7 @@ function update() {
   
   if(cursors.down.isDown) {
     if(prevDownPressed === false) {
-      player.moveDown();
+      currUser.moveDown();
     }
     prevDownPressed = true;
   } else {
@@ -133,7 +143,7 @@ function update() {
   
   if(cursors.right.isDown) {
     if(prevRightPressed === false) {
-      player.moveRight();
+      currUser.moveRight();
     }
     prevRightPressed = true;
   } else {
@@ -142,7 +152,7 @@ function update() {
   
   if(cursors.left.isDown) {
     if(prevLeftPressed === false) {
-      player.moveLeft();
+      currUser.moveLeft();
     }
     prevLeftPressed = true;
   } else {
