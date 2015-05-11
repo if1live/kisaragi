@@ -87,7 +87,7 @@ var game = new Phaser.Game(width, height, Phaser.AUTO, 'phaser-example', {
 function preload() {
   // dummy sprite
   game.load.image('user', 'assets/sprites/sora-128x128.png');
-  game.load.image('current_user', 'assets/sprites/sora-128x128.png');
+  game.load.image('current_user', 'assets/sprites/sora2-128x128.png');
 
   // dummy tilemap
   game.load.image('ground_1x1', 'assets/tilemaps/tiles/ground_1x1.png');
