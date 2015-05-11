@@ -30,13 +30,13 @@
 				<th>IP</th>
 				<th>Pos</th>
 			</tr>
-			<% for(var i = 0 ; i < world.userList.length ; i++) { %>
-			<% var user = world.userList[i]; %>
-			<% var client = user.client; %>
+			<% for(var i = 0 ; i < world.objectList('user').length ; i++) { %>
+			<% var user = world.objectList('user')[i]; %>
+			<% var sock = user.sock; %>
 			<tr>
 				<td><%= user.id %></td>
-				<td><%= client.uuid %></td>
-				<td><%= client.getAddress() %></td>
+				<td><%= sock.uuid %></td>
+				<td><%= sock.getAddress() %></td>
 				<td><%= user.pos %></td>
 			</tr>
 			<% } %>
@@ -44,9 +44,11 @@
 
 		<h2>World</h2>
 		<p class="admin-map">
-			<% for(var y = world.height - 1 ; y >= 0 ; --y) { %>
-			<% for(var x = 0 ; x < world.width ; ++x) { %>
-			<%= helper.gameObjectToChar(world.getObject(y, x)) %>
+			<% for(var y = world.level.height - 1 ; y >= 0 ; --y) { %>
+			<% for(var x = 0 ; x < world.level.width ; ++x) { %>
+			<% var obj = world.getObject(x, y) %>
+			<% var tile = world.level.tile(x, y) %>
+			<%= helper.gameObjectToChar(obj, tile) %>
 			<% } %>
 			<br/>
 			<% } %>
@@ -54,6 +56,7 @@
 
 		<script src="/libs/js/jquery.min.js"></script>
 		<script src="/libs/js/bootstrap.min.js"></script>
+		<script src="/libs/js/sprintf.min.js"></script>
 		</div>
 	</body>
 </html>

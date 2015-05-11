@@ -33,10 +33,6 @@ app.get('/', function(req, res) {
   res.render('pages/index');
 });
 
-app.get('/dev', function(req, res) {
-  res.render('pages/dev');
-});
-
 app.get('/game', function(req, res) {
   res.render('pages/game');
 });

@@ -18,6 +18,7 @@ module.exports = function(grunt) {
             'underscore/*.js',
             'requirejs/require.js',
             'assert/assert.js',
+            'sprintf/dist/sprintf.min.js',
             'pathfinding/*.js'
           ],
           'publish/libs/css': [

@@ -176,6 +176,27 @@ function ping() {
   var timestamp = Date.now();
   socket.emit('c2s_ping', {timestamp:timestamp});
 }
+
+function dumpCommunication(cmd, obj) {
+  console.log(cmd + " : " + JSON.stringify(obj));
+}
+
+socket.on('s2c_echo', function(ctx) {
+  dumpCommunication('echo', ctx);
+});
+
+function echo(ctx) {
+  socket.emit('c2s_echo', ctx);
+}
+
+socket.on('s2c_echoAll', function(ctx) {
+  dumpCommunication('echoAll', ctx);
+});
+
+function echoAll(ctx) {
+  socket.emit('c2s_echoAll', ctx);
+}
+
 // TODO periodic ping
 ping();
 
