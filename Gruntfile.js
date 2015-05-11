@@ -17,6 +17,7 @@ module.exports = function(grunt) {
             'jquery-ui/*.js',
             'underscore/*.js',
             'requirejs/require.js',
+            'assert/assert.js',
             'pathfinding/*.js'
           ],
           'publish/libs/css': [

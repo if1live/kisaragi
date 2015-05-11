@@ -30,3 +30,4 @@ node_modules
 
 bower-components
 publish
+.DS_Store
