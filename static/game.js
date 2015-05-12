@@ -1,5 +1,4 @@
 // initialize game context
-var socket = io();
 var world = new World('cli');
 var level = world.level;
 var users = new Object();
@@ -12,35 +11,10 @@ var layer;
 var tileSize = 32;
 var cursors;
 
-// network & handler
-var ping = new network.ClientPing(socket);
-ping.ping();
-
-var echoRunner = new network.ClientEcho(socket);
-
-socket.on('s2c_login', function(obj) {
-  // dumpCommunication('s2c_login', obj);
-  currUserId = obj.id;
-  socket.emit('c2s_requestMap', {});
-  socket.emit('c2s_requestUserList', {});
-});
-
-socket.on('s2c_responseMap', function(obj) {
-  // object synchronize by serializer/deserializer
-  level.serializer().deserialize(obj);
-
-  // generate tile map from server data
-  // TODO lazy level loading
-  if(layer) {
-    layer.destroy();
-  }
-  layer = map.create('level', level.width, level.height, tileSize, tileSize);
-
-  var currentTile = 1;
-  _.each(obj.obstacles, function(obstacle) {
-    map.putTile(currentTile, obstacle.pos[0], level.height - obstacle.pos[1] - 1, layer);
-  });
-});
+// network
+var socket = null;
+var ping = null;
+var echoRunner = null;
 
 function getUserSprite(gameObject) {
   return getCommonSprite(gameObject, 'user');
@@ -69,34 +43,59 @@ function getCommonSprite(gameObject, spriteName) {
   return gameObject.sprite;
 }
 
-socket.on('s2c_moveOccur', function(obj) {
-  world.syncAllObjectList(obj.user_list);
-  currUser = world.findObject(currUserId);
-  currUser.sock = socket;
-  
-  _.each(world.allObjectList(), function(gameObject, i) {
-    var tileX = gameObject.pos[0];
-    var tileY = level.height - gameObject.pos[1] - 1;
-    var x = tileX * tileSize;
-    var y = tileY * tileSize;
-
-    var sprite = null;
-    if(gameObject.category === 'user') {
-      if(gameObject.id === currUserId) {
-        sprite = getCurrUserSprite(gameObject);
-      } else {
-        sprite = getUserSprite(gameObject);
-      }
-    } else if(gameObject.category === 'enemy') {
-      sprite = getEnemySprite(gameObject);
-    } else if(gameObject.category === 'item') {
-      sprite = getItemSprite(gameObject);
-    }
-    sprite.position.x = x;
-    sprite.position.y = y;
+function registerSocketHandler(socket) {
+  socket.on('s2c_login', function(obj) {
+    currUserId = obj.id;
+    // sometime, socket io connection end before game context created
+    socket.emit('c2s_requestMap', {});
+    socket.emit('c2s_requestUserList', {});
   });
-});
 
+  socket.on('s2c_responseMap', function(obj) {
+    // object synchronize by serializer/deserializer
+    level.serializer().deserialize(obj);
+
+    // generate tile map from server data
+    // TODO lazy level loading
+    if(layer) {
+      layer.destroy();
+    }
+    layer = map.create('level', level.width, level.height, tileSize, tileSize);
+
+    var currentTile = 1;
+    _.each(obj.obstacles, function(obstacle) {
+      map.putTile(currentTile, obstacle.pos[0], level.height - obstacle.pos[1] - 1, layer);
+    });
+  });
+
+  socket.on('s2c_moveOccur', function(obj) {
+    world.syncAllObjectList(obj.user_list);
+    currUser = world.findObject(currUserId);
+    currUser.sock = socket;
+
+    _.each(world.allObjectList(), function(gameObject, i) {
+      var tileX = gameObject.pos[0];
+      var tileY = level.height - gameObject.pos[1] - 1;
+      var x = tileX * tileSize;
+      var y = tileY * tileSize;
+
+      var sprite = null;
+      if(gameObject.category === 'user') {
+        if(gameObject.id === currUserId) {
+          sprite = getCurrUserSprite(gameObject);
+        } else {
+          sprite = getUserSprite(gameObject);
+        }
+      } else if(gameObject.category === 'enemy') {
+        sprite = getEnemySprite(gameObject);
+      } else if(gameObject.category === 'item') {
+        sprite = getItemSprite(gameObject);
+      }
+      sprite.position.x = x;
+      sprite.position.y = y;
+    });
+  });
+}
 
 // phaser
 var width = 800;
@@ -132,10 +131,17 @@ function create() {
   marker = game.add.graphics();
   marker.lineStyle(2, 0x0000ff, 1);
   marker.drawRect(0, 0, tileSize, tileSize);
-  
-  game.input.addMoveCallback(updateMarker, this);
-}
 
+  game.input.addMoveCallback(updateMarker, this);
+
+  // create network after game context created
+  socket = io();
+  registerSocketHandler(socket);
+
+  echoRunner = new network.ClientEcho(socket);
+  ping = new network.ClientPing(socket);
+  ping.ping();
+}
 
 function updateMarker() {
   if(!layer) {
