@@ -5,10 +5,27 @@ var users = new Object();
 var currUser = null;
 var currUserId = null;
 
-// tilemap
+// tilemap - static elem
 var map;
-var layer;
+var tileLayer;
 var tileSize = 32;
+
+// marker
+var marker = null;
+var EMPTY_MARKER_COLOR = 0x0000ff;
+var USER_MARKER_COLOR = 0x00ffff;
+var ENEMY_MARKER_COLOR = 0xff0000;
+var WALL_MARKER_COLOR = 0x000000;
+var UNKNOWN_MARKER_COLOR = 0xffff00;
+
+// dynamic elem
+var characterGroup = null;
+
+// layer order
+var GROUND_DEPTH = 1;
+var CHARACTER_DEPTH = 2;
+
+// input
 var cursors;
 
 // network
@@ -35,6 +52,8 @@ function getItemSprite(gameObject) {
 function getCommonSprite(gameObject, spriteName) {
   if(gameObject.sprite === undefined || gameObject.sprite === null) {
     var sprite = game.add.sprite(-100, -100, spriteName);
+    characterGroup.add(sprite);
+
     sprite.anchor.set(0, 0);
     gameObject.sprite = sprite;
     gameObject.sprite.width = tileSize;
@@ -57,14 +76,23 @@ function registerSocketHandler(socket) {
 
     // generate tile map from server data
     // TODO lazy level loading
-    if(layer) {
-      layer.destroy();
+    if(tileLayer) {
+      tileLayer.destroy();
     }
-    layer = map.create('level', level.width, level.height, tileSize, tileSize);
+    tileLayer = map.create('level', level.width, level.height, tileSize, tileSize);
+    tileLayer.z = GROUND_DEPTH;
+    game.world.sort();
 
-    var currentTile = 1;
+    var groundTile = 29;
+    for(var y = 0 ; y < level.width ; y += 1) {
+      for(var x = 0 ; x < level.width ; x += 1) {
+        map.putTile(groundTile, x, y, tileLayer);
+      }
+    }
+
+    var wallTile = 9;
     _.each(obj.obstacles, function(obstacle) {
-      map.putTile(currentTile, obstacle.pos[0], level.height - obstacle.pos[1] - 1, layer);
+      map.putTile(wallTile, obstacle.pos[0], level.height - obstacle.pos[1] - 1, tileLayer);
     });
   });
 
@@ -112,24 +140,24 @@ function preload() {
   game.load.image('item', 'assets/sprites/blue_ball.png');
 
   // dummy tilemap
-  game.load.image('ground_1x1', 'assets/tilemaps/tiles/ground_1x1.png');
+  game.load.image('desert', 'assets/tilemaps/tiles/tmw_desert_spacing.png');
 }
-
-
-var marker = null;
 
 
 function create() {
   game.stage.backgroundColor = '#2d2d2d';
   
   map = game.add.tilemap();
-  map.addTilesetImage('ground_1x1');
+  map.addTilesetImage('desert', undefined, tileSize, tileSize, 1, 1);
+
+  characterGroup = game.add.group();
+  characterGroup.z = CHARACTER_DEPTH;
   
   cursors = game.input.keyboard.createCursorKeys();
 
   // cursor + tile select
   marker = game.add.graphics();
-  marker.lineStyle(2, 0x0000ff, 1);
+  marker.lineStyle(2, EMPTY_MARKER_COLOR, 1);
   marker.drawRect(0, 0, tileSize, tileSize);
 
   game.input.addMoveCallback(updateMarker, this);
@@ -144,33 +172,54 @@ function create() {
 }
 
 function updateMarker() {
-  if(!layer) {
+  if(!tileLayer) {
     return;
   }
 
   // move tile marker to mouse position
-  var tileX = layer.getTileX(game.input.activePointer.worldX);
-  var tileY = layer.getTileY(game.input.activePointer.worldY);
+  var rawTileX = tileLayer.getTileX(game.input.activePointer.worldX);
+  var rawTileY = tileLayer.getTileY(game.input.activePointer.worldY);
 
-  if(tileX >= level.width) {
-    tileX = level.width - 1;
+  if(rawTileX >= level.width) {
+    rawTileX = level.width - 1;
   }
-  if(tileY >= level.height) {
-    tileY = level.height - 1;
+  if(rawTileY >= level.height) {
+    rawTileY = level.height - 1;
   }
 
-  marker.x = tileX * tileSize;
-  marker.y = tileY * tileSize;
+  marker.x = rawTileX * tileSize;
+  marker.y = rawTileY * tileSize;
+
+  var tileCoord = markerToTileCoord(marker);
+  var tileObj = world.getObject(tileCoord.x, tileCoord.y);
+  var color = EMPTY_MARKER_COLOR;
+  if(tileObj) {
+    if(tileObj.category === 'user') {
+      color = USER_MARKER_COLOR;
+    } else if(tileObj.category === 'enemy') {
+      color = ENEMY_MARKER_COLOR;
+    } else {
+      color = UNKNOWN_MARKER_COLOR;
+    }
+  } else {
+    if(level.tile(tileCoord.x, tileCoord.y) === level.TILE_OBSTACLE) {
+      color = WALL_MARKER_COLOR;
+    }
+  }
+  marker.clear();
+  marker.lineStyle(2, color, 1);
+  marker.drawRect(0, 0, tileSize, tileSize);
+
+  // TODO why double clicked?
   if (game.input.mousePointer.isDown) {
     // TODO implement move to
-    var data = markerToTileCoord(marker);
-    console.log("selected tile coord : " + data.tileX + "," + data.tileY);
+    console.log("selected tile coord : " + tileCoord.x + "," + tileCoord.y);
   }
 }
 
 function markerToTileCoord(marker) {
   var tileX = marker.x / tileSize;
-  var tileY = level.height - marker.y / tileSize;
+  var tileY = level.height - marker.y / tileSize - 1;
   return { x: tileX, y: tileY };
 }
 
