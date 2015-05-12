@@ -147,9 +147,20 @@ function updateMarker() {
   if(!layer) {
     return;
   }
+
   // move tile marker to mouse position
-  marker.x = layer.getTileX(game.input.activePointer.worldX) * tileSize;
-  marker.y = layer.getTileY(game.input.activePointer.worldY) * tileSize;
+  var tileX = layer.getTileX(game.input.activePointer.worldX);
+  var tileY = layer.getTileY(game.input.activePointer.worldY);
+
+  if(tileX >= level.width) {
+    tileX = level.width - 1;
+  }
+  if(tileY >= level.height) {
+    tileY = level.height - 1;
+  }
+
+  marker.x = tileX * tileSize;
+  marker.y = tileY * tileSize;
   if (game.input.mousePointer.isDown) {
     // TODO implement move to
     var data = markerToTileCoord(marker);
