@@ -16,6 +16,8 @@ var cursors;
 var ping = new network.ClientPing(socket);
 ping.ping();
 
+var echoRunner = new network.ClientEcho(socket);
+
 socket.on('s2c_login', function(obj) {
   // dumpCommunication('s2c_login', obj);
   currUserId = obj.id;
@@ -210,24 +212,3 @@ function render() {
   var pingMsg = sprintf('Ping : avg=%d, max=%d, min=%d, last=%d', ping.average(), ping.max(), ping.min(), ping.last());
   game.debug.text(pingMsg, 16, 530);
 }
-
-function dumpCommunication(cmd, obj) {
-  console.log(cmd + " : " + JSON.stringify(obj));
-}
-
-socket.on('s2c_echo', function(ctx) {
-  dumpCommunication('echo', ctx);
-});
-
-function echo(ctx) {
-  socket.emit('c2s_echo', ctx);
-}
-
-socket.on('s2c_echoAll', function(ctx) {
-  dumpCommunication('echoAll', ctx);
-});
-
-function echoAll(ctx) {
-  socket.emit('c2s_echoAll', ctx);
-}
-
