@@ -27,6 +27,7 @@ app.locals.inspect = require('util').inspect;
 // Game World
 var server = new network.Server(io);
 var world = new World('svr');
+world.loadLevelFile('res/map.txt');
 
 
 app.get('/', function(req, res) {
