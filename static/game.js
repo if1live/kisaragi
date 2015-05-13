@@ -214,6 +214,7 @@ function updateMarker() {
   if (game.input.mousePointer.isDown) {
     // TODO implement move to
     console.log("selected tile coord : " + tileCoord.x + "," + tileCoord.y);
+    currUser.requestMoveTo(tileCoord.x, tileCoord.y);
   }
 }
 
