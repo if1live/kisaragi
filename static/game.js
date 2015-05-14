@@ -1,3 +1,5 @@
+"use strict";
+
 // initialize game context
 var world = new World('cli');
 var level = world.level;

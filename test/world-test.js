@@ -39,7 +39,7 @@ vows.describe('World').addBatch({
     'enemy': {
       topic: new World('svr'),
       'success': function(topic) {
-        var user = topic.createUser('foo');
+        var user = topic.createUser({"foo": "bar"});
         topic.addUser(user);
 
         var enemy = topic.generateEnemy();
@@ -49,7 +49,7 @@ vows.describe('World').addBatch({
     'user': {
       topic: new World('svr'),
       'success': function(topic) {
-        var user = topic.createUser('foo');
+        var user = topic.createUser({"foo": "bar"});
         topic.addUser(user);
 
         topic.generateEnemy();
@@ -71,7 +71,7 @@ vows.describe('World').addBatch({
     '1 time': {
       topic: new World('svr'),
       'success': function(topic) {
-        var user = topic.createUser('foo');
+        var user = topic.createUser({"foo": "bar"});
         topic.addUser(user);
         assert.equal(topic.objectList('user').length, 1);
         assert.equal(user.id, 1);
@@ -80,8 +80,8 @@ vows.describe('World').addBatch({
     'multiple time': {
       topic: new World('svr'),
       'success': function(topic) {
-        var user_a = topic.createUser('foo');
-        var user_b = topic.createUser('bar');
+        var user_a = topic.createUser({"foo": "bar"});
+        var user_b = topic.createUser({"foo": "spam"});
         topic.addUser(user_a);
         topic.addUser(user_b);
 
@@ -93,8 +93,8 @@ vows.describe('World').addBatch({
   'removeUser': {
     topic: new World('svr'),
     'success': function(topic) {
-      var user_a = topic.createUser('foo');
-      var user_b = topic.createUser('bar');
+      var user_a = topic.createUser({"foo": "bar"});
+      var user_b = topic.createUser({"foo": "spam"});
       topic.addUser(user_a);
       topic.addUser(user_b);
 
@@ -106,7 +106,7 @@ vows.describe('World').addBatch({
     'exist': {
       topic: new World('svr'),
       'success': function(topic) {
-        var user = topic.createUser('foo');
+        var user = topic.createUser({"foo": "bar"});
         topic.addUser(user);
         assert.equal(topic.findUser(user.id), user);
       }

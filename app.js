@@ -1,3 +1,5 @@
+"use strict";
+
 // constants
 var HTTP_PORT = 8001;
 
@@ -10,7 +12,6 @@ var io = require('socket.io')(http);
 var gameloop = require('node-gameloop');
 var PF = require('pathfinding');
 
-var globals = require('./lib/globals');
 var World = require('./lib/world');
 var network = require('./lib/network');
 var admin = require('./lib/admin');
@@ -94,7 +95,8 @@ http.listen(app.get('port'), function() {
 });
 
 // game loop
+var TARGET_FPS = 60;
 var loopId = gameloop.setGameLoop(function(delta) {
   world.update(delta);
-}, 1000/globals.targetFps);
+}, 1000.0/TARGET_FPS);
 
