@@ -134,17 +134,16 @@ function registerSocketHandler(socket) {
     game.world.sort();
 
     var groundTile = 29;
+    var wallTile = 9;
     for(var y = 0 ; y < level.width ; y += 1) {
       for(var x = 0 ; x < level.width ; x += 1) {
-        // TOCO check tile
-        map.putTile(groundTile, x, y, tileLayer);
+        if(level.tile(x, y) === level.TILE_OBSTACLE) {
+          map.putTile(wallTile, x, y, tileLayer);
+        } else {
+          map.putTile(groundTile, x, y, tileLayer);
+        }
       }
     }
-
-    var wallTile = 9;
-    _.each(data.obstacles, function(obstacle) {
-      map.putTile(wallTile, obstacle.pos[0], level.height - obstacle.pos[1] - 1, tileLayer);
-    });
   });
   
   socket.on('s2c_newObject', function(data) {

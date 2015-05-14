@@ -8,7 +8,7 @@ describe('User[cli]', function() {
   beforeEach(function() {
     // dummy socket
     this.sock = {
-      emit: function(cmd, data) { }
+      emit: function(cmd, data) { },
     };
   });
   

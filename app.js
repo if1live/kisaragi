@@ -68,7 +68,6 @@ io.on('connection', function(socket) {
     // for game
     // 게임 기본 정보 요청
     'c2s_requestMap',
-    'c2s_requestUserList',
 
     // 이동
     'c2s_requestMove',
