@@ -34,12 +34,15 @@ module.exports = function(grunt) {
     },
     mocha_istanbul: {
       coverage: {
-        src: 'test', // a folder works nicely
+        src: ['test'],
         options: {
+          coverage: true, // this will make the grunt.event.on('coverage') event listener to be triggered
           ui: 'bdd',
           reporter: 'dot',
           mask: '*.spec.js'
-        }
+        },
+        root: './lib', // define where the cover task should consider the root of libraries that are covered by tests
+        reportFormats: ['cobertura','lcovonly']
       }
     },
     istanbul_check_coverage: {
@@ -75,5 +78,4 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['bowercopy']);
   
   grunt.registerTask('coverage', ['mocha_istanbul:coverage']);
-  
 };

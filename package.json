@@ -37,6 +37,7 @@
     "jshint-stylish": "*",
     "istanbul": "0.3.13",
     "codeclimate-test-reporter": "*",
+    "coveralls": "*",
     "pathfinding": "0.4.17"
   }
 }
