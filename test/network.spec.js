@@ -60,3 +60,40 @@ describe('Server', function() {
     });
   });
 });
+
+describe('ClientEcho', function() {
+  beforeEach(function() {
+    function DummySocket() {
+      var self = this;
+      self.cmdTable = {};
+      self.called = {};
+      self.on = function(cmd, func) {
+        self.cmdTable[cmd] = func;
+        self.called[cmd] = false;
+      };
+      self.emit = function(cmd, ctx) {
+        var nextCmd = cmd.replace('c2s', 's2c');
+        self.cmdTable[nextCmd](ctx);
+        self.called[nextCmd] = true;
+      };
+    }
+    this.socket = new DummySocket();
+    this.echo = new network.ClientEcho(this.socket, {
+      echo: function(ctx) {},
+      echoAll: function(ctx) {}
+    });
+  });
+  
+  describe('#echo()', function() {
+    it('success', function() {
+      this.echo.echo('data');
+      assert.equal(this.socket.called.s2c_echo, true);
+    });
+  });
+  describe('#echoAll()', function() {
+    it('success', function() {
+      this.echo.echoAll('data');
+      assert.equal(this.socket.called.s2c_echoAll, true);
+    });
+  });
+});

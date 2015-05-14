@@ -170,6 +170,7 @@ function create() {
 
   echoRunner = new network.ClientEcho(socket);
   ping = new network.ClientPing(socket);
+  ping.renderer = new network.HtmlPingRenderer('ping-result');
   ping.ping();
 }
 
@@ -277,7 +278,4 @@ function render() {
 
   var tileCoord = markerToTileCoord(marker);
   game.debug.text('Tile Coord : ' + tileCoord.x + ',' + tileCoord.y, 16, 550);
-
-  var pingMsg = sprintf('Ping : avg=%d, max=%d, min=%d, last=%d', ping.average(), ping.max(), ping.min(), ping.last());
-  game.debug.text(pingMsg, 16, 530);
 }

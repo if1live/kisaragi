@@ -6,6 +6,17 @@
 		<% include ../partials/head %>
 	</head>
 	<body>
+		<div id="phaser-example"></div>
+			
+		<h2>debug</h2>
+		<span id="ping-result">
+			ping[<span class="ping-count"></span>] : 
+			curr=<span class="ping-curr"></span>ms /
+			average=<span class="ping-average"></span>ms /
+			min=<span class="ping-min"></span>ms /
+			max=<span class="ping-max"></span>ms
+		</span>
+		
 		<script src="/libs/js/underscore-min.js"></script>
 		<script src="/libs/js/socket.io.js"></script>
 		<script src="/libs/js/pathfinding-browser.min.js"></script>
