@@ -23,7 +23,6 @@
   "boss": false,
   "debug": false,
   "eqnull": false,
-  "esnext": false,
   "evil": false,
   "expr": false,
   "funcscope": false,
@@ -54,5 +53,15 @@
 
   "es3": false,
   "es5": false,
-  "esnext": true
+  "esnext": true,
+  "predef": [
+    "describe",
+    "it",
+    "before",
+    "beforeEach",
+    "after",
+    "afterEach",
+    "$",
+    "_"
+  ]
 }

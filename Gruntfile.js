@@ -32,35 +32,25 @@ module.exports = function(grunt) {
         }
       }
     },
-    vows: {
-      all: {
+    mocha_istanbul: {
+      coverage: {
+        src: 'test', // a folder works nicely
         options: {
-          // String {spec|json|dot-matrix|xunit|tap}
-          // defaults to "dot-matrix"
-          //reporter: "spec",
-          // String or RegExp which is
-          // matched against title to
-          // restrict which tests to run
-          //onlyRun: /helper/,
-          // Boolean, defaults to false
-          verbose: false,
-          // Boolean, defaults to false
-          silent: false,
-          // Colorize reporter output,
-          // boolean, defaults to true
-          colors: true,
-          // Run each test in its own
-          // vows process, defaults to
-          // false
-          isolate: false,
-          // String {plain|html|json|xml}
-          // defaults to none
-          coverage: "json"
-        },
-        // String or array of strings
-        // determining which files to include.
-        // This option is grunt's "full" file format.
-        src: ["test/*.js"]
+          ui: 'bdd',
+          reporter: 'dot',
+          mask: '*.spec.js'
+        }
+      }
+    },
+    istanbul_check_coverage: {
+      default: {
+        options: {
+          coverageFolder: 'coverage*', // will check both coverage folders and merge the coverage results
+          check: {
+            lines: 80,
+            statements: 80
+          }
+        }
       }
     },
     nodemon: {
@@ -77,12 +67,13 @@ module.exports = function(grunt) {
   });
 
   grunt.loadNpmTasks('grunt-bowercopy');
-  grunt.loadNpmTasks("grunt-vows");
   grunt.loadNpmTasks('grunt-nodemon');
   grunt.loadNpmTasks('grunt-contrib-jshint');
-
+  grunt.loadNpmTasks('grunt-mocha-istanbul');
 
   // Default task(s).
   grunt.registerTask('default', ['bowercopy']);
-  grunt.registerTask('test', ['vows']);
+  
+  grunt.registerTask('coverage', ['mocha_istanbul:coverage']);
+  
 };

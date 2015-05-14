@@ -10,14 +10,14 @@
   },
   "scripts": {
     "pretest": "jshint app.js lib/ test/",
-    "test": "vows --spec",
+    "test": "mocha --reporter dot --ui bdd",
     "prestart": "jshint app.js lib/ test/",
     "start": "node app.js"
   },
   "dependencies": {
     "underscore": "1.8.3",
     "node-gameloop": "0.1.0",
-    "vows": "0.8.1",
+    "mocha": "*",
     "socket.io": "1.3.5",
     "node-uuid": "1.4.3",
     "ejs": "1.0.0",
@@ -30,8 +30,8 @@
     "grunt-cli": "*",
     "grunt-bower-task": "*",
     "grunt-bowercopy": "*",
-    "grunt-vows": "*",
     "grunt-nodemon": "*",
+    "grunt-mocha-istanbul": "*",
     "grunt-contrib-jshint": "*",
     "jshint": "2.7.0",
     "jshint-stylish": "*",
