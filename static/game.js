@@ -3,7 +3,6 @@
 // initialize game context
 var world = new World('cli');
 var level = world.level;
-var users = new Object();
 var currUser = null;
 var currUserId = null;
 
@@ -64,17 +63,66 @@ function getCommonSprite(gameObject, spriteName) {
   return gameObject.sprite;
 }
 
+function createGameObject(data) {
+  var gameObject = null;
+  if(data.category === 'user') {
+    gameObject = new User('cli', socket);
+  } else if(data.category === 'enemy') {
+    gameObject = new Enemy('cli', socket);
+  } else {
+    assert(!"unknown category");
+  }
+  gameObject.id = data.id;
+  gameObject.pos = data.pos;
+  world.attachObject(gameObject);
+  
+  var sprite = null;
+  if(gameObject.category === 'user') {
+    if(data.id === currUserId) {
+      sprite = getCurrUserSprite(gameObject);
+    } else {
+      sprite = getUserSprite(gameObject);
+    }
+  } else if(gameObject.category === 'enemy') {
+    sprite = getEnemySprite(gameObject);
+  } else if(gameObject.category === 'item') {
+    sprite = getItemSprite(gameObject);
+  }
+  
+  updateGameObjectPos(gameObject);
+  
+  return gameObject;
+}
+
+function updateGameObjectPos(gameObject) {
+  var tileX = gameObject.pos[0];
+  var tileY = level.height - gameObject.pos[1] - 1;
+  var x = tileX * tileSize;
+  var y = tileY * tileSize;
+  var sprite = gameObject.sprite;
+  sprite.position.x = x;
+  sprite.position.y = y;
+}
+
 function registerSocketHandler(socket) {
-  socket.on('s2c_login', function(obj) {
-    currUserId = obj.id;
+  socket.on('s2c_login', function(data) {
+    //console.log(data);
+    console.log('Login : userId=' + data.id);
+    currUserId = data.id;
+    level.width = data.width;
+    level.height = data.height;
+    
+    currUser = createGameObject(data);
+    
     // sometime, socket io connection end before game context created
     socket.emit('c2s_requestMap', {});
-    socket.emit('c2s_requestUserList', {});
   });
 
-  socket.on('s2c_responseMap', function(obj) {
+  socket.on('s2c_responseMap', function(data) {
+    //console.log(data);
+    console.log('Load Level data from server');
     // object synchronize by serializer/deserializer
-    level.serializer().deserialize(obj);
+    level.serializer().deserialize(data);
 
     // generate tile map from server data
     // TODO lazy level loading
@@ -88,42 +136,39 @@ function registerSocketHandler(socket) {
     var groundTile = 29;
     for(var y = 0 ; y < level.width ; y += 1) {
       for(var x = 0 ; x < level.width ; x += 1) {
+        // TOCO check tile
         map.putTile(groundTile, x, y, tileLayer);
       }
     }
 
     var wallTile = 9;
-    _.each(obj.obstacles, function(obstacle) {
+    _.each(data.obstacles, function(obstacle) {
       map.putTile(wallTile, obstacle.pos[0], level.height - obstacle.pos[1] - 1, tileLayer);
     });
   });
-
-  socket.on('s2c_moveOccur', function(obj) {
-    world.syncAllObjectList(obj.user_list);
-    currUser = world.findObject(currUserId);
-    currUser.sock = socket;
-
-    _.each(world.allObjectList(), function(gameObject, i) {
-      var tileX = gameObject.pos[0];
-      var tileY = level.height - gameObject.pos[1] - 1;
-      var x = tileX * tileSize;
-      var y = tileY * tileSize;
-
-      var sprite = null;
-      if(gameObject.category === 'user') {
-        if(gameObject.id === currUserId) {
-          sprite = getCurrUserSprite(gameObject);
-        } else {
-          sprite = getUserSprite(gameObject);
-        }
-      } else if(gameObject.category === 'enemy') {
-        sprite = getEnemySprite(gameObject);
-      } else if(gameObject.category === 'item') {
-        sprite = getItemSprite(gameObject);
-      }
-      sprite.position.x = x;
-      sprite.position.y = y;
-    });
+  
+  socket.on('s2c_newObject', function(data) {
+    //console.log(data);
+    if(currUser === null || currUser.id === data.id) {
+      return;
+    }
+    console.log('New Object : id=' + data.id);
+    
+    // create user to world
+    createGameObject(data);
+  });
+  
+  socket.on('s2c_removeObject', function(data) {
+    //console.log(data);
+    console.log('Remove Object : id=' + data.id);
+    world.removeId(data.id);
+  });
+  
+  socket.on('s2c_moveNotify', function(data) {
+    //console.log(data);
+    var gameObject = world.findObject(data.id);
+    gameObject.pos = data.pos;
+    updateGameObjectPos(gameObject);
   });
 }
 
