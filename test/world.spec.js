@@ -7,6 +7,7 @@ var World = require('../lib/world');
 describe('World', function() {
   beforeEach(function() {
     this.topic = new World('svr');
+    this.topic.level.reset(10, 10);
   });
   describe('#getNextId()', function() {
     it('success', function() {
