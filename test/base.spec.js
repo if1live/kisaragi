@@ -4,14 +4,82 @@
 var assert = require('assert');
 var base = require('../lib/base');
 
-describe('base', function() {
-  describe('#unitTestSample()', function() {
-    before(function() {
-      this.topic = base.unitTestSample();
+describe('base.Entity', function() {
+  describe('#x, #y', function() {
+    beforeEach(function() {
+      this.subject = new base.Entity();
     });
+    it('set x', function() {
+      this.subject.x(10);
+      assert.equal(this.subject.pos[0], 10);
+    });
+    it('get x', function() {
+      this.subject.pos[0] = 20;
+      assert.equal(this.subject.x(), 20);
+    });
+    it('set y', function() {
+      this.subject.y(30);
+      assert.equal(this.subject.pos[1], 30);
+    });
+    it('get y', function() {
+      this.subject.pos[1] = 40;
+      assert.equal(this.subject.y(), 40);
+    });
+  });
+});
 
-    it('success', function() {
-      assert.equal(this.topic, true);
+describe('base.EntityManager', function() {
+  describe('#findALl()', function() {
+    before(function() {
+      this.mgr = new base.EntityManager();
+      
+      this.ent_a = new base.Entity();
+      this.ent_a.movableId = 100;
+      this.ent_a.pos = [1, 2];
+      
+      this.ent_b = new base.Entity();
+      this.ent_b.movableId = 200;
+      this.ent_b.pos = [1, 3];
+      
+      this.mgr.add(this.ent_a);
+      this.mgr.add(this.ent_b);
+    });
+    it('pos based == combine based', function() {
+      var elemList = this.mgr.findAll({
+        x: this.ent_a.x(), 
+        y: this.ent_a.y()
+      });
+      assert.equal(elemList[0], this.ent_a);
+    });
+    it('id based', function() {
+      var elemList = this.mgr.findAll({
+        id: this.ent_b.movableId
+      });
+      assert.equal(elemList[0], this.ent_b);
+    });
+  });
+  
+  describe('#remove', function() {
+    beforeEach(function() {
+      this.mgr = new base.EntityManager();
+      
+      this.ent_a = new base.Entity();
+      this.ent_a.movableId = 100;
+      
+      this.mgr.add(this.ent_a);
+    });
+    it('id', function() {
+      this.mgr.remove(this.ent_a.movableId);
+      assert.equal(this.mgr.table[this.ent_a.id()], undefined);
+    });
+    it('cond', function() {
+      this.mgr.remove({
+        id: this.ent_a.movableId
+      });
+      assert.equal(this.mgr.table[this.ent_a.id()], undefined);
+    });
+    it('cannot find exist id', function() {
+      this.mgr.remove(999);
     });
   });
 });
