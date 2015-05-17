@@ -1,0 +1,1 @@
+﻿///<reference path="../app/app.d.ts"/>

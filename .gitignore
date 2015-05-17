@@ -31,3 +31,17 @@ node_modules
 bower-components
 publish
 .DS_Store
+
+# typescript
+typings
+app/*.js
+test/*.js
+*.map
+build
+bin
+obj
+
+all.js
+all.js.map
+app.js
+app.js.map

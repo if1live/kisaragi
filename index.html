@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>TypeScript HTML App</title>
+    <link rel="stylesheet" href="app.css" type="text/css" />
+
+    <script src="publish/libs/js/phaser.min.js"></script>
+    <script src="publish/libs/js/socket.io.js"></script>
+    <script src="publish/libs/js/assert.js"></script>
+    <script src="publish/libs/js/pathfinding-browser.min.js"></script>
+    <script src="publish/libs/js/underscore-min.js"></script>
+    <script src="publish/libs/js/sprintf.min.js"></script>
+
+    <script>
+        function require(name) {
+            if (name === 'underscore') {
+                return window._;
+            }
+            return null;
+        }
+    </script>
+
+    <script src="all.js"></script>
+</head>
+<body>
+    <h1>TypeScript HTML App</h1>
+
+    <div id="content"></div>
+</body>
+</html>
