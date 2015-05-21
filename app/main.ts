@@ -1,9 +1,6 @@
 ﻿// Ŭnicode please
 ///<reference path="app.d.ts"/>
 
-// constants
-var HTTP_PORT: number = 8001;
-
 import serveStatic = require('serve-static');
 import express = require('express');
 var app = express();
@@ -11,19 +8,18 @@ var http = require('http').Server(app);
 var io: SocketIO.Server = require('socket.io')(http);
 var gameloop = require('node-gameloop');
 
+if (typeof module !== 'undefined') {
+    var kisaragi = require('./kisaragi');
+}
 
 // all environments
-app.set('port', HTTP_PORT);
+app.set('port', kisaragi.HTTP_PORT);
 app.set('view engine', 'ejs');
 app.use(serveStatic(__dirname + '/../static'));
 app.use(serveStatic(__dirname + '/../publish'));
 app.use(serveStatic(__dirname + '/../lib'));
 // http://stackoverflow.com/questions/12488930/dump-an-object-in-ejs-templates-from-express3-x-views
 app.locals.inspect = require('util').inspect;
-
-if (typeof module !== 'undefined') {
-    var kisaragi = require('./kisaragi');
-}
 
 // Game World
 var server = new kisaragi.Server(io);
@@ -94,7 +90,6 @@ http.listen(app.get('port'), function () {
 });
 
 // game loop
-var TARGET_FPS = 60;
 var loopId = gameloop.setGameLoop(function (delta) {
     world.update(delta);
-}, 1000.0 / TARGET_FPS);
+}, 1000.0 / kisaragi.TARGET_FPS);

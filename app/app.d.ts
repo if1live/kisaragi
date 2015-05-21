@@ -5,9 +5,14 @@
 
 ///<reference path="../bower-components/phaser/typescript/phaser.d.ts"/>
 
+///<reference path="constants.ts"/>
+
 ///<reference path="network.ts"/>
+///<reference path="server_socket.ts"/>
+
 ///<reference path="packet.ts"/>
 ///<reference path="base.ts"/>
+///<reference path="entity.ts"/>
 
 ///<reference path="admin.ts"/>
 ///<reference path="enemy.ts"/>

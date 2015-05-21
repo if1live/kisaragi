@@ -225,7 +225,9 @@ function create() {
     game.input.addMoveCallback(updateMarker, this);
 
     // create network after game context created
-    socket = io('http://127.0.0.1:8001');
+    var host = window.location.hostname;
+    var url = 'http://' + host + ':' + kisaragi.HTTP_PORT;
+    socket = io(url);
     registerSocketHandler(socket);
 
     echoRunner = new kisaragi.ClientEcho(socket, {});

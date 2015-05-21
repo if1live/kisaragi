@@ -24,8 +24,10 @@
     <Content Include="index.html" />
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="app\app.d.ts" />
+    <TypeScriptCompile Include="app\entity.ts" />
     <TypeScriptCompile Include="app\packet.ts" />
     <TypeScriptCompile Include="app\player.ts" />
+    <TypeScriptCompile Include="app\server_socket.ts" />
     <TypeScriptCompile Include="test\enemy_spec.ts" />
     <TypeScriptCompile Include="test\player_spec.ts" />
     <TypeScriptCompile Include="test\game_world_spec.ts" />
@@ -48,6 +50,7 @@
     <Content Include="package.json" />
     <Content Include="README.md" />
     <Content Include="tsd.json" />
+    <TypeScriptCompile Include="app\constants.ts" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
