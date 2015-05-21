@@ -77,6 +77,7 @@ module kisaragi {
                     socket.on(cmd, function (obj) {
                         var client = server.find({ socket_io: socket });
                         var packet = PacketFactory.createFromJson(obj);
+                        //console.log("Receive[id=" + client.userId + "] " + packet.command + " : " + JSON.stringify(packet.toJson()));
                         client.onEvent(packet, world, client.user);
                     });
                 }

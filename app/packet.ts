@@ -197,9 +197,19 @@ module kisaragi {
         }
         
         _generateJson(): any {
+            var categoryName = '';
+            if (this.category === Category.Enemy) {
+                categoryName = "enemy";
+            } else if (this.category === Category.Item) {
+                categoryName = "item";
+            } else if (this.category === Category.Player) {
+                categoryName = "player";
+            }
+
             return {
                 movableId: this.movableId,
                 category: this.category,
+                categoryName: categoryName,
                 x: this.x,
                 y: this.y
             };

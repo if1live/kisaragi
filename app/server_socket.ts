@@ -33,6 +33,14 @@ module kisaragi {
             var sock = new ServerSocket_SocketIO(uuid_val, socket, io);
             return sock;
         }
+
+        get userId(): number {
+            if (this.user) {
+                return this.user.movableId;
+            } else {
+                return -1;
+            }
+        }
     }
 
     /*
@@ -95,13 +103,16 @@ module kisaragi {
 
         send(packet: BasePacket) {
             var self = this;
+            //console.log("Send[id=" + this.userId + "] " + packet.command + " : " + JSON.stringify(packet.toJson()));
             return self.socket.emit(packet.command, packet.toJson());
         }
 
         broadcast(packet: BasePacket) {
             var self = this;
+            //console.log("Broadcast[id=" + this.userId + "] " + packet.command + " : " + JSON.stringify(packet.toJson()));
             return self.io.emit(packet.command, packet.toJson());
         }
+
     }
 
     class ServerSocket_Mock extends ServerSocket {
