@@ -34,7 +34,6 @@
     "grunt-bowercopy": "*",
     "grunt-nodemon": "*",
     "grunt-mocha-istanbul": "*",
-    "grunt-contrib-jshint": "*",
     "grunt-tsd": "*",
     "grunt-typescript": "*",
     "grunt-env": "*",

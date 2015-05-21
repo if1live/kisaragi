@@ -151,12 +151,6 @@ module.exports = function (grunt) {
         }
       }
     },
-    jshint: {
-      all: ['Gruntfile.js', 'lib/*.js', 'test/*.js'],
-      options: {
-        reporter: require('jshint-stylish')
-      }
-    },
     tslint: {
       options: {
         configuration: grunt.file.readJSON("tslint.json")
@@ -169,7 +163,6 @@ module.exports = function (grunt) {
 
   grunt.loadNpmTasks('grunt-bowercopy');
   grunt.loadNpmTasks('grunt-nodemon');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-mocha-istanbul');
   grunt.loadNpmTasks('grunt-tsd');
   grunt.loadNpmTasks('grunt-env');
