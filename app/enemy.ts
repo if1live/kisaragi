@@ -39,6 +39,6 @@ module kisaragi {
 }
 
 declare var exports: any;
-if (typeof exports != 'undefined') {
+if (typeof exports !== 'undefined') {
     exports.Enemy = kisaragi.Enemy;
 }

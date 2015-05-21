@@ -68,7 +68,7 @@ module kisaragi {
                 var cols = rows[i].split('');
                 var line = [];
                 for (var j: number = 0; j < this.width; j += 1) {
-                    if (cols[j] == 'x') {
+                    if (cols[j] === 'x') {
                         line.push(TileCode.Obstacle);
                     }
                     else {
@@ -83,7 +83,7 @@ module kisaragi {
             var obstacles: Coord[] = [];
             for (var y: number = 0; y < this.height; y += 1) {
                 for (var x: number = 0; x < this.width; x += 1) {
-                    if (this.data[y][x] == TileCode.Obstacle) {
+                    if (this.data[y][x] === TileCode.Obstacle) {
                         obstacles.push(new Coord(x, y));
                     }
                 }
@@ -127,7 +127,7 @@ module kisaragi {
         }
 
         isEmptyTile(x: number, y: number): boolean {
-            return this.tile(x, y) == TileCode.Empty;
+            return this.tile(x, y) === TileCode.Empty;
         }
 
         findPath(start_pos: Coord, target_pos: Coord, world: GameWorld): Array<Coord> {
@@ -144,7 +144,7 @@ module kisaragi {
 
         findNextPos(start_pos: Coord, target_pos: Coord, world: GameWorld): Coord {
             var path = this.findPath(start_pos, target_pos, world);
-            if (path.length == 0) {
+            if (path.length === 0) {
                 return null;
             } else {
                 return path[1];
@@ -154,6 +154,6 @@ module kisaragi {
 }
 
 declare var exports: any;
-if (typeof exports != 'undefined') {
+if (typeof exports !== 'undefined') {
     exports.Level = kisaragi.Level;
 }

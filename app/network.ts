@@ -68,19 +68,19 @@ module kisaragi {
                 return self.broadcast(packet);
             }
             
-            if (user == null) {
+            if (user === null) {
                 console.log("User is null!!!!");
                 return;
             }
 
             // handle event
-            if (cmd == ConnectPacket.commandName) {
+            if (cmd === ConnectPacket.commandName) {
                 user.connect(world, <ConnectPacket> packet);
-            } else if (cmd == DisconnectPacket.commandName) {
+            } else if (cmd === DisconnectPacket.commandName) {
                 user.disconnect(world, <DisconnectPacket> packet);
-            } else if (cmd == RequestMapPacket.commandName) {
+            } else if (cmd === RequestMapPacket.commandName) {
                 user.c2s_requestMap(world, <RequestMapPacket> packet);
-            } else if (cmd == RequestMovePacket.commandName) {
+            } else if (cmd === RequestMovePacket.commandName) {
                 user.c2s_requestMove(world, <RequestMovePacket> packet);
             } else {
                 console.log('cmd:' + cmd + ' is unknown command');
@@ -105,7 +105,7 @@ module kisaragi {
     }
 
     export function createMockServerSocket(uuid_val: string) {
-        if (uuid_val == null) {
+        if (!!uuid_val) {
             uuid_val = uuid.v1();
         }
         return new ServerSocket_Mock(uuid_val);
@@ -134,10 +134,10 @@ module kisaragi {
 
             var filterTable = {
                 'uuid': (sock: ServerSocket) => {
-                    return sock.uuid == opts.uuid;
+                    return sock.uuid === opts.uuid;
                 },
                 'socket_io': (sock) => {
-                    return sock.socket == opts.socket_io;
+                    return sock.socket === opts.socket_io;
                 }
             };
 
@@ -153,7 +153,7 @@ module kisaragi {
         disconnectSocketIO(socket: SocketIO.Socket): boolean {
             var self = this;
             var sock = self.find({ socket_io: socket });
-            if (sock == null) {
+            if (sock === null) {
                 return false;
             }
             self.sockList = _.reject(self.sockList, function (x) { return x === sock; });
@@ -325,7 +325,7 @@ module kisaragi {
 }
 
 declare var exports: any;
-if (typeof exports != 'undefined') {
+if (typeof exports !== 'undefined') {
     exports.Enemy = kisaragi.Enemy;
     exports.ServerSocket = kisaragi.ServerSocket;
     exports.Server = kisaragi.Server;

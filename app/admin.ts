@@ -11,16 +11,16 @@ module kisaragi {
 
         gameObjectToChar(entity: Entity, tile: TileCode) {
             if (entity) {
-                if (entity.category == Category.Player) {
+                if (entity.category === Category.Player) {
                     //return sprintf("%02d", entity.movableId);
                     return entity.movableId.toString();
-                } else if (entity.category == Category.Enemy) {
+                } else if (entity.category === Category.Enemy) {
                     return 'EE';
                 }
                 // unknown
                 return 'XX';
             } else {
-                if (tile == TileCode.Empty) {
+                if (tile === TileCode.Empty) {
                     return '..';
                 } else {
                     return '%%';

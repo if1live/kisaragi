@@ -155,6 +155,14 @@ module.exports = function(grunt) {
       options: {
         reporter: require('jshint-stylish')
       }
+    },
+    tslint: {
+      options: {
+        configuration: grunt.file.readJSON("tslint.json")
+      },
+      files: {
+        src: ['app/**/*.ts', 'test/**/*.ts']
+      }
     }
   });
 
@@ -167,6 +175,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-typescript');
   grunt.loadNpmTasks('grunt-mocha-test');
+  grunt.loadNpmTasks('grunt-tslint');
 
   // Default task(s).
   grunt.registerTask('default', ['bowercopy']);

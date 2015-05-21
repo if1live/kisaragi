@@ -58,7 +58,7 @@ module kisaragi {
             for(var i = 0 ; i < packetClassList.length ; ++i) {
                 var packetClass = packetClassList[i];
                 packet = <BasePacket> new packetClass(); 
-                if(packetType == packet.packetType) {
+                if(packetType === packet.packetType) {
                     packet.loadJson(data);
                     return packet;
                 }

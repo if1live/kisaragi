@@ -114,7 +114,7 @@ module kisaragi {
             }
 
             //console.log(this.targetPos + '/' + this.moveCooltime);
-            if (this.targetPos !== null && this.moveCooltime == 0) {
+            if (this.targetPos !== null && this.moveCooltime === 0) {
                 var nextPos = self.world.level.findNextPos(self.pos, self.targetPos, self.world);
                 if (!nextPos) {
                     self.targetPos = null;
@@ -168,17 +168,17 @@ module kisaragi {
 
             if ('id' in opts) {
                 predList.push((ent: Entity) => {
-                    return ent.movableId == opts.id;
+                    return ent.movableId === opts.id;
                 });
             }
             if ('x' in opts) {
                 predList.push((ent: Entity) => {
-                    return ent.x == opts.x;
+                    return ent.x === opts.x;
                 });
             }
             if ('y' in opts) {
                 predList.push((ent: Entity) => {
-                    return ent.y == opts.y;
+                    return ent.y === opts.y;
                 });
             }
 
@@ -258,7 +258,7 @@ module kisaragi {
 
 
 declare var exports: any;
-if (typeof exports != 'undefined') {
+if (typeof exports !== 'undefined') {
     exports.Role = kisaragi.Role;
     exports.Category = kisaragi.Category;
     exports.TileCode = kisaragi.TileCode;
