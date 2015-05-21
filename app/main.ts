@@ -15,7 +15,7 @@ if (typeof module !== 'undefined') {
 // all environments
 app.set('port', kisaragi.HTTP_PORT);
 app.set('view engine', 'ejs');
-app.use(serveStatic(__dirname + '/../static'));
+app.use('/static', serveStatic(__dirname + '/../static'));
 app.use(serveStatic(__dirname + '/../publish'));
 app.use(serveStatic(__dirname + '/../lib'));
 // http://stackoverflow.com/questions/12488930/dump-an-object-in-ejs-templates-from-express3-x-views

@@ -35,6 +35,7 @@ publish
 # typescript
 typings
 app/*.js
+app_client/*.js
 test/*.js
 *.map
 build

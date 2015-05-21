@@ -78,7 +78,7 @@ module kisaragi {
     export class HtmlPingRenderer implements IPingRenderer {
         displayId: string;
 
-        constductor(displayId: string) {
+        constructor(displayId: string) {
             this.displayId = displayId;
         }
 
@@ -144,7 +144,7 @@ module kisaragi {
 
         ping() {
             var self = this;
-            var packet = PacketFactory.create(PacketType.Ping);
+            var packet = PacketFactory.ping();
             self.socket.emit(packet.command, packet.toJson());
         }
 

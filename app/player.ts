@@ -62,7 +62,7 @@ module kisaragi {
             world.removeUser(self);
             
             var removePacket = PacketFactory.removeObject(self.movableId);
-            self.svrSock.send(removePacket);
+            self.svrSock.broadcast(removePacket);
         };
 
         c2s_requestMap(world: GameWorld, packet: RequestMapPacket) {

@@ -76,7 +76,15 @@ module.exports = function (grunt) {
           target: 'ES5'
         }
       },
-
+      client: {
+        src: ['app_client/**/*.ts'],
+        dest: 'publish/app_client.js',
+        options: {
+          module: 'commonjs',
+          sourcemap: true,
+          target: 'ES5'
+        }
+      },
       test: {
         src: ['test/**/*.ts'],
         options: {
@@ -94,6 +102,10 @@ module.exports = function (grunt) {
       test: {
         files: ['test/**/*.ts'],
         tasks: ['typescript:test', '_runTests']
+      },
+      client: {
+        files: ['app_client/**/*.ts'],
+        tasks: ['typescript:client', '_runTests']
       },
       definitions: {
         files: ['typings/**/*.d.ts'],

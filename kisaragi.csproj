@@ -22,15 +22,18 @@
     <Content Include="app.css" />
     <Content Include="Gruntfile.js" />
     <Content Include="index.html" />
-    <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="app\app.d.ts" />
     <TypeScriptCompile Include="app\entity.ts" />
     <TypeScriptCompile Include="app\packet.ts" />
     <TypeScriptCompile Include="app\player.ts" />
     <TypeScriptCompile Include="app\server_socket.ts" />
+    <TypeScriptCompile Include="app_client\app_client.d.ts" />
+    <TypeScriptCompile Include="app_client\client_main.ts" />
+    <TypeScriptCompile Include="app_client\main_state.ts" />
     <TypeScriptCompile Include="test\enemy_spec.ts" />
     <TypeScriptCompile Include="test\player_spec.ts" />
     <TypeScriptCompile Include="test\game_world_spec.ts" />
+    <Content Include="run_server.js" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -51,6 +54,10 @@
     <Content Include="README.md" />
     <Content Include="tsd.json" />
     <TypeScriptCompile Include="app\constants.ts" />
+    <Content Include="views\pages\admin.ejs" />
+    <Content Include="views\pages\game.ejs" />
+    <Content Include="views\pages\index.ejs" />
+    <Content Include="views\partials\head.ejs" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
