@@ -111,25 +111,25 @@ function updateGameObjectPos(gameObject: kisaragi.Entity) {
 }
 
 function registerSocketHandler(socket) {
-    socket.on(kisaragi.LoginPacket.commandName, function (data) {
-        var packet = <kisaragi.LoginPacket> kisaragi.BasePacket.createFromJson(data);
+    socket.on(kisaragi.PacketFactory.toCommand(kisaragi.PacketType.Login), function (data) {
+        var packet = <kisaragi.LoginPacket> kisaragi.PacketFactory.createFromJson(data);
         
         console.log('Login : userId=' + packet.movableId);
         currUserId = packet.movableId;
         level.width = packet.width;
         level.height = packet.height;
 
-        var newObjPacket = kisaragi.NewObjectPacket.create(packet.movableId, kisaragi.Category.Player, packet.x, packet.y);
+        var newObjPacket = kisaragi.PacketFactory.newObject(packet.movableId, kisaragi.Category.Player, packet.x, packet.y);
         currUser = createGameObject(newObjPacket);
     
         // sometime, socket io connection end before game context created
-        var requestMapPacket = kisaragi.RequestMapPacket.create();
-        socket.emit(requestMapPacket.command, requestMapPacket.generateJson);
+        var requestMapPacket = kisaragi.PacketFactory.requestMap();
+        socket.emit(requestMapPacket.command, requestMapPacket.toJson());
     });
 
 
-    socket.on(kisaragi.ResponseMapPacket.commandName, function (data) {
-        var packet = <kisaragi.ResponseMapPacket> kisaragi.BasePacket.createFromJson(data);
+    socket.on(kisaragi.PacketFactory.toCommand(kisaragi.PacketType.ResponseMap), function (data) {
+        var packet = <kisaragi.ResponseMapPacket> kisaragi.PacketFactory.createFromJson(data);
         //console.log(data);
         console.log('Load Level data from server');
             
@@ -160,8 +160,8 @@ function registerSocketHandler(socket) {
         }
     });
 
-    socket.on(kisaragi.NewObjectPacket.commandName, function (data) {
-        var packet = <kisaragi.NewObjectPacket> kisaragi.BasePacket.createFromJson(data);
+    socket.on(kisaragi.PacketFactory.toCommand(kisaragi.PacketType.NewObject), function (data) {
+        var packet = <kisaragi.NewObjectPacket> kisaragi.PacketFactory.createFromJson(data);
         console.log('New Object : id=' + packet.movableId);
         if (!world.findObject(packet.movableId)) {
             // create user to world
@@ -171,14 +171,14 @@ function registerSocketHandler(socket) {
         }
     });
 
-    socket.on(kisaragi.RemoveObjectPacket.commandName, function (data) {
-        var packet = <kisaragi.RemoveObjectPacket> kisaragi.BasePacket.createFromJson(data);
+    socket.on(kisaragi.PacketFactory.toCommand(kisaragi.PacketType.RemoveObject), function (data) {
+        var packet = <kisaragi.RemoveObjectPacket> kisaragi.PacketFactory.createFromJson(data);
         console.log('Remove Object : id=' + packet.movableId);
         world.removeId(packet.movableId);
     });
 
-    socket.on(kisaragi.MoveNotifyPacket.commandName, function (data) {
-        var packet = <kisaragi.MoveNotifyPacket> kisaragi.BasePacket.createFromJson(data);
+    socket.on(kisaragi.PacketFactory.toCommand(kisaragi.PacketType.MoveNotify), function (data) {
+        var packet = <kisaragi.MoveNotifyPacket> kisaragi.PacketFactory.createFromJson(data);
         var gameObject = world.findObject(packet.movableId);
         gameObject.x = packet.x;
         gameObject.y = packet.y;

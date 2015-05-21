@@ -38,7 +38,7 @@ module kisaragi {
             var self = this;
             world.addUser(self);
 
-            var loginPacket = LoginPacket.create(
+            var loginPacket = PacketFactory.login(
                 this.movableId,
                 this.x,
                 this.y,
@@ -47,12 +47,12 @@ module kisaragi {
             );
             self.svrSock.send(loginPacket);
 
-            var newObjectPacket = NewObjectPacket.create(this.movableId, this.category, this.x, this.y);
+            var newObjectPacket = PacketFactory.newObject(this.movableId, this.category, this.x, this.y);
             self.svrSock.broadcast(newObjectPacket);
     
             // give dynamic object's info to new user
             _.each(world.allObjectList(), function (ent: Entity) {
-                var newObjectPacket = NewObjectPacket.create(ent.movableId, ent.category, ent.x, ent.y);
+                var newObjectPacket = PacketFactory.newObject(ent.movableId, ent.category, ent.x, ent.y);
                 self.svrSock.send(newObjectPacket);
             });
         };
@@ -61,14 +61,14 @@ module kisaragi {
             var self = this;
             world.removeUser(self);
             
-            var removePacket = RemoveObjectPacket.create(self.movableId);
+            var removePacket = PacketFactory.removeObject(self.movableId);
             self.svrSock.send(removePacket);
         };
 
         c2s_requestMap(world: GameWorld, packet: RequestMapPacket) {
             var self = this;
             
-            var responseMapPacket = ResponseMapPacket.create(world.level);
+            var responseMapPacket = PacketFactory.responseMap(world.level);
             self.svrSock.send(responseMapPacket);
         };
 
@@ -112,7 +112,7 @@ module kisaragi {
             if (self.world && !self.world.isMovablePos(x, y)) {
                 return;
             }
-            var packet:RequestMovePacket = RequestMovePacket.create(this.movableId, x, y);
+            var packet:RequestMovePacket = PacketFactory.requestMove(this.movableId, x, y);
             self.cliSock.emit(packet.command, packet.toJson());
         };
 

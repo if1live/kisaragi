@@ -61,11 +61,11 @@ module kisaragi {
             var cmd = packet.command;
             
             // for development
-            if (cmd === PingPacket.commandName) {
+            if (cmd === PacketFactory.toCommand(PacketType.Ping)) {
                 return self.send(packet);
-            } else if (cmd === EchoPacket.commandName) {
+            } else if (cmd === PacketFactory.toCommand(PacketType.Echo)) {
                 return self.send(packet);
-            } else if (cmd === EchoAllPacket.commandName) {
+            } else if (cmd === PacketFactory.toCommand(PacketType.EchoAll)) {
                 return self.broadcast(packet);
             }
             
@@ -75,13 +75,13 @@ module kisaragi {
             }
 
             // handle event
-            if (cmd === ConnectPacket.commandName) {
+            if (cmd === PacketFactory.toCommand(PacketType.Connect)) {
                 user.connect(world, <ConnectPacket> packet);
-            } else if (cmd === DisconnectPacket.commandName) {
+            } else if (cmd === PacketFactory.toCommand(PacketType.Disconnect)) {
                 user.disconnect(world, <DisconnectPacket> packet);
-            } else if (cmd === RequestMapPacket.commandName) {
+            } else if (cmd === PacketFactory.toCommand(PacketType.RequestMap)) {
                 user.c2s_requestMap(world, <RequestMapPacket> packet);
-            } else if (cmd === RequestMovePacket.commandName) {
+            } else if (cmd === PacketFactory.toCommand(PacketType.RequestMove)) {
                 user.c2s_requestMove(world, <RequestMovePacket> packet);
             } else {
                 console.log('cmd:' + cmd + ' is unknown command');
@@ -218,8 +218,8 @@ module kisaragi {
             var self = this;
             self.socket = socket;
 
-            socket.on(PingPacket.commandName, function (obj) {
-                var packet = <PingPacket> BasePacket.createFromJson(obj);
+            socket.on(PacketFactory.toCommand(PacketType.Ping), function (obj) {
+                var packet = <PingPacket> PacketFactory.createFromJson(obj);
                 
                 self.count += 1;
                 var now = Date.now();
@@ -245,7 +245,7 @@ module kisaragi {
 
         ping() {
             var self = this;
-            var packet = PingPacket.create();
+            var packet = PacketFactory.create(PacketType.Ping);
             self.socket.emit(packet.command, packet.toJson());
         }
 
@@ -288,11 +288,11 @@ module kisaragi {
             self.socket = socket;
 
             var echoCallback = (ctx) => {
-                var packet = <EchoPacket> BasePacket.createFromJson(ctx);
+                var packet = <EchoPacket> PacketFactory.createFromJson(ctx);
                 self.dumpCommunication(packet.command, packet.data);
             };
             var echoAllCallback = (ctx) => {
-                var packet = <EchoAllPacket> BasePacket.createFromJson(ctx);
+                var packet = <EchoAllPacket> PacketFactory.createFromJson(ctx);
                 self.dumpCommunication(packet.command, packet.data);
             };
 
@@ -305,8 +305,8 @@ module kisaragi {
                 }
             }
 
-            socket.on(EchoPacket.commandName, echoCallback);
-            socket.on(EchoAllPacket.commandName, echoAllCallback);
+            socket.on(PacketFactory.toCommand(PacketType.Echo), echoCallback);
+            socket.on(PacketFactory.toCommand(PacketType.EchoAll), echoAllCallback);
         }
 
         dumpCommunication(cmd, obj) {
@@ -314,12 +314,12 @@ module kisaragi {
         }
 
         echo(ctx) {
-            var packet = EchoPacket.create(ctx);
+            var packet = PacketFactory.echo(ctx);
             this.socket.emit(packet.command, packet.toJson());
         }
 
         echoAll(ctx) {
-            var packet = EchoAllPacket.create(ctx);
+            var packet = PacketFactory.echoAll(ctx);
             this.socket.emit(packet.command, packet.toJson());
         }
     }

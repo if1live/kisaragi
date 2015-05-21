@@ -9,9 +9,7 @@
     "url": "https://github.com/if1live/kisaragi.git"
   },
   "scripts": {
-    "pretest": "jshint app.js lib/ test/",
     "test": "mocha --reporter dot --ui bdd",
-    "prestart": "jshint app.js lib/ test/",
     "start":  "node app/main.js"
   },
   "dependencies": {

@@ -24,7 +24,6 @@
     <Content Include="index.html" />
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="app\app.d.ts" />
-    <TypeScriptCompile Include="app\dummy.ts" />
     <TypeScriptCompile Include="app\packet.ts" />
     <TypeScriptCompile Include="app\player.ts" />
     <TypeScriptCompile Include="test\enemy_spec.ts" />

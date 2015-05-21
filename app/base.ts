@@ -88,7 +88,7 @@ module kisaragi {
                 var maxDist = 1000000;
                 var dist = Math.abs(self.x - user.x) + Math.abs(self.y - user.y);
                 if (dist < maxDist) {
-                    var packet = MoveNotifyPacket.create(self.movableId, self.x, self.y);
+                    var packet = PacketFactory.moveNotify(self.movableId, self.x, self.y);
                     user.svrSock.send(packet);
                 }
             });
