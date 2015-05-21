@@ -137,9 +137,9 @@ module.exports = function (grunt) {
           coverage: true, // this will make the grunt.event.on('coverage') event listener to be triggered
           ui: 'bdd',
           reporter: 'dot',
-          mask: '*.spec.js'
+          mask: '*_spec.js'
         },
-        root: './lib', // define where the cover task should consider the root of libraries that are covered by tests
+        root: './app', // define where the cover task should consider the root of libraries that are covered by tests
         reportFormats: ['cobertura','lcovonly']
       }
     },
