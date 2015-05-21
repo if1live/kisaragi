@@ -1,3 +1,4 @@
+﻿// Ŭnicode please
 /// <reference path="app/app.d.ts" />
 
 // initialize game context
@@ -260,9 +261,9 @@ function updateMarker() {
     var tileObj = world.getObject(tileCoord.x, tileCoord.y);
     var color = EMPTY_MARKER_COLOR;
     if (tileObj) {
-        if (tileObj.category === 'user') {
+        if (tileObj.category === kisaragi.Category.Player) {
             color = USER_MARKER_COLOR;
-        } else if (tileObj.category === 'enemy') {
+        } else if (tileObj.category === kisaragi.Category.Enemy) {
             color = ENEMY_MARKER_COLOR;
         } else {
             color = UNKNOWN_MARKER_COLOR;

@@ -1,1 +1,2 @@
-﻿///<reference path="../app/app.d.ts"/>
+﻿// Ŭnicode please
+///<reference path="../app/app.d.ts"/>

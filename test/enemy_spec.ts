@@ -1,3 +1,4 @@
+﻿// Ŭnicode please
 ///<reference path="test.d.ts"/>
 
 import assert = require('assert');

@@ -1,3 +1,4 @@
+﻿// Ŭnicode please
 module kisaragi {
     export enum PacketType {
         Ping,

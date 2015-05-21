@@ -1,4 +1,5 @@
-﻿///<reference path="app.d.ts"/>
+﻿// Ŭnicode please
+///<reference path="app.d.ts"/>
 
 // constants
 var HTTP_PORT: number = 8001;

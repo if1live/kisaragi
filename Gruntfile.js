@@ -1,4 +1,5 @@
-module.exports = function(grunt) {
+﻿// Ŭnicode please
+module.exports = function (grunt) {
   "use strict";
   
   // Reference

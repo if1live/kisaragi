@@ -1,4 +1,5 @@
-﻿///<reference path="app.d.ts"/>
+﻿// Ŭnicode please
+///<reference path="app.d.ts"/>
 
 if (typeof module !== 'undefined') {
     _ = require('underscore');
