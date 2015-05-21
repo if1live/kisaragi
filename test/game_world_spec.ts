@@ -29,7 +29,8 @@ describe('GameWorld', function () {
         });
         describe('exist', function () {
             beforeEach(function () {
-                topic.objectList(kisaragi.Category.Item).push({ id: 1 });
+                var ent = new kisaragi.Entity(1);
+                topic.objectList(kisaragi.Category.Item).push(ent);
             });
             it('use prev list', function () {
                 assert.equal(topic.objectList(kisaragi.Category.Item).length, 1);
@@ -39,8 +40,10 @@ describe('GameWorld', function () {
     describe('#allObjectList()', function () {
         describe('simple', function () {
             beforeEach(function () {
-                topic.objectList(kisaragi.Category.Item).push({ id: 1 });
-                topic.objectList(kisaragi.Category.Enemy).push({ id: 2 });
+                var ent_1 = new kisaragi.Entity(1);
+                var ent_2 = new kisaragi.Entity(2);
+                topic.objectList(kisaragi.Category.Item).push(ent_1);
+                topic.objectList(kisaragi.Category.Enemy).push(ent_2);
             });
             it('success', function () {
                 assert.equal(topic.allObjectList().length, 2);
@@ -49,20 +52,13 @@ describe('GameWorld', function () {
     });
     
     describe('#findObject()', function () {
-        var user = null;
         var enemy = null;
 
         beforeEach(function () {
-            user = topic.createUser({ "foo": "bar" });
-            topic.addUser(user);
-
             enemy = topic.generateEnemy();
         });
         it('enemy', function () {
             assert.equal(topic.findObject(enemy.movableId), enemy);
-        });
-        it('user', function () {
-            assert.equal(topic.findObject(user.movableId), user);
         });
     });
     // User

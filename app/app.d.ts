@@ -4,6 +4,7 @@
 ///<reference path="../bower-components/phaser/typescript/phaser.d.ts"/>
 
 ///<reference path="network.ts"/>
+///<reference path="packet.ts"/>
 ///<reference path="base.ts"/>
 
 ///<reference path="admin.ts"/>
@@ -15,4 +16,3 @@
 
 ///<reference path="main.ts"/>
 ///<reference path="dummy.ts"/>
-

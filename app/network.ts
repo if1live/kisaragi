@@ -24,9 +24,9 @@ module kisaragi {
             this.user = null;
         }
 
-        send(cmd: string, ctx) { }
-        broadcast(cmd: string, ctx) { }
-        onEvent(cmd: string, world, user, obj) { }
+        send(packet: BasePacket) { }
+        broadcast(packet: BasePacket) { }
+        onEvent(packet: BasePacket, world: GameWorld, user: Player) { }
     }
 
     /*
@@ -55,43 +55,46 @@ module kisaragi {
             return remoteAddr.replace('::ffff:', '');
         }
 
-        onEvent(cmd: string, world: GameWorld, user: Player, obj) {
+        onEvent(packet: BasePacket, world: GameWorld, user: Player) {
             var self = this;
+            var cmd = packet.command;
+            
             // for development
-            if (cmd === 'c2s_ping') {
-                return self.send('s2c_ping', obj);
-            } else if (cmd === 'c2s_echo') {
-                return self.send('s2c_echo', obj);
-            } else if (cmd === 'c2s_echoAll') {
-                return self.broadcast('s2c_echoAll', obj);
-            } 
+            if (cmd === PingPacket.commandName) {
+                return self.send(packet);
+            } else if (cmd === EchoPacket.commandName) {
+                return self.send(packet);
+            } else if (cmd === EchoAllPacket.commandName) {
+                return self.broadcast(packet);
+            }
+            
             if (user == null) {
                 console.log("User is null!!!!");
                 return;
             }
 
             // handle event
-            if (cmd == 'connect') {
-                user.connect(world, obj);
-            } else if (cmd == 'disconnect') {
-                user.disconnect(world, obj);
-            } else if (cmd == 'c2s_requestMap') {
-                user.c2s_requestMap(world, obj);
-            } else if (cmd == 'c2s_requestMove') {
-                user.c2s_requestMove(world, obj);
+            if (cmd == ConnectPacket.commandName) {
+                user.connect(world, <ConnectPacket> packet);
+            } else if (cmd == DisconnectPacket.commandName) {
+                user.disconnect(world, <DisconnectPacket> packet);
+            } else if (cmd == RequestMapPacket.commandName) {
+                user.c2s_requestMap(world, <RequestMapPacket> packet);
+            } else if (cmd == RequestMovePacket.commandName) {
+                user.c2s_requestMove(world, <RequestMovePacket> packet);
             } else {
                 console.log('cmd:' + cmd + ' is unknown command');
             }
         }
 
-        send(cmd: string, ctx) {
+        send(packet: BasePacket) {
             var self = this;
-            return self.socket.emit(cmd, ctx);
+            return self.socket.emit(packet.command, packet.toJson());
         }
 
-        broadcast(cmd: string, ctx) {
+        broadcast(packet: BasePacket) {
             var self = this;
-            return self.io.emit(cmd, ctx);
+            return self.io.emit(packet.command, packet.toJson());
         }
     }
 
@@ -214,10 +217,12 @@ module kisaragi {
             var self = this;
             self.socket = socket;
 
-            socket.on('s2c_ping', function (obj) {
+            socket.on(PingPacket.commandName, function (obj) {
+                var packet = <PingPacket> BasePacket.createFromJson(obj);
+                
                 self.count += 1;
                 var now = Date.now();
-                var prev = obj.timestamp;
+                var prev = packet.timestamp;
                 var diff = now - prev;
                 if (self.logs.length < self.windowSize) {
                     self.logs.push(diff);
@@ -239,8 +244,8 @@ module kisaragi {
 
         ping() {
             var self = this;
-            var timestamp = Date.now();
-            self.socket.emit('c2s_ping', { timestamp: timestamp });
+            var packet = PingPacket.create();
+            self.socket.emit(packet.command, packet.toJson());
         }
 
         max() {
@@ -282,10 +287,12 @@ module kisaragi {
             self.socket = socket;
 
             var echoCallback = (ctx) => {
-                self.dumpCommunication('echo', ctx);
+                var packet = <EchoPacket> BasePacket.createFromJson(ctx);
+                self.dumpCommunication(packet.command, packet.data);
             };
             var echoAllCallback = (ctx) => {
-                self.dumpCommunication('echoAll', ctx);
+                var packet = <EchoAllPacket> BasePacket.createFromJson(ctx);
+                self.dumpCommunication(packet.command, packet.data);
             };
 
             if (callbacks !== undefined) {
@@ -297,8 +304,8 @@ module kisaragi {
                 }
             }
 
-            socket.on('s2c_echo', echoCallback);
-            socket.on('s2c_echoAll', echoAllCallback);
+            socket.on(EchoPacket.commandName, echoCallback);
+            socket.on(EchoAllPacket.commandName, echoAllCallback);
         }
 
         dumpCommunication(cmd, obj) {
@@ -306,11 +313,13 @@ module kisaragi {
         }
 
         echo(ctx) {
-            this.socket.emit('c2s_echo', ctx);
+            var packet = EchoPacket.create(ctx);
+            this.socket.emit(packet.command, packet.toJson());
         }
 
         echoAll(ctx) {
-            this.socket.emit('c2s_echoAll', ctx);
+            var packet = EchoAllPacket.create(ctx);
+            this.socket.emit(packet.command, packet.toJson());
         }
     }
 }

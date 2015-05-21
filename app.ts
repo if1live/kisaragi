@@ -1,7 +1,5 @@
 /// <reference path="app/app.d.ts" />
 
-// client 에서는 require 사용 불가능
-
 // initialize game context
 var world = new kisaragi.GameWorld(kisaragi.Role.Client);
 var level = world.level;
@@ -36,23 +34,23 @@ var socket = null;
 var ping = null;
 var echoRunner = null;
 
-function getUserSprite(gameObject) {
+function getUserSprite(gameObject: kisaragi.Entity) {
     return getCommonSprite(gameObject, 'user');
 }
 
-function getCurrUserSprite(gameObject) {
+function getCurrUserSprite(gameObject: kisaragi.Entity) {
     return getCommonSprite(gameObject, 'current_user');
 }
 
-function getEnemySprite(gameObject) {
+function getEnemySprite(gameObject: kisaragi.Entity) {
     return getCommonSprite(gameObject, 'enemy');
 }
 
-function getItemSprite(gameObject) {
+function getItemSprite(gameObject: kisaragi.Entity) {
     return getCommonSprite(gameObject, 'item');
 }
 
-function getCommonSprite(gameObject, spriteName) {
+function getCommonSprite(gameObject: kisaragi.Entity, spriteName: string) {
     if (gameObject.sprite === undefined || gameObject.sprite === null) {
         var sprite = game.add.sprite(-100, -100, spriteName);
         characterGroup.add(sprite);
@@ -65,17 +63,16 @@ function getCommonSprite(gameObject, spriteName) {
     return gameObject.sprite;
 }
 
-function createGameObject(data) {
-    // TODO 서버와 클라의 보내는 패킷 규격 일치시키기
+function createGameObject(packet: kisaragi.NewObjectPacket) {
     var gameObject: kisaragi.Entity = null;
 
-    var movableId = data.id;
-    var pos = new kisaragi.Coord(data.x, data.y);
+    var movableId = packet.movableId;
+    var pos = new kisaragi.Coord(packet.x, packet.y);
 
-    if (data.category === kisaragi.Category.Player) {
+    if (packet.category === kisaragi.Category.Player) {
         gameObject = kisaragi.Player.createClientEntity(movableId, socket);
         gameObject.pos = pos;
-    } else if (data.category === kisaragi.Category.Enemy) {
+    } else if (packet.category === kisaragi.Category.Enemy) {
         gameObject = new kisaragi.Enemy(movableId, kisaragi.Role.Client, pos);
         //gameObject = new Enemy();
     } else {
@@ -86,7 +83,7 @@ function createGameObject(data) {
 
     var sprite = null;
     if (gameObject.category === kisaragi.Category.Player) {
-        if (data.id === currUserId) {
+        if (packet.movableId === currUserId) {
             sprite = getCurrUserSprite(gameObject);
         } else {
             sprite = getUserSprite(gameObject);
@@ -102,7 +99,7 @@ function createGameObject(data) {
     return gameObject;
 }
 
-function updateGameObjectPos(gameObject) {
+function updateGameObjectPos(gameObject: kisaragi.Entity) {
     var tileX = gameObject.pos.x;
     var tileY = level.height - gameObject.pos.y - 1;
     var x = tileX * tileSize;
@@ -113,27 +110,32 @@ function updateGameObjectPos(gameObject) {
 }
 
 function registerSocketHandler(socket) {
-    socket.on('s2c_login', function (data) {
-        //console.log(data);
-        console.log('Login : userId=' + data.id);
-        currUserId = data.id;
-        level.width = data.width;
-        level.height = data.height;
+    socket.on(kisaragi.LoginPacket.commandName, function (data) {
+        var packet = <kisaragi.LoginPacket> kisaragi.BasePacket.createFromJson(data);
+        
+        console.log('Login : userId=' + packet.movableId);
+        currUserId = packet.movableId;
+        level.width = packet.width;
+        level.height = packet.height;
 
-        currUser = createGameObject(data);
+        var newObjPacket = kisaragi.NewObjectPacket.create(packet.movableId, kisaragi.Category.Player, packet.x, packet.y);
+        currUser = createGameObject(newObjPacket);
     
         // sometime, socket io connection end before game context created
-        socket.emit('c2s_requestMap', {});
+        var requestMapPacket = kisaragi.RequestMapPacket.create();
+        socket.emit(requestMapPacket.command, requestMapPacket.generateJson);
     });
 
-    socket.on('s2c_responseMap', function (data) {
+
+    socket.on(kisaragi.ResponseMapPacket.commandName, function (data) {
+        var packet = <kisaragi.ResponseMapPacket> kisaragi.BasePacket.createFromJson(data);
         //console.log(data);
         console.log('Load Level data from server');
             
         // object synchronize by serializer/deserializer
-        level.width = data.width;
-        level.height = data.height;
-        level.data = data.data;
+        level.width = packet.width;
+        level.height = packet.height;
+        level.data = packet.data;
 
         // generate tile map from server data
         // TODO lazy level loading
@@ -157,27 +159,28 @@ function registerSocketHandler(socket) {
         }
     });
 
-    socket.on('s2c_newObject', function (data) {
-        //console.log(data);
-        console.log('New Object : id=' + data.id);
-        if (!world.findObject(data.id)) {
+    socket.on(kisaragi.NewObjectPacket.commandName, function (data) {
+        var packet = <kisaragi.NewObjectPacket> kisaragi.BasePacket.createFromJson(data);
+        console.log('New Object : id=' + packet.movableId);
+        if (!world.findObject(packet.movableId)) {
             // create user to world
-            createGameObject(data);
+            createGameObject(packet);
         } else {
-            console.log('Object id=' + data.id + 'is already created');
+            console.log('Object id=' + packet.movableId + 'is already created');
         }
     });
 
-    socket.on('s2c_removeObject', function (data) {
-        //console.log(data);
-        console.log('Remove Object : id=' + data.id);
-        world.removeId(data.id);
+    socket.on(kisaragi.RemoveObjectPacket.commandName, function (data) {
+        var packet = <kisaragi.RemoveObjectPacket> kisaragi.BasePacket.createFromJson(data);
+        console.log('Remove Object : id=' + packet.movableId);
+        world.removeId(packet.movableId);
     });
 
-    socket.on('s2c_moveNotify', function (data) {
-        //console.log(data);
-        var gameObject = world.findObject(data.id);
-        gameObject.pos = data.pos;
+    socket.on(kisaragi.MoveNotifyPacket.commandName, function (data) {
+        var packet = <kisaragi.MoveNotifyPacket> kisaragi.BasePacket.createFromJson(data);
+        var gameObject = world.findObject(packet.movableId);
+        gameObject.x = packet.x;
+        gameObject.y = packet.y;
         updateGameObjectPos(gameObject);
     });
 }

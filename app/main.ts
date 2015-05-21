@@ -49,13 +49,15 @@ app.get('/admin', (req, res) => {
 io.on('connection', (socket) => {
     var client = server.connectSocketIO(socket);
     var user = world.createUser(client);
-    client.onEvent('connect', world, user, {});
+    var packet = new kisaragi.ConnectPacket();
+    client.onEvent(packet, world, user);
     console.log(`[User=${user.movableId}] connected`);
 
-    socket.on('disconnect', function () {
+    socket.on(kisaragi.DisconnectPacket.commandName, function () {
         var client = server.find({ socket_io: socket });
         var user = client.user;
-        client.onEvent('disconnect', world, user, {});
+        var packet = new kisaragi.DisconnectPacket();
+        client.onEvent(packet, world, user);
 
         server.disconnectSocketIO(socket);
         console.log(`[User=${user.movableId}] disconnected`);
@@ -63,23 +65,21 @@ io.on('connection', (socket) => {
 
 
     var cmdList = [
-        // for game
-        // 게임 기본 정보 요청
-        'c2s_requestMap',
-
-        // 이동
-        'c2s_requestMove',
-
         // for development
-        'c2s_ping',
-        'c2s_echo',
-        'c2s_echoAll'
+        kisaragi.PingPacket.commandName,
+        kisaragi.EchoPacket.commandName,
+        kisaragi.EchoAllPacket.commandName,
+        
+        // for game
+        kisaragi.RequestMapPacket.commandName,
+        kisaragi.RequestMovePacket.commandName
     ];
 
     function registerCommand(cmd) {
         socket.on(cmd, function (obj) {
             var client = server.find({ socket_io: socket });
-            client.onEvent(cmd, world, client.user, obj);
+            var packet = kisaragi.BasePacket.createFromJson(obj);
+            client.onEvent(packet, world, client.user);
         });
     }
     for (var i = 0; i < cmdList.length; i += 1) {

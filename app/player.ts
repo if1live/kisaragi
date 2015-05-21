@@ -33,54 +33,42 @@ module kisaragi {
             return player;
         }
 
-        connect(world: GameWorld, data) {
+        connect(world: GameWorld, packet: ConnectPacket) {
             var self = this;
             world.addUser(self);
 
-            var loginData = {
-                id: this.movableId,
-                category: this.category,
-                x: this.x,
-                y: this.y,
-                width: world.level.width,
-                height: world.level.height
-            }
-            self.svrSock.send('s2c_login', loginData);
+            var loginPacket = LoginPacket.create(
+                this.movableId,
+                this.x,
+                this.y,
+                world.level.width,
+                world.level.height
+            );
+            self.svrSock.send(loginPacket);
 
-            self.svrSock.broadcast('s2c_newObject', {
-                id: this.movableId,
-                category: this.category,
-                x: this.x,
-                y: this.y
-            });
+            var newObjectPacket = NewObjectPacket.create(this.movableId, this.category, this.x, this.y);
+            self.svrSock.broadcast(newObjectPacket);
     
             // give dynamic object's info to new user
             _.each(world.allObjectList(), function (ent: Entity) {
-                self.svrSock.send('s2c_newObject', {
-                    id: ent.movableId,
-                    category: ent.category,
-                    x: ent.x,
-                    y: ent.y
-                });
+                var newObjectPacket = NewObjectPacket.create(ent.movableId, ent.category, ent.x, ent.y);
+                self.svrSock.send(newObjectPacket);
             });
         };
 
-        disconnect(world: GameWorld, data) {
+        disconnect(world: GameWorld, packet: DisconnectPacket) {
             var self = this;
             world.removeUser(self);
-            self.svrSock.broadcast('s2c_removeObject', {
-                id: self.movableId
-            });
+            
+            var removePacket = RemoveObjectPacket.create(self.movableId);
+            self.svrSock.send(removePacket);
         };
 
-        c2s_requestMap(world: GameWorld, data) {
+        c2s_requestMap(world: GameWorld, packet: RequestMapPacket) {
             var self = this;
-            data = {
-                data: world.level.data,
-                width: world.level.width,
-                height: world.level.height
-            }
-            self.svrSock.send('s2c_responseMap', data);
+            
+            var responseMapPacket = ResponseMapPacket.create(world.level);
+            self.svrSock.send(responseMapPacket);
         };
 
         // move function
@@ -123,15 +111,13 @@ module kisaragi {
             if (self.world && !self.world.isMovablePos(x, y)) {
                 return;
             }
-            self.cliSock.emit('c2s_requestMove', {
-                x: x,
-                y: y
-            });
+            var packet:RequestMovePacket = RequestMovePacket.create(this.movableId, x, y);
+            self.cliSock.emit(packet.command, packet.toJson());
         };
 
-        c2s_requestMove(world: GameWorld, data) {
-            if (world.isMovablePos(data.x, data.y)) {
-                this.targetPos = new Coord(data.x, data.y);
+        c2s_requestMove(world: GameWorld, packet: RequestMovePacket) {
+            if (world.isMovablePos(packet.x, packet.y)) {
+                this.targetPos = new Coord(packet.x, packet.y);
             }
         };
     }

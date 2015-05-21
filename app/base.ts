@@ -55,7 +55,7 @@ module kisaragi {
         moveCooltime: number;    
 
         // renderable
-        //self.sprite = null;
+        sprite: Phaser.Sprite;
     
         constructor(id: number) {
             this.movableId = id;
@@ -63,6 +63,7 @@ module kisaragi {
             this.targetPos = null;
             this.world = null;
             this.moveCooltime = COOLTIME_MOVE;
+            this.sprite = null;
         }
         get x(): number {
             return this.pos.x;
@@ -86,10 +87,8 @@ module kisaragi {
                 var maxDist = 1000000;
                 var dist = Math.abs(self.x - user.x) + Math.abs(self.y - user.y);
                 if (dist < maxDist) {
-                    user.svrSock.send('s2c_moveNotify', {
-                        id: self.movableId,
-                        pos: self.pos
-                    });
+                    var packet = MoveNotifyPacket.create(self.movableId, self.x, self.y);
+                    user.svrSock.send(packet);
                 }
             });
         };

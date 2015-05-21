@@ -63,7 +63,6 @@ describe('Server', function () {
     });
 });
 
-
 describe('ClientEcho', () => {
     beforeEach(() => {
         function DummySocket() {
@@ -75,9 +74,8 @@ describe('ClientEcho', () => {
                 self.called[cmd] = false;
             };
             self.emit = function (cmd, ctx) {
-                var nextCmd = cmd.replace('c2s', 's2c');
-                self.cmdTable[nextCmd](ctx);
-                self.called[nextCmd] = true;
+                self.cmdTable[cmd](ctx);
+                self.called[cmd] = true;
             };
         }
         this.socket = new DummySocket();
@@ -90,14 +88,13 @@ describe('ClientEcho', () => {
     describe('#echo()', () => {
         it('success', () => {
             this.echo.echo('data');
-            assert.equal(this.socket.called.s2c_echo, true);
+            assert.equal(this.socket.called.echo, true);
         });
     });
     describe('#echoAll()', () => {
         it('success', () => {
             this.echo.echoAll('data');
-            assert.equal(this.socket.called.s2c_echoAll, true);
+            assert.equal(this.socket.called.echoAll, true);
         });
     });
 });
-

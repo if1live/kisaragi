@@ -30,25 +30,25 @@ module kisaragi {
             self.level = new Level();
         }
 
-        loadLevelFile(filename) {
+        loadLevelFile(filename: string) {
             this.level.loadFromFile(filename);
         };
 
-        getNextId() {
+        getNextId(): number {
             var self = this;
             var retval = self.nextClientId;
             self.nextClientId += 1;
             return retval;
         };
 
-        getRunningTime() {
+        getRunningTime(): number {
             var self = this;
             var now = Date.now();
             return (now - self.initialTime) / 1000;
         };
 
         // General Game Object Access Function Start
-        objectList(category: Category) {
+        objectList(category: Category): Entity[] {
             var self = this;
             if (self.objectListTable[category] === undefined) {
                 self.objectListTable[category] = [];
@@ -56,11 +56,11 @@ module kisaragi {
             return self.objectListTable[category];
         };
 
-        objectListHelper(category: Category) {
+        objectListHelper(category: Category): EntityListHelper {
             return new EntityListHelper(this.objectList(category));
         };
 
-        allObjectList() {
+        allObjectList(): Entity[] {
             var self = this;
             var objList = [];
             _.each(_.values(self.objectListTable), function (list, idx) {
@@ -69,7 +69,7 @@ module kisaragi {
             return objList;
         };
 
-        addObject(obj: Entity) {
+        addObject(obj: Entity): boolean {
             var self = this;
             if (!obj.world) {
                 obj.world = self;
@@ -83,7 +83,7 @@ module kisaragi {
             }
         };
 
-        attachObject(obj) {
+        attachObject(obj: Entity): boolean {
             var self = this;
             if (!obj.world) {
                 obj.world = self;
@@ -93,9 +93,10 @@ module kisaragi {
                 return false;
             }
             self.objectListHelper(obj.category).add(obj);
+            return true;
         };
 
-        removeObject(obj) {
+        removeObject(obj: Entity) {
             if (obj.sprite) {
                 obj.sprite.parent.removeChild(obj.sprite);
                 obj.sprite.destroy();
@@ -103,7 +104,7 @@ module kisaragi {
             this.objectListHelper(obj.category).removeEntity(obj);
         };
 
-        removeId(pk) {
+        removeId(pk: number) {
             var self = this;
             var obj = self.findObject(pk);
             if (obj) {
@@ -111,7 +112,7 @@ module kisaragi {
             }
         };
 
-        findObject(pk) {
+        findObject(pk: number): Entity {
             var filtered = _.map(_.values(this.objectListTable), function (list) {
                 var helper = new EntityListHelper(list);
                 return helper.find(pk);
@@ -122,7 +123,7 @@ module kisaragi {
             return filtered[0];
         };
 
-        getObject(x: number, y: number) {
+        getObject(x: number, y: number): Entity {
             var self = this;
             // if object exist, return object(user, enemy,...)
             var pred = function (el: Entity) {
@@ -157,16 +158,16 @@ module kisaragi {
         };
 
         // User 
-        getUserCount() {
+        getUserCount(): number {
             return this.objectList(Category.Player).length;
         }
 
-        createUser(sock) {
+        createUser(sock: ServerSocket): Player {
             var user = Player.createServerEntity(null, sock);
             return user;
         }
 
-        addUser(user) {
+        addUser(user: Player) {
             var self = this;
             // 유저를 적당한 곳에 배치하기
             var pos = self.findAnyEmptyPos();
@@ -174,17 +175,17 @@ module kisaragi {
             self.addObject(user);
         }
 
-        findUser(pk) {
+        findUser(pk: number) {
             return this.objectListHelper(Category.Player).find(pk);
         }
 
-        removeUser(user) {
+        removeUser(user: Player) {
             var self = this;
             self.removeObject(user);
         }
 
         // Enemy
-        generateEnemy() {
+        generateEnemy(): Enemy {
             var self = this;
             var pos = self.findAnyEmptyPos();
             var enemy = new Enemy(null, Role.Server, pos);
@@ -194,7 +195,7 @@ module kisaragi {
   
         // level
         // can i go there?
-        isMovablePos(x, y) {
+        isMovablePos(x: number, y: number): boolean {
             var self = this;
             // level range check
             var pos = self.level.filterPosition(x, y);
@@ -214,7 +215,7 @@ module kisaragi {
         }
 
         // Game Logic
-        update(delta) {
+        update(delta: number) {
             var self = this;
             self.tickCount += 1;
             //console.log('Hi there! (frame=%s, delta=%s)', self.frameCount++, delta);

@@ -53,7 +53,7 @@ module kisaragi {
             }
         }
 
-        loadFromFile(filename) {
+        loadFromFile(filename: string) {
             var data: string = fs.readFileSync(filename, 'utf-8');
             var rows: string[] = data.split('\n');
 
@@ -91,7 +91,7 @@ module kisaragi {
             return obstacles;
         }
 
-        createGrid(world) {
+        createGrid(world: GameWorld) {
             // static elem
             var matrix = JSON.parse(JSON.stringify(this.data));
             for (var y: number = 0; y < this.height; y += 1) {
@@ -130,7 +130,7 @@ module kisaragi {
             return this.tile(x, y) == TileCode.Empty;
         }
 
-        findPath(start_pos: Coord, target_pos: Coord, world): Array<Coord> {
+        findPath(start_pos: Coord, target_pos: Coord, world: GameWorld): Array<Coord> {
             var grid = this.createGrid(world);
             var finder = new PF.AStarFinder();
             var rawPath = finder.findPath(start_pos.x, start_pos.y, target_pos.x, target_pos.y, grid);
@@ -142,7 +142,7 @@ module kisaragi {
             return path;
         }
 
-        findNextPos(start_pos: Coord, target_pos: Coord, world): Coord {
+        findNextPos(start_pos: Coord, target_pos: Coord, world: GameWorld): Coord {
             var path = this.findPath(start_pos, target_pos, world);
             if (path.length == 0) {
                 return null;
