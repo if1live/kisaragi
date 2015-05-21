@@ -41,7 +41,7 @@
     <TypeScriptCompile Include="app\enemy.ts" />
     <TypeScriptCompile Include="app\base.ts" />
     <TypeScriptCompile Include="app\level.ts" />
-    <TypeScriptCompile Include="app\main.ts" />
+    <TypeScriptCompile Include="app\server_main.ts" />
     <TypeScriptCompile Include="app\game_world.ts" />
     <TypeScriptCompile Include="app\network.ts" />
     <TypeScriptCompile Include="test\base_spec.ts" />

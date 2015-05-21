@@ -157,7 +157,7 @@ module.exports = function (grunt) {
     nodemon: {
       dev: {
         options: {
-          file: 'app/main.js',
+          file: 'run_server.js',
           watchedExtensions: ['js', 'json'],
           watchedFolders: ['app', 'test']
         }

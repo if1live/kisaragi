@@ -21,4 +21,4 @@
 ///<reference path="level.ts"/>
 ///<reference path="game_world.ts"/>
 
-///<reference path="main.ts"/>
+///<reference path="server_main.ts"/>

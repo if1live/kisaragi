@@ -15,7 +15,7 @@ module kisaragi {
         io: SocketIO.Server;
         sockList: ServerSocket[];
 
-        constructor(io: SocketIO.Server) {
+        constructor(io) {
             var self = this;
             self.io = io;
 

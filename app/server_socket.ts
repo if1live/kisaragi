@@ -10,7 +10,7 @@ module kisaragi {
     export class ServerSocket {
         uuid: string;
         category: ServerSocketCategory;
-        user: Entity;
+        user: Player;
 
         constructor(category: ServerSocketCategory, uuid_val: string) {
             this.category = category;
