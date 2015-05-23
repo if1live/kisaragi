@@ -36,10 +36,13 @@ module.exports = function (grunt) {
             'requirejs/require.js',
             'assert/assert.js',
             'sprintf/dist/sprintf.min.js',
-            'pathfinding/*.js'
+            'pathfinding/*.js',
+            'mocha/mocha.js',
+            'node-uuid/uuid.js'
           ],
           'publish/libs/css': [
             'bootstrap/dist/css/*.css',
+            'mocha/mocha.css'
           ],
           'publish/libs/fonts': [
             'bootstrap/dist/fonts/*',
