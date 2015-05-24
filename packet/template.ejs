@@ -1,0 +1,48 @@
+module kisaragi {
+    export enum PacketType {
+    <% for(var i = 0 ; i < packets.length ; i += 1) { %>
+        <%= packets[i].name -%>,
+    <% } %>
+    }
+    
+    <% for(var i = 0 ; i < packets.length ; i += 1) { %>
+<% var packet = packets[i] -%>
+    export class <%=packet.classname()%> extends BasePacket {
+        <% for(var j = 0 ; j < packet.attrs.length ; j += 1) { %>
+<% var attr = packet.attrs[j] -%>
+        <%=attr.name %>: <%- attr.type -%>;
+        <% } %>
+        
+        constructor() {
+            super(PacketType.<%= packet.name %>);
+        }
+        
+        get command(): string {
+            return '<%=packet.command%>';
+        }
+        _generateJson(): any {
+            return {
+                <% for(var j = 0 ; j < packet.attrs.length ; j += 1) { %>
+<% var attr = packet.attrs[j] -%>
+                <%=attr.name%>: this.<%=attr.name -%>, 
+                <% } %>
+            };
+        }
+        loadJson(data: any) {
+            <% for(var j = 0 ; j < packet.attrs.length ; j += 1) { %>
+<% var attr = packet.attrs[j] -%>
+            this.<%=attr.name%> = data.<%=attr.name -%>; 
+            <% } %>
+        }
+    }
+    <% } %>
+}
+
+declare var exports: any;
+if (typeof exports !== 'undefined') {
+    exports.PacketType = kisaragi.PacketType;
+    <% for(var i = 0 ; i < packets.length ; i += 1) { %>
+    exports.<%= packets[i].classname() -%> = kisaragi.<%= packets[i].classname() -%>;
+    <% } %>
+}
+
