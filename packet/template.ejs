@@ -15,6 +15,10 @@ module kisaragi {
         
         constructor() {
             super(PacketType.<%= packet.name %>);
+            <% for(var j = 0 ; j < packet.attrs.length ; j += 1) { %>
+<% var attr = packet.attrs[j] -%>
+            this.<%=attr.name%> = <%= attr.defaultValue %>;<% -%>
+            <% } %>
         }
         
         get command(): string {

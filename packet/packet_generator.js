@@ -10,7 +10,18 @@ function PacketAttribute(data) {
   var self = this;
   self.name = data[0];
   self.type = data[1];
-  self.defaultValue = data[2];
+
+  if(data[2] !== undefined) {
+    self.defaultValue = data[2];
+  } else {
+    if(self.type === 'number') {
+      self.defaultValue = 0;
+    } else if(self.type === 'string') {
+      self.defaultValue = "''";
+    } else {
+      self.defaultValue = 'null';
+    }
+  }
 }
 
 
