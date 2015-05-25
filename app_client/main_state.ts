@@ -128,11 +128,12 @@ module kisaragi {
                 self.level.width = packet.width;
                 self.level.height = packet.height;
 
-                var newObjPacket = PacketFactory.newObject(packet.movableId, Category.Player, packet.x, packet.y);
+                var factory = new PacketFactory();
+                var newObjPacket = factory.newObject(packet.movableId, Category.Player, packet.x, packet.y);
                 self.currUser = <Player> self.createGameObject(newObjPacket);
     
                 // sometime, socket io connection end before game context created
-                var requestMapPacket = PacketFactory.requestMap();
+                var requestMapPacket = factory.createRequestMap();
                 socket.emit(requestMapPacket.command, requestMapPacket.toJson());
             });
 

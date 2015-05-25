@@ -1,10 +1,9 @@
+///<reference path="../app.d.ts"/>
+/*
+Auto generated code
+*/
+
 module kisaragi {
-    export enum PacketType {
-    <% for(var i = 0 ; i < packets.length ; i += 1) { %>
-        <%= packets[i].name -%>,
-    <% } %>
-    }
-    
     <% for(var i = 0 ; i < packets.length ; i += 1) { %>
 <% var packet = packets[i] -%>
     export class <%=packet.classname()%> extends BasePacket {
@@ -44,7 +43,6 @@ module kisaragi {
 
 declare var exports: any;
 if (typeof exports !== 'undefined') {
-    exports.PacketType = kisaragi.PacketType;
     <% for(var i = 0 ; i < packets.length ; i += 1) { %>
     exports.<%= packets[i].classname() -%> = kisaragi.<%= packets[i].classname() -%>;
     <% } %>

@@ -7,10 +7,15 @@
 
 ///<reference path="constants.ts"/>
 
+///<reference path="network/base_packet.ts"/>
+///<reference path="network/packet.ts"/>
+///<reference path="network/packet_type.ts"/>
+///<reference path="network/base_packet_factory.ts"/>
+///<reference path="network/packet_factory.ts"/>
+
 ///<reference path="network.ts"/>
 ///<reference path="server_socket.ts"/>
 
-///<reference path="packet.ts"/>
 ///<reference path="base.ts"/>
 ///<reference path="entity.ts"/>
 
