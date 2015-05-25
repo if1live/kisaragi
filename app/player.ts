@@ -7,7 +7,7 @@ if (typeof module !== 'undefined') {
 
 module kisaragi {
     export class Player extends Entity {
-        svrSock: ServerSocket;
+        svrSock: ServerConnection;
         cliSock: SocketIOClient.Socket;
 
         constructor(id: number, role: Role) {
@@ -22,7 +22,7 @@ module kisaragi {
             player.cliSock = sock;
             return player;
         }
-        static createServerEntity(id: number, sock: ServerSocket) {
+        static createServerEntity(id: number, sock: ServerConnection) {
             var player = new Player(id, Role.Server);
             player.svrSock = sock;
 
@@ -46,15 +46,15 @@ module kisaragi {
                 world.level.width,
                 world.level.height
             );
-            self.svrSock.send(loginPacket);
+            self.svrSock.sendImmediate(loginPacket);
 
             var newObjectPacket = factory.newObject(this.movableId, this.category, this.x, this.y);
-            self.svrSock.broadcast(newObjectPacket);
+            self.svrSock.broadcastImmediate(newObjectPacket);
     
             // give dynamic object's info to new user
             _.each(world.allObjectList(), function (ent: Entity) {
                 var newObjectPacket = factory.newObject(ent.movableId, ent.category, ent.x, ent.y);
-                self.svrSock.send(newObjectPacket);
+                self.svrSock.sendImmediate(newObjectPacket);
             });
         };
 
@@ -64,14 +64,14 @@ module kisaragi {
             
             var factory = new PacketFactory();
             var removePacket = factory.removeObject(self.movableId);
-            self.svrSock.broadcast(removePacket);
+            self.svrSock.broadcastImmediate(removePacket);
         };
 
         c2s_requestMap(world: GameWorld, packet: RequestMapPacket) {
             var self = this;
             var factory = new PacketFactory();
             var responseMapPacket = factory.responseMap(world.level);
-            self.svrSock.send(responseMapPacket);
+            self.svrSock.sendImmediate(responseMapPacket);
         };
 
         // move function

@@ -63,6 +63,6 @@ function renderTemplate(template_file, output_path) {
   });
 }
 
-renderTemplate('tpl_packet.ejs', __dirname + '/../app/network/packet.ts');
-renderTemplate('tpl_packet_type.ejs', __dirname + '/../app/network/packet_type.ts');
-renderTemplate('tpl_base_packet_factory.ejs', __dirname + '/../app/network/base_packet_factory.ts');
+renderTemplate('tpl_packet.ejs', __dirname + '/../app/packet/packet.ts');
+renderTemplate('tpl_packet_type.ejs', __dirname + '/../app/packet/packet_type.ts');
+renderTemplate('tpl_base_packet_factory.ejs', __dirname + '/../app/packet/base_packet_factory.ts');

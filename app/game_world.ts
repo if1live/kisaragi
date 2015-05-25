@@ -163,7 +163,7 @@ module kisaragi {
             return this.objectList(Category.Player).length;
         }
 
-        createUser(sock: ServerSocket): Player {
+        createUser(sock: ServerConnection): Player {
             var user = Player.createServerEntity(null, sock);
             return user;
         }

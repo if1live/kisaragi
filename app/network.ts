@@ -29,7 +29,7 @@ module kisaragi {
 
     export class Server {
         io: SocketIO.Server;
-        sockList: ServerSocket[];
+        sockList: ServerConnection[];
 
         constructor(io) {
             var self = this;
@@ -38,18 +38,18 @@ module kisaragi {
             self.sockList = [];
         }
 
-        connectSocketIO(socket: SocketIO.Socket): ServerSocket {
+        connectSocketIO(socket: SocketIO.Socket): ServerConnection {
             var self = this;
-            var sock = ServerSocket.socketIO(uuid.v1(), socket, self.io);
+            var sock = ServerConnection.socketIO(uuid.v1(), socket, self.io);
             self.sockList.push(sock);
             return sock;
         };
 
-        find(opts): ServerSocket {
+        find(opts): ServerConnection {
             var self = this;
 
             var filterTable = {
-                'uuid': (sock: ServerSocket) => {
+                'uuid': (sock: ServerConnection) => {
                     return sock.uuid === opts.uuid;
                 },
                 'socket_io': (sock) => {
@@ -253,7 +253,7 @@ module kisaragi {
 
 declare var exports: any;
 if (typeof exports !== 'undefined') {
-    exports.ServerSocket = kisaragi.ServerSocket;
+    exports.ServerConnection = kisaragi.ServerConnection;
     exports.Server = kisaragi.Server;
     
     exports.createMockSocketIOServer = kisaragi.createMockSocketIOServer;
