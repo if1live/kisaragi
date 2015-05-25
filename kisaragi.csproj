@@ -23,6 +23,7 @@
     <Content Include="Gruntfile.js" />
     <Content Include="index.html" />
     <TypeScriptCompile Include="app\app.d.ts" />
+    <TypeScriptCompile Include="app\client_connection.ts" />
     <TypeScriptCompile Include="app\entity.ts" />
     <TypeScriptCompile Include="app\packet\base_packet.ts" />
     <TypeScriptCompile Include="app\packet\packet.ts" />

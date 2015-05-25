@@ -7,8 +7,8 @@ if (typeof module !== 'undefined') {
 
 module kisaragi {
     export class Player extends Entity {
-        svrSock: ServerConnection;
-        cliSock: SocketIOClient.Socket;
+        svrConn: ServerConnection;
+        cliConn: ClientConnection;
 
         constructor(id: number, role: Role) {
             super(id);
@@ -17,18 +17,18 @@ module kisaragi {
             this.role = role;
         }
 
-        static createClientEntity(id: number, sock: SocketIOClient.Socket) {
+        static createClientEntity(id: number, conn: ClientConnection) {
             var player = new Player(id, Role.Client);
-            player.cliSock = sock;
+            player.cliConn = conn;
             return player;
         }
-        static createServerEntity(id: number, sock: ServerConnection) {
+        static createServerEntity(id: number, conn: ServerConnection) {
             var player = new Player(id, Role.Server);
-            player.svrSock = sock;
+            player.svrConn = conn;
 
             // sock - user는 서로 연결시켜놓기. sock != socket io object
-            if (sock) {
-                sock.user = player;
+            if (conn) {
+                conn.user = player;
             }
 
             return player;
@@ -46,15 +46,15 @@ module kisaragi {
                 world.level.width,
                 world.level.height
             );
-            self.svrSock.sendImmediate(loginPacket);
+            self.svrConn.sendImmediate(loginPacket);
 
             var newObjectPacket = factory.newObject(this.movableId, this.category, this.x, this.y);
-            self.svrSock.broadcastImmediate(newObjectPacket);
+            self.svrConn.broadcastImmediate(newObjectPacket);
     
             // give dynamic object's info to new user
             _.each(world.allObjectList(), function (ent: Entity) {
                 var newObjectPacket = factory.newObject(ent.movableId, ent.category, ent.x, ent.y);
-                self.svrSock.sendImmediate(newObjectPacket);
+                self.svrConn.sendImmediate(newObjectPacket);
             });
         };
 
@@ -64,14 +64,14 @@ module kisaragi {
             
             var factory = new PacketFactory();
             var removePacket = factory.removeObject(self.movableId);
-            self.svrSock.broadcastImmediate(removePacket);
+            self.svrConn.broadcastImmediate(removePacket);
         };
 
         c2s_requestMap(world: GameWorld, packet: RequestMapPacket) {
             var self = this;
             var factory = new PacketFactory();
             var responseMapPacket = factory.responseMap(world.level);
-            self.svrSock.sendImmediate(responseMapPacket);
+            self.svrConn.sendImmediate(responseMapPacket);
         };
 
         // move function
@@ -116,7 +116,7 @@ module kisaragi {
             }
             var factory = new PacketFactory();
             var packet:RequestMovePacket = factory.requestMove(this.movableId, x, y);
-            self.cliSock.emit(packet.command, packet.toJson());
+            self.cliConn.sendImmediate(packet);
         };
 
         c2s_requestMove(world: GameWorld, packet: RequestMovePacket) {

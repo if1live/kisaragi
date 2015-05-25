@@ -9,11 +9,10 @@ if (typeof module !== 'undefined') {
 describe('Player[Client]', function () {
     describe('move function', function () {
         var subject: kisaragi.Player = null;
-        var sock = null;
 
         beforeEach(function () {
-            sock = kisaragi.createMockSocketIOClient(null);
-            subject = kisaragi.Player.createClientEntity(1, sock);
+            var conn = kisaragi.ClientConnection.mock();
+            subject = kisaragi.Player.createClientEntity(1, conn);
             subject.x = 0;
             subject.y = 0;
         });

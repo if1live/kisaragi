@@ -15,6 +15,7 @@
 
 ///<reference path="network.ts"/>
 ///<reference path="server_connection.ts"/>
+///<reference path="client_connection.ts"/>
 
 ///<reference path="base.ts"/>
 ///<reference path="entity.ts"/>

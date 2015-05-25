@@ -31,6 +31,7 @@ module kisaragi {
 
         // network
         socket: SocketIOClient.Socket;
+        conn: ClientConnection;
         ping: ClientPing;
         echoRunner: ClientEcho;
 
@@ -79,7 +80,7 @@ module kisaragi {
             var pos = new Coord(packet.x, packet.y);
 
             if (packet.category === Category.Player) {
-                gameObject = Player.createClientEntity(movableId, this.socket);
+                gameObject = Player.createClientEntity(movableId, this.conn);
                 gameObject.pos = pos;
             } else if (packet.category === Category.Enemy) {
                 gameObject = new Enemy(movableId, Role.Client, pos);
@@ -118,11 +119,9 @@ module kisaragi {
             sprite.position.y = y;
         }
 
-        registerSocketHandler(socket) {
+        registerSocketHandler(conn: ClientConnection) {
             var self = this;
-            socket.on(PacketFactory.toCommand(PacketType.Login), function (data) {
-                var packet = <LoginPacket> PacketFactory.createFromJson(data);
-
+            conn.registerHandler(PacketType.Login, function (packet: LoginPacket) {
                 console.log('Login : userId=' + packet.movableId);
                 self.currUserId = packet.movableId;
                 self.level.width = packet.width;
@@ -134,12 +133,10 @@ module kisaragi {
     
                 // sometime, socket io connection end before game context created
                 var requestMapPacket = factory.createRequestMap();
-                socket.emit(requestMapPacket.command, requestMapPacket.toJson());
+                conn.sendImmediate(requestMapPacket);
             });
 
-
-            socket.on(PacketFactory.toCommand(PacketType.ResponseMap), function (data) {
-                var packet = <ResponseMapPacket> PacketFactory.createFromJson(data);
+            conn.registerHandler(PacketType.ResponseMap, function(packet: ResponseMapPacket) {
                 //console.log(data);
                 console.log('Load Level data from server');
             
@@ -170,8 +167,7 @@ module kisaragi {
                 }
             });
 
-            socket.on(PacketFactory.toCommand(PacketType.NewObject), function (data) {
-                var packet = <NewObjectPacket> PacketFactory.createFromJson(data);
+            conn.registerHandler(PacketType.NewObject, function (packet: NewObjectPacket) {
                 console.log('New Object : id=' + packet.movableId);
                 if (!self.gameWorld.findObject(packet.movableId)) {
                     // create user to world
@@ -181,14 +177,12 @@ module kisaragi {
                 }
             });
 
-            socket.on(PacketFactory.toCommand(PacketType.RemoveObject), function (data) {
-                var packet = <RemoveObjectPacket> PacketFactory.createFromJson(data);
+            conn.registerHandler(PacketType.RemoveObject, function (packet: RemoveObjectPacket) {
                 console.log('Remove Object : id=' + packet.movableId);
                 self.gameWorld.removeId(packet.movableId);
             });
 
-            socket.on(PacketFactory.toCommand(PacketType.MoveNotify), function (data) {
-                var packet = <MoveNotifyPacket> PacketFactory.createFromJson(data);
+            conn.registerHandler(PacketType.MoveNotify, function (packet: MoveNotifyPacket) {
                 var gameObject = self.gameWorld.findObject(packet.movableId);
                 gameObject.x = packet.x;
                 gameObject.y = packet.y;
@@ -242,7 +236,8 @@ module kisaragi {
             var host = window.location.hostname;
             var url = 'http://' + host + ':' + HTTP_PORT;
             this.socket = io(url);
-            this.registerSocketHandler(this.socket);
+            this.conn = ClientConnection.socketIO(this.socket);
+            this.registerSocketHandler(this.conn);
 
             this.echoRunner = new ClientEcho(this.socket, {});
             this.ping = new ClientPing(this.socket);
