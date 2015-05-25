@@ -38,7 +38,8 @@ module kisaragi {
             var self = this;
             world.addUser(self);
 
-            var loginPacket = PacketFactory.login(
+            var factory = new PacketFactory();
+            var loginPacket = factory.login(
                 this.movableId,
                 this.x,
                 this.y,
@@ -47,12 +48,12 @@ module kisaragi {
             );
             self.svrSock.send(loginPacket);
 
-            var newObjectPacket = PacketFactory.newObject(this.movableId, this.category, this.x, this.y);
+            var newObjectPacket = factory.newObject(this.movableId, this.category, this.x, this.y);
             self.svrSock.broadcast(newObjectPacket);
     
             // give dynamic object's info to new user
             _.each(world.allObjectList(), function (ent: Entity) {
-                var newObjectPacket = PacketFactory.newObject(ent.movableId, ent.category, ent.x, ent.y);
+                var newObjectPacket = factory.newObject(ent.movableId, ent.category, ent.x, ent.y);
                 self.svrSock.send(newObjectPacket);
             });
         };
@@ -61,14 +62,15 @@ module kisaragi {
             var self = this;
             world.removeUser(self);
             
-            var removePacket = PacketFactory.removeObject(self.movableId);
+            var factory = new PacketFactory();
+            var removePacket = factory.removeObject(self.movableId);
             self.svrSock.broadcast(removePacket);
         };
 
         c2s_requestMap(world: GameWorld, packet: RequestMapPacket) {
             var self = this;
-            
-            var responseMapPacket = PacketFactory.responseMap(world.level);
+            var factory = new PacketFactory();
+            var responseMapPacket = factory.responseMap(world.level);
             self.svrSock.send(responseMapPacket);
         };
 
@@ -112,7 +114,8 @@ module kisaragi {
             if (self.world && !self.world.isMovablePos(x, y)) {
                 return;
             }
-            var packet:RequestMovePacket = PacketFactory.requestMove(this.movableId, x, y);
+            var factory = new PacketFactory();
+            var packet:RequestMovePacket = factory.requestMove(this.movableId, x, y);
             self.cliSock.emit(packet.command, packet.toJson());
         };
 

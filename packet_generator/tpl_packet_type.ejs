@@ -1,0 +1,20 @@
+﻿///<reference path="../app.d.ts"/>
+/*
+Auto generated code
+*/
+
+module kisaragi {
+    export enum PacketType {
+    <% for(var i = 0 ; i < packets.length ; i += 1) { %>
+        <%= packets[i].name -%>,
+    <% } %>
+    }
+}
+
+
+declare var exports: any;
+if (typeof exports !== 'undefined') {
+    exports.PacketType = kisaragi.PacketType;
+}
+
+

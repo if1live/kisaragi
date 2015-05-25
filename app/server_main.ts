@@ -43,18 +43,19 @@ module kisaragi {
                 });
             });
 
+            var factory = new PacketFactory();
 
             io_http.on('connection', (socket) => {
                 var client = server.connectSocketIO(socket);
                 var user = world.createUser(client);
-                var packet = PacketFactory.connect();
+                var packet = factory.createConnect();
                 client.onEvent(packet, world, user);
                 console.log(`[User=${user.movableId}] connected`);
 
                 socket.on(PacketFactory.toCommand(PacketType.Disconnect), function () {
                     var client = server.find({ socket_io: socket });
                     var user = client.user;
-                    var packet = PacketFactory.disconnect();
+                    var packet = factory.createDisconnect();
                     client.onEvent(packet, world, user);
 
                     server.disconnectSocketIO(socket);

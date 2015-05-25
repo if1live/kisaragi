@@ -45,6 +45,7 @@ module kisaragi {
 
         moveNotify(world: GameWorld) {
             var self = this;
+            var factory = new PacketFactory();
             // send move notify to closed user
             var userList = world.objectList(Category.Player);
             _.each(userList, function (user: Player) {
@@ -52,7 +53,7 @@ module kisaragi {
                 var maxDist = 1000000;
                 var dist = Math.abs(self.x - user.x) + Math.abs(self.y - user.y);
                 if (dist < maxDist) {
-                    var packet = PacketFactory.moveNotify(self.movableId, self.x, self.y);
+                    var packet = factory.moveNotify(self.movableId, self.x, self.y);
                     user.svrSock.send(packet);
                 }
             });

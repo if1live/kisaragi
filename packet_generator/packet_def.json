@@ -1,0 +1,93 @@
+[
+  {
+    "name": "Ping",
+    "command": "ping",
+    "content": [
+      [ "timestamp", "number" ]
+    ]
+  },
+  {
+    "name": "Echo",
+    "command": "echo",
+    "content": [
+      [ "data", "any" ]
+    ]
+  },
+  {
+    "name": "EchoAll",
+    "command": "echoAll",
+    "content": [
+      [ "data", "any" ]
+    ]
+  },
+  {
+    "name": "Connect",
+    "command": "connect",
+    "content": []
+  },
+  {
+    "name": "Disconnect",
+    "command": "disconnect",
+    "content": []
+  },
+  {
+    "name": "RequestMove",
+    "command": "c2s_requestMove",
+    "content": [
+      [ "movableId", "number" ],
+      [ "x", "number" ],
+      [ "y", "number" ]
+    ]
+  },
+  {
+    "name": "MoveNotify",
+    "command": "s2c_moveNotify",
+    "content": [
+      [ "movableId", "number" ],
+      [ "x", "number" ],
+      [ "y", "number" ]
+    ]
+  },
+  {
+    "name": "NewObject",
+    "command": "s2c_newObject",
+    "content": [
+      [ "movableId", "number" ],
+      [ "category", "Category" ],
+      [ "x", "number" ],
+      [ "y", "number" ]
+    ]
+  },
+  {
+    "name": "RemoveObject",
+    "command": "s2c_removeObject",
+    "content": [
+      [ "movableId", "number" ]
+    ]
+  },
+  {
+    "name": "Login",
+    "command": "s2c_login",
+    "content": [
+      [ "movableId", "number" ],
+      [ "x", "number" ],
+      [ "y", "number" ],
+      [ "width", "number" ],
+      [ "height", "number" ]
+    ]
+  },
+  {
+    "name": "RequestMap",
+    "command": "c2s_requestMap",
+    "content": []
+  },
+  {
+    "name": "ResponseMap",
+    "command": "s2c_requestMap",
+    "content": [
+      [ "data", "Array<Array<TileCode>>" ],
+      [ "width", "number" ],
+      [ "height", "number" ]
+    ]
+  }
+]

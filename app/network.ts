@@ -168,7 +168,8 @@ module kisaragi {
 
         ping() {
             var self = this;
-            var packet = PacketFactory.ping();
+            var factory = new PacketFactory();
+            var packet = factory.ping();
             self.socket.emit(packet.command, packet.toJson());
         }
 
@@ -237,12 +238,14 @@ module kisaragi {
         }
 
         echo(ctx) {
-            var packet = PacketFactory.echo(ctx);
+            var factory = new PacketFactory();
+            var packet = factory.echo(ctx);
             this.socket.emit(packet.command, packet.toJson());
         }
 
         echoAll(ctx) {
-            var packet = PacketFactory.echoAll(ctx);
+            var factory = new PacketFactory();
+            var packet = factory.echoAll(ctx);
             this.socket.emit(packet.command, packet.toJson());
         }
     }
