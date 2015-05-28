@@ -19,7 +19,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
-    <Content Include="app.css" />
+    <Content Include="vs_main\app.css" />
+    <Content Include="vs_main\index.js" />
+    <Content Include="vs_main\index_game.html" />
     <Content Include="Gruntfile.js" />
     <Content Include="index.html" />
     <TypeScriptCompile Include="app\app.d.ts" />
@@ -50,6 +52,7 @@
     <TypeScriptCompile Include="test\game_world_spec.ts" />
     <Content Include="packet_generator\packet_generator.js" />
     <Content Include="run_server.js" />
+    <Content Include="vs_main\index_test.html" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>

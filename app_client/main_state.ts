@@ -192,13 +192,13 @@ module kisaragi {
 
         preload() {
             // dummy sprite
-            this.load.image('user', 'static/assets/sprites/kisaragi.png');
-            this.load.image('current_user', 'static/assets/sprites/mutsuki.png');
-            this.load.image('enemy', 'static/assets/sprites/space-baddie-purple.png');
-            this.load.image('item', 'static/assets/sprites/blue_ball.png');
+            this.load.image('user', '/static/assets/sprites/kisaragi.png');
+            this.load.image('current_user', '/static/assets/sprites/mutsuki.png');
+            this.load.image('enemy', '/static/assets/sprites/space-baddie-purple.png');
+            this.load.image('item', '/static/assets/sprites/blue_ball.png');
 
             // dummy tilemap
-            this.load.image('desert', 'static/assets/tilemaps/tiles/tmw_desert_spacing.png');
+            this.load.image('desert', '/static/assets/tilemaps/tiles/tmw_desert_spacing.png');
         }
 
 

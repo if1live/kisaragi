@@ -3,71 +3,16 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>TypeScript HTML App</title>
-    <link rel="stylesheet" href="app.css" type="text/css" />
-    <link rel="stylesheet" href="publish/libs/css/mocha.css" type="text/css" />
+    <title>Kisaragi</title>
 </head>
 <body>
-    <h1>TypeScript HTML App</h1>
-
-    <div id="content"></div>
-    <div id="mocha"></div>
-
-    <script src="publish/libs/js/phaser.min.js"></script>
-    <script src="publish/libs/js/socket.io.js"></script>
-    <script src="publish/libs/js/assert.js"></script>
-    <script src="publish/libs/js/pathfinding-browser.min.js"></script>
-    <script src="publish/libs/js/underscore-min.js"></script>
-    <script src="publish/libs/js/sprintf.min.js"></script>
-    <script src="publish/libs/js/uuid.js"></script>
-
-    <script src="publish/libs/js/mocha.js"></script>
-
-    <script>
-        function require(name) {
-            if (name === 'underscore') {
-                return window._;
-            } else if (name == 'assert') {
-                return window.assert;
-            }
-            throw ("unknown library : " + name);
-            return null;
-        }
-    </script>
-
-    <script>
-        mocha.setup({
-            ui: 'bdd',
-            globals: ['socket', 'echo', 'jQuery'],
-            timeout: 10000
-        });
-        mocha.checkLeaks();
-    </script>
-
-
-    <script src="all.js"></script>
-
-    <!-- add unit test file -->
-    <script src="test/base_spec.js"></script>
-    <script src="test/enemy_spec.js"></script>
-    <script src="test/game_world_spec.js"></script>
-    <script src="test/level_spec.js"></script>
-    <script src="test/network_spec.js"></script>
-    <script src="test/player_spec.js"></script>
-
-    <script src="test/network/client_connection_spec.js"></script>
-    <script src="test/network/server_connection_spec.js"></script>
-    <script src="test/network/echo_spec.js"></script>
-    <script src="test/network/ping_spec.js"></script>
-    <script src="test/network/connection_manager_spec.js"></script>
-
-
-    <script>
-        // Run Game
-        var main = new kisaragi.ClientMain();
-
-        // Run unit test
-        //mocha.run();
-    </script>
+    <h1>Kisaragi</h1>
+    
+    <h2>
+        <a href="/vs_main/index_game.html">Game</a>
+    </h2>
+    <h2>
+        <a href="/vs_main/index_test.html">Unit Test</a>
+    </h2>
 </body>
 </html>

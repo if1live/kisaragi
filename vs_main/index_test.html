@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>TypeScript HTML App</title>
+    <link rel="stylesheet" href="/publish/libs/css/mocha.css" type="text/css" />
+</head>
+<body>
+    <h1>Unit Test</h1>
+
+    <div id="mocha"></div>
+
+    <script src="/publish/libs/js/phaser.min.js"></script>
+    <script src="/publish/libs/js/socket.io.js"></script>
+    <script src="/publish/libs/js/assert.js"></script>
+    <script src="/publish/libs/js/pathfinding-browser.min.js"></script>
+    <script src="/publish/libs/js/underscore-min.js"></script>
+    <script src="/publish/libs/js/sprintf.min.js"></script>
+    <script src="/publish/libs/js/uuid.js"></script>
+
+    <script src="/publish/libs/js/mocha.js"></script>
+
+    <script>
+        mocha.setup({
+            ui: 'bdd',
+            globals: ['socket', 'echo', 'jQuery'],
+            timeout: 10000
+        });
+        mocha.checkLeaks();
+    </script>
+
+    <script src="/vs_main/index.js"></script>
+    <script src="/all.js"></script>
+
+    <!-- add unit test file -->
+    <script src="/test/base_spec.js"></script>
+    <script src="/test/enemy_spec.js"></script>
+    <script src="/test/game_world_spec.js"></script>
+    <script src="/test/level_spec.js"></script>
+    <script src="/test/network_spec.js"></script>
+    <script src="/test/player_spec.js"></script>
+
+    <script src="/test/network/client_connection_spec.js"></script>
+    <script src="/test/network/server_connection_spec.js"></script>
+    <script src="/test/network/echo_spec.js"></script>
+    <script src="/test/network/ping_spec.js"></script>
+    <script src="/test/network/connection_manager_spec.js"></script>
+
+
+    <script>
+        mocha.run();
+    </script>
+</body>
+</html>
