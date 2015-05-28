@@ -21,6 +21,7 @@
 ///<reference path="network/echo.ts"/>
 ///<reference path="network/server_connection.ts"/>
 ///<reference path="network/client_connection.ts"/>
+///<reference path="network/connection_manager.ts"/>
 
 ///<reference path="base.ts"/>
 ///<reference path="entity.ts"/>

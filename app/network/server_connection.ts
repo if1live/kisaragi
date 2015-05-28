@@ -11,48 +11,27 @@ module kisaragi {
         uuid: string;
         category: ServerConnectionCategory;
         user: Player;
-
-        sendQueue: Queue<ServerSendablePacket>;
-        recvQueue: Queue<BasePacket>;
+        mgr: ConnectionManager;
 
         constructor(category: ServerConnectionCategory, uuid_val: string) {
             this.category = category;
             this.uuid = uuid_val;
             this.user = null;
-
-            this.sendQueue = new Queue<ServerSendablePacket>();
-            this.recvQueue = new Queue<BasePacket>();
+            this.mgr = null;
         }
 
         send(packet: BasePacket) {
             var elem = ServerSendablePacket.send(packet, this);
-            this.sendQueue.push(elem);
+            this.mgr.addSendPacket(elem);
         }
         broadcast(packet: BasePacket) {
             var elem = ServerSendablePacket.broadcast(packet, this);
-            this.sendQueue.push(elem);
+            this.mgr.addSendPacket(elem);
         }
 
         sendImmediate(packet: BasePacket) { }
         broadcastImmediate(packet: BasePacket) { }
-        
-        flushSendQueue() {
-            while (this.sendQueue.isEmpty() === false) {
-                var sendPacket = this.sendQueue.pop();
-                if (sendPacket.sendType === ServerSendablePacketType.Send) {
-                    this.sendImmediate(sendPacket.packet);
-                } else if (sendPacket.sendType === ServerSendablePacketType.Broadcast) {
-                    this.broadcastImmediate(sendPacket.packet);
-                }
-            }
-        }
-
-        flushRecvQueue(world: GameWorld, user: Player) {
-            while (this.recvQueue.isEmpty() === false) {
-                var packet = this.recvQueue.pop();
-                this.onEvent(packet, world, user);
-            }
-        }
+        registerHandler(category: PacketType, handler: any) { }
 
         onEvent(packet: BasePacket, world: GameWorld, user: Player) { }
 
@@ -146,6 +125,11 @@ module kisaragi {
         broadcastImmediate(packet: BasePacket) {
             //console.log("Broadcast[id=" + this.userId + "] " + packet.command + " : " + JSON.stringify(packet.toJson()));
             return this.io.emit(packet.command, packet.toJson());
+        }
+        
+        registerHandler(category: PacketType, handler: any) {
+            var command = PacketFactory.toCommand(category)
+            this.socket.on(command, handler);
         }
     }
 
