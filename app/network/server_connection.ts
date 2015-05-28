@@ -39,15 +39,15 @@ module kisaragi {
 
         sendImmediate(packet: BasePacket) {
             //console.log("Send[id=" + this.userId + "] " + packet.command + " : " + JSON.stringify(packet.toJson()));
-            this.sendImpl(packet);
+            this._sendImpl(packet);
         }
         broadcastImmediate(packet: BasePacket) {
             //console.log("Broadcast[id=" + this.userId + "] " + packet.command + " : " + JSON.stringify(packet.toJson()));
-            this.broadcastImpl(packet);
+            this._broadcastImpl(packet);
         }
 
-        sendImpl(packet: BasePacket) { }
-        broadcastImpl(packet: BasePacket) { }
+        _sendImpl(packet: BasePacket) { }
+        _broadcastImpl(packet: BasePacket) { }
 
         
         registerHandler(category: PacketType, handler: any) { }
@@ -127,10 +127,10 @@ module kisaragi {
             return remoteAddr.replace('::ffff:', '');
         }
 
-        sendImpl(packet: BasePacket) {
+        _sendImpl(packet: BasePacket) {
             return this.socket.emit(packet.command, packet.toJson());
         }
-        broadcastImpl(packet: BasePacket) {
+        _broadcastImpl(packet: BasePacket) {
             return this.io.emit(packet.command, packet.toJson());
         }
         
@@ -141,8 +141,20 @@ module kisaragi {
     }
 
     export class MockServerConnection extends ServerConnection {
+        sendedPacket: BasePacket;
+        broadcastedPacket: BasePacket;
+
         constructor(uuid_val: string) {
             super(ServerConnectionCategory.Mock, uuid_val);
+            this.sendedPacket = null;
+            this.broadcastedPacket = null;
+        }
+
+        _sendImpl(packet: BasePacket) {
+            this.sendedPacket = packet;
+        }
+        _broadcastImpl(packet: BasePacket) {
+            this.broadcastedPacket = packet;
         }
     }
 }
