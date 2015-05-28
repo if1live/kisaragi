@@ -7,6 +7,8 @@
 
 ///<reference path="constants.ts"/>
 
+///<reference path="core/queue.ts"/>
+
 ///<reference path="packet/base_packet.ts"/>
 ///<reference path="packet/packet.ts"/>
 ///<reference path="packet/packet_type.ts"/>
@@ -14,8 +16,11 @@
 ///<reference path="packet/packet_factory.ts"/>
 
 ///<reference path="network.ts"/>
-///<reference path="server_connection.ts"/>
-///<reference path="client_connection.ts"/>
+
+///<reference path="network/ping.ts"/>
+///<reference path="network/echo.ts"/>
+///<reference path="network/server_connection.ts"/>
+///<reference path="network/client_connection.ts"/>
 
 ///<reference path="base.ts"/>
 ///<reference path="entity.ts"/>

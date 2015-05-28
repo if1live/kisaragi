@@ -1,5 +1,5 @@
 ﻿// Ŭnicode please
-///<reference path="app.d.ts"/>
+///<reference path="../app.d.ts"/>
 
 module kisaragi {
     enum ServerConnectionCategory {
@@ -7,27 +7,12 @@ module kisaragi {
         Mock,
     }
 
-    enum SendPacketType {
-        Send,
-        Broadcast
-    }
-
-    class SendPacket {
-        sendType: SendPacketType;
-        packet: BasePacket;
-
-        constructor(sendType: SendPacketType, packet: BasePacket) {
-            this.sendType = sendType;
-            this.packet = packet;
-        }
-    }
-
     export class ServerConnection {
         uuid: string;
         category: ServerConnectionCategory;
         user: Player;
 
-        sendQueue: Queue<SendPacket>;
+        sendQueue: Queue<ServerSendablePacket>;
         recvQueue: Queue<BasePacket>;
 
         constructor(category: ServerConnectionCategory, uuid_val: string) {
@@ -35,16 +20,16 @@ module kisaragi {
             this.uuid = uuid_val;
             this.user = null;
 
-            this.sendQueue = new Queue<SendPacket>();
+            this.sendQueue = new Queue<ServerSendablePacket>();
             this.recvQueue = new Queue<BasePacket>();
         }
 
         send(packet: BasePacket) {
-            var elem = new SendPacket(SendPacketType.Send, packet);
+            var elem = ServerSendablePacket.send(packet, this);
             this.sendQueue.push(elem);
         }
         broadcast(packet: BasePacket) {
-            var elem = new SendPacket(SendPacketType.Broadcast, packet);
+            var elem = ServerSendablePacket.broadcast(packet, this);
             this.sendQueue.push(elem);
         }
 
@@ -54,9 +39,9 @@ module kisaragi {
         flushSendQueue() {
             while (this.sendQueue.isEmpty() === false) {
                 var sendPacket = this.sendQueue.pop();
-                if (sendPacket.sendType === SendPacketType.Send) {
+                if (sendPacket.sendType === ServerSendablePacketType.Send) {
                     this.sendImmediate(sendPacket.packet);
-                } else if (sendPacket.sendType === SendPacketType.Broadcast) {
+                } else if (sendPacket.sendType === ServerSendablePacketType.Broadcast) {
                     this.broadcastImmediate(sendPacket.packet);
                 }
             }

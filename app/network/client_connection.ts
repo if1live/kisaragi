@@ -1,5 +1,5 @@
 ﻿ // Ŭnicode please
-///<reference path="app.d.ts"/>
+///<reference path="../app.d.ts"/>
 
 module kisaragi {
     enum ClientConnectionCategory {

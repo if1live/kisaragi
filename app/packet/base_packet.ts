@@ -21,29 +21,37 @@ module kisaragi {
         }
     }
 
-    export class Queue<T> {
-        queue: T[];
-
-        get length(): number {
-            return this.queue.length;
+    export enum ServerSendablePacketType {
+        Send,
+        Broadcast
+    }
+    
+    export class ServerSendablePacket {
+        sendType: ServerSendablePacketType;
+        packet: BasePacket;
+        conn: ServerConnection;
+        
+        constructor(sendableType: ServerSendablePacketType, packet: BasePacket, conn: ServerConnection) {
+            this.sendType = sendableType;
+            this.packet = packet;
+            this.conn = conn;
         }
-
-        isEmpty(): boolean {
-            return (0 === this.length);
+        
+        static send(packet: BasePacket, conn: ServerConnection) {
+            return new ServerSendablePacket(ServerSendablePacketType.Send, packet, conn);
         }
-
-        push(elem: T): boolean {
-            if (elem === null) {
-                return false;
-            }
-            this.queue.push(elem);
-            return true;
+        static broadcast(packet: BasePacket, conn: ServerConnection) {
+            return new ServerSendablePacket(ServerSendablePacketType.Broadcast, packet, conn);
         }
-        pop(): T {
-            if (this.length === 0) {
-                return null;
-            }
-            return this.queue.shift();
+    }
+    
+    export class ServerReceivedPacket {
+        packet: BasePacket;
+        conn: ServerConnection;
+        
+        constructor(packet: BasePacket, conn: ServerConnection) {
+            this.packet = packet;
+            this.conn = conn;
         }
     }
 }
@@ -51,6 +59,9 @@ module kisaragi {
 declare var exports: any;
 if (typeof exports !== 'undefined') {
     exports.BasePacket = kisaragi.BasePacket;
-    exports.Queue = kisaragi.Queue;
+    exports.ServerSendablePacketType = kisaragi.ServerSendablePacketType;
+    exports.ServerSendablePacket = kisaragi.ServerSendablePacket;
+    exports.ServerReceivedPacket = kisaragi.ServerReceivedPacket;
+    
 }
 
