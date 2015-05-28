@@ -20,6 +20,14 @@ module kisaragi {
             this.mgr = null;
         }
 
+        get userId(): number {
+            if (this.user) {
+                return this.user.movableId;
+            } else {
+                return -1;
+            }
+        }
+
         send(packet: BasePacket) {
             var elem = ServerSendablePacket.send(packet, this);
             this.mgr.addSendPacket(elem);
@@ -29,57 +37,23 @@ module kisaragi {
             this.mgr.addSendPacket(elem);
         }
 
-        sendImmediate(packet: BasePacket) { }
-        broadcastImmediate(packet: BasePacket) { }
+        sendImmediate(packet: BasePacket) {
+            //console.log("Send[id=" + this.userId + "] " + packet.command + " : " + JSON.stringify(packet.toJson()));
+            this.sendImpl(packet);
+        }
+        broadcastImmediate(packet: BasePacket) {
+            //console.log("Broadcast[id=" + this.userId + "] " + packet.command + " : " + JSON.stringify(packet.toJson()));
+            this.broadcastImpl(packet);
+        }
+
+        sendImpl(packet: BasePacket) { }
+        broadcastImpl(packet: BasePacket) { }
+
+        
         registerHandler(category: PacketType, handler: any) { }
 
-        onEvent(packet: BasePacket, world: GameWorld, user: Player) { }
-
-        static mock(uuid_val: string) {
-            if (!!uuid_val) {
-                uuid_val = uuid.v1();
-            }
-            return new ServerConnection_Mock(uuid_val);
-        }
-
-        static socketIO(uuid_val: string, socket: SocketIO.Socket, io: SocketIO.Server) {
-            var sock = new ServerConnection_SocketIO(uuid_val, socket, io);
-            return sock;
-        }
-
-        get userId(): number {
-            if (this.user) {
-                return this.user.movableId;
-            } else {
-                return -1;
-            }
-        }
-    }
-
-    /*
-    client socket for server
-    */
-    class ServerConnection_SocketIO extends ServerConnection {
-        socket: SocketIO.Socket;
-        io: SocketIO.Server;
-
-        constructor(uuid_val: string, socket: SocketIO.Socket, io: SocketIO.Server) {
-            super(ServerConnectionCategory.SocketIO, uuid_val);
-
-            var self = this;
-            self.socket = socket;
-            self.io = io;
-
-            socket.on('error', function (err) {
-                console.log("Socket Error Occur");
-                console.error(err.stack);
-            });
-        }
-
         getAddress() {
-            var self = this;
-            var remoteAddr = self.socket.request.connection.remoteAddress;
-            return remoteAddr.replace('::ffff:', '');
+            return '127.0.0.1';
         }
 
         onEvent(packet: BasePacket, world: GameWorld, user: Player) {
@@ -117,13 +91,46 @@ module kisaragi {
             }
         }
 
-        sendImmediate(packet: BasePacket) {
-            //console.log("Send[id=" + this.userId + "] " + packet.command + " : " + JSON.stringify(packet.toJson()));
-            return this.socket.emit(packet.command, packet.toJson());
+        static mock(uuid_val: string) {
+            return new MockServerConnection(uuid_val);
         }
 
-        broadcastImmediate(packet: BasePacket) {
-            //console.log("Broadcast[id=" + this.userId + "] " + packet.command + " : " + JSON.stringify(packet.toJson()));
+        static socketIO(uuid_val: string, socket: SocketIO.Socket, io: SocketIO.Server) {
+            var sock = new ServerConnection_SocketIO(uuid_val, socket, io);
+            return sock;
+        }
+    }
+
+    /*
+    client socket for server
+    */
+    class ServerConnection_SocketIO extends ServerConnection {
+        socket: SocketIO.Socket;
+        io: SocketIO.Server;
+
+        constructor(uuid_val: string, socket: SocketIO.Socket, io: SocketIO.Server) {
+            super(ServerConnectionCategory.SocketIO, uuid_val);
+
+            var self = this;
+            self.socket = socket;
+            self.io = io;
+
+            socket.on('error', function (err) {
+                console.log("Socket Error Occur");
+                console.error(err.stack);
+            });
+        }
+
+        getAddress() {
+            var self = this;
+            var remoteAddr = self.socket.request.connection.remoteAddress;
+            return remoteAddr.replace('::ffff:', '');
+        }
+
+        sendImpl(packet: BasePacket) {
+            return this.socket.emit(packet.command, packet.toJson());
+        }
+        broadcastImpl(packet: BasePacket) {
             return this.io.emit(packet.command, packet.toJson());
         }
         
@@ -133,7 +140,7 @@ module kisaragi {
         }
     }
 
-    class ServerConnection_Mock extends ServerConnection {
+    export class MockServerConnection extends ServerConnection {
         constructor(uuid_val: string) {
             super(ServerConnectionCategory.Mock, uuid_val);
         }
@@ -143,4 +150,5 @@ module kisaragi {
 declare var exports: any;
 if (typeof exports !== 'undefined') {
     exports.ServerConnection = kisaragi.ServerConnection;
+    exports.MockServerConnection = kisaragi.MockServerConnection;
 }
