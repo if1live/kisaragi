@@ -4,20 +4,20 @@ Auto generated code
 */
 
 module kisaragi {
-    <% for(var i = 0 ; i < packets.length ; i += 1) { %>
+<% for(var i = 0 ; i < packets.length ; i += 1) { %>
 <% var packet = packets[i] -%>
     export class <%=packet.classname()%> extends BasePacket {
         <% for(var j = 0 ; j < packet.attrs.length ; j += 1) { %>
 <% var attr = packet.attrs[j] -%>
         <%=attr.name %>: <%- attr.type -%>;
-        <% } %>
+<% } %>
         
         constructor() {
             super(PacketType.<%= packet.name %>);
-            <% for(var j = 0 ; j < packet.attrs.length ; j += 1) { %>
+<% for(var j = 0 ; j < packet.attrs.length ; j += 1) { %>
 <% var attr = packet.attrs[j] -%>
             this.<%=attr.name%> = <%= attr.defaultValue %>;<% -%>
-            <% } %>
+<% } %>
         }
         
         get command(): string {
@@ -25,17 +25,17 @@ module kisaragi {
         }
         _generateJson(): any {
             return {
-                <% for(var j = 0 ; j < packet.attrs.length ; j += 1) { %>
+<% for(var j = 0 ; j < packet.attrs.length ; j += 1) { %>
 <% var attr = packet.attrs[j] -%>
                 <%=attr.name%>: this.<%=attr.name -%>, 
-                <% } %>
+<% } %>
             };
         }
         loadJson(data: any) {
-            <% for(var j = 0 ; j < packet.attrs.length ; j += 1) { %>
+<% for(var j = 0 ; j < packet.attrs.length ; j += 1) { %>
 <% var attr = packet.attrs[j] -%>
             this.<%=attr.name%> = data.<%=attr.name -%>; 
-            <% } %>
+<% } %>
         }
     }
     <% } %>
@@ -43,8 +43,8 @@ module kisaragi {
 
 declare var exports: any;
 if (typeof exports !== 'undefined') {
-    <% for(var i = 0 ; i < packets.length ; i += 1) { %>
+<% for(var i = 0 ; i < packets.length ; i += 1) { %>
     exports.<%= packets[i].classname() -%> = kisaragi.<%= packets[i].classname() -%>;
-    <% } %>
+<% } %>
 }
 

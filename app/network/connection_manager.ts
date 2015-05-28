@@ -54,20 +54,8 @@ module kisaragi {
         
         registerConnectionHandler(conn: ServerConnection) {
             var self = this;
-            // register packet
-            var receivablePacketTypeList = [
-                // for develop/debug/test
-                PacketType.Ping,
-                PacketType.Echo,
-                PacketType.EchoAll,
-    
-                // for game
-                PacketType.RequestMap,
-                PacketType.RequestMove,
-            ];
-
-            for(var i = 0 ; i < receivablePacketTypeList.length ; i += 1) {
-                var packetType = receivablePacketTypeList[i];
+            for(var i = 0 ; i < allPacketTypeList.length ; i += 1) {
+                var packetType = allPacketTypeList[i];
                 conn.registerHandler(packetType, function(data) {
                     var packet = PacketFactory.createFromJson(data);
                     var svrPacket = new ServerReceivedPacket(packet, conn);

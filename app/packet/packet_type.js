@@ -19,7 +19,22 @@ var kisaragi;
         PacketType[PacketType["ResponseMap"] = 11] = "ResponseMap";
     })(kisaragi.PacketType || (kisaragi.PacketType = {}));
     var PacketType = kisaragi.PacketType;
+    kisaragi.allPacketTypeList = [
+        PacketType.Ping,
+        PacketType.Echo,
+        PacketType.EchoAll,
+        PacketType.Connect,
+        PacketType.Disconnect,
+        PacketType.RequestMove,
+        PacketType.MoveNotify,
+        PacketType.NewObject,
+        PacketType.RemoveObject,
+        PacketType.Login,
+        PacketType.RequestMap,
+        PacketType.ResponseMap,
+    ];
 })(kisaragi || (kisaragi = {}));
 if (typeof exports !== 'undefined') {
     exports.PacketType = kisaragi.PacketType;
+    exports.allPacketTypeList = kisaragi.allPacketTypeList;
 }
