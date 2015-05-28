@@ -1,4 +1,4 @@
-﻿ // Ŭnicode please
+﻿// Ŭnicode please
 ///<reference path="../app.d.ts"/>
 
 module kisaragi {
@@ -24,11 +24,18 @@ module kisaragi {
         
         handle(packet: BasePacket) {
             var handler = this.handlerTable[packet.packetType];
-            handler(packet);
+            if (typeof handler !== 'undefined') {
+                handler(packet);
+            }
         }
 
+        registerHandlerPreHook(category: PacketType, handler: HandlerFunc) { }
+        registerHandlerPostHook(category: PacketType, handler: HandlerFunc) { }
+
         registerHandler(category: PacketType, handler: HandlerFunc) {
+            this.registerHandlerPreHook(category, handler);
             this.handlerTable[category] = handler;
+            this.registerHandlerPostHook(category, handler);
         }
 
         static mock(): MockClientConnection {
@@ -64,10 +71,8 @@ module kisaragi {
             this.sock.emit(packet.command, packet.toJson());
         }
 
-        registerHandler(category: PacketType, handler: HandlerFunc) {
+        registerHandlerPostHook(category: PacketType, handler: HandlerFunc) {
             var self = this;
-            this.handlerTable[category] = handler;
-
             var command = PacketFactory.toCommand(category)
             this.sock.on(command, function (data) {
                 var packet = PacketFactory.createFromJson(data);
@@ -75,7 +80,6 @@ module kisaragi {
             });
         }
     }
-
 }
 
 if (typeof exports !== 'undefined') {
