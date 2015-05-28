@@ -63,39 +63,3 @@ describe('Server', function () {
         });
     });
 });
-
-describe('ClientEcho', () => {
-    beforeEach(() => {
-        function DummySocket() {
-            var self = this;
-            self.cmdTable = {};
-            self.called = {};
-            self.on = function (cmd, func) {
-                self.cmdTable[cmd] = func;
-                self.called[cmd] = false;
-            };
-            self.emit = function (cmd, ctx) {
-                self.cmdTable[cmd](ctx);
-                self.called[cmd] = true;
-            };
-        }
-        this.socket = new DummySocket();
-        this.echo = new kisaragi.ClientEcho(this.socket, {
-            echo: function (ctx) { },
-            echoAll: function (ctx) { }
-        });
-    });
-
-    describe('#echo()', () => {
-        it('success', () => {
-            this.echo.echo('data');
-            assert.equal(this.socket.called.echo, true);
-        });
-    });
-    describe('#echoAll()', () => {
-        it('success', () => {
-            this.echo.echoAll('data');
-            assert.equal(this.socket.called.echoAll, true);
-        });
-    });
-});

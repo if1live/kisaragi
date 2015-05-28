@@ -116,7 +116,7 @@ module kisaragi {
             }
             var factory = new PacketFactory();
             var packet:RequestMovePacket = factory.requestMove(this.movableId, x, y);
-            self.cliConn.sendImmediate(packet);
+            self.cliConn.send(packet);
         };
 
         c2s_requestMove(world: GameWorld, packet: RequestMovePacket) {

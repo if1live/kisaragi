@@ -133,7 +133,7 @@ module kisaragi {
     
                 // sometime, socket io connection end before game context created
                 var requestMapPacket = factory.createRequestMap();
-                conn.sendImmediate(requestMapPacket);
+                conn.send(requestMapPacket);
             });
 
             conn.registerHandler(PacketType.ResponseMap, function(packet: ResponseMapPacket) {
@@ -239,7 +239,8 @@ module kisaragi {
             this.conn = ClientConnection.socketIO(this.socket);
             this.registerSocketHandler(this.conn);
 
-            this.echoRunner = new ClientEcho(this.socket, {});
+            //TODO
+            //this.echoRunner = new ClientEcho(this.socket, {});
             this.ping = new ClientPing(this.socket);
             this.ping.renderer = new HtmlPingRenderer('ping-result');
             this.ping.ping();

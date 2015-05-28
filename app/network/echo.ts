@@ -2,49 +2,45 @@
 ///<reference path="../app.d.ts"/>
 
 module kisaragi {
-	export class ClientEcho {
-        socket: SocketIOClient.Socket;
-
-        constructor(socket: SocketIOClient.Socket, callbacks) {
+    export class ServerEcho {
+    }
+    
+    export class ClientEcho {
+        conn: ClientConnection;
+        
+        // response check
+        echoReceivedPacket: EchoPacket;
+        echoAllReceivedPacket: EchoAllPacket;
+        
+        constructor(conn: ClientConnection) {
             var self = this;
-            self.socket = socket;
-
-            var echoCallback = (ctx) => {
-                var packet = <EchoPacket> PacketFactory.createFromJson(ctx);
-                self.dumpCommunication(packet.command, packet.data);
-            };
-            var echoAllCallback = (ctx) => {
-                var packet = <EchoAllPacket> PacketFactory.createFromJson(ctx);
-                self.dumpCommunication(packet.command, packet.data);
-            };
-
-            if (callbacks !== undefined) {
-                if (callbacks.echo) {
-                    echoCallback = callbacks.echo;
-                }
-                if (callbacks.echoAll) {
-                    echoAllCallback = callbacks.echoAll;
-                }
-            }
-
-            socket.on(PacketFactory.toCommand(PacketType.Echo), echoCallback);
-            socket.on(PacketFactory.toCommand(PacketType.EchoAll), echoAllCallback);
+            this.conn = conn;
+            this.reset();
+            
+            conn.registerHandler(PacketType.Echo, function(packet: EchoPacket) {
+                self.echoReceivedPacket = packet;
+                console.log(packet.command + " : " + JSON.stringify(packet.data));
+            });
+            conn.registerHandler(PacketType.EchoAll, function(packet: EchoAllPacket) {
+                self.echoAllReceivedPacket = packet;
+                console.log(packet.command + " : " + JSON.stringify(packet.data));
+            });
         }
-
-        dumpCommunication(cmd, obj) {
-            console.log(cmd + " : " + JSON.stringify(obj));
+        
+        reset() {
+            this.echoReceivedPacket = null;
+            this.echoAllReceivedPacket = null;
         }
-
-        echo(ctx) {
+        
+        echo(data: any) {
             var factory = new PacketFactory();
-            var packet = factory.echo(ctx);
-            this.socket.emit(packet.command, packet.toJson());
+            var packet = factory.echo(data);
+            this.conn.send(packet);
         }
-
-        echoAll(ctx) {
+        echoAll(data: any) {
             var factory = new PacketFactory();
-            var packet = factory.echoAll(ctx);
-            this.socket.emit(packet.command, packet.toJson());
+            var packet = factory.echoAll(data);
+            this.conn.send(packet);
         }
     }
 }
@@ -52,4 +48,5 @@ module kisaragi {
 declare var exports: any;
 if(typeof exports !== 'undefined') {
     exports.ClientEcho = kisaragi.ClientEcho;
+    exports.ServerEcho = kisaragi.ServerEcho;
 }

@@ -14,43 +14,41 @@ module kisaragi {
     export class ClientConnection {
         category: ClientConnectionCategory;
         handlerTable: any;
-        sendQueue: Queue<BasePacket>;
-        recvQueue: Queue<BasePacket>;
 
         constructor(category: ClientConnectionCategory) {
             this.category = category;
             this.handlerTable = {};
-            this.sendQueue = new Queue<BasePacket>();
-            this.recvQueue = new Queue<BasePacket>();
         }
 
-        send(packet: BasePacket) {
-            this.sendQueue.push(packet);
-        }
-        sendImmediate(packet: BasePacket) { }
-
-        flushSend() {
-            while (this.sendQueue.isEmpty() === false) {
-                var packet = this.sendQueue.pop();
-                this.sendImmediate(packet);
-            }
+        send(packet: BasePacket) { }
+        
+        handle(packet: BasePacket) {
+            var handler = this.handlerTable[packet.packetType];
+            handler(packet);
         }
 
         registerHandler(category: PacketType, handler: HandlerFunc) {
-            this.registerHandler[category] = handler;
+            this.handlerTable[category] = handler;
         }
 
-        static mock(): ClientConnection {
-            return new ClientConnection_Mock();
+        static mock(): MockClientConnection {
+            return new MockClientConnection();
         }
         static socketIO(sock: SocketIOClient.Socket) {
             return new ClientConnection_SocketIO(sock);
         }
     }
 
-    class ClientConnection_Mock extends ClientConnection {
+    export class MockClientConnection extends ClientConnection {
+        // for unit test
+        sendedPacket: BasePacket;
+        
         constructor() {
             super(ClientConnectionCategory.Mock);
+            this.sendedPacket = null;
+        }
+        send(packet: BasePacket) {
+            this.sendedPacket = packet;
         }
     }
 
@@ -62,17 +60,18 @@ module kisaragi {
             this.sock = sock;
         }
 
-        sendImmediate(packet: BasePacket) {
+        send(packet: BasePacket) {
             this.sock.emit(packet.command, packet.toJson());
         }
 
         registerHandler(category: PacketType, handler: HandlerFunc) {
-            this.registerHandler[category] = handler;
+            var self = this;
+            this.handlerTable[category] = handler;
 
             var command = PacketFactory.toCommand(category)
             this.sock.on(command, function (data) {
                 var packet = PacketFactory.createFromJson(data);
-                handler(packet);
+                self.handle(packet);
             });
         }
     }
@@ -81,5 +80,6 @@ module kisaragi {
 
 if (typeof exports !== 'undefined') {
     exports.ClientConnection = kisaragi.ClientConnection;
+    exports.MockClientConnection = kisaragi.MockClientConnection;
 }
 
