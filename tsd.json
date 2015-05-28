@@ -6,37 +6,37 @@
   "bundle": "typings/tsd.d.ts",
   "installed": {
     "mocha/mocha.d.ts": {
-      "commit": "2e904baa7f46d2752b63e6aeb8687ed471e7569b"
+      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
     },
     "node/node.d.ts": {
-      "commit": "2e904baa7f46d2752b63e6aeb8687ed471e7569b"
+      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
     },
     "express/express.d.ts": {
-      "commit": "2e904baa7f46d2752b63e6aeb8687ed471e7569b"
+      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
     },
     "underscore/underscore.d.ts": {
-      "commit": "2e904baa7f46d2752b63e6aeb8687ed471e7569b"
+      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
     },
     "typescript/typescript.d.ts": {
-      "commit": "2e904baa7f46d2752b63e6aeb8687ed471e7569b"
+      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
     },
     "serve-static/serve-static.d.ts": {
-      "commit": "2e904baa7f46d2752b63e6aeb8687ed471e7569b"
+      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
     },
     "socket.io/socket.io.d.ts": {
-      "commit": "2e904baa7f46d2752b63e6aeb8687ed471e7569b"
+      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
     },
     "socket.io-client/socket.io-client.d.ts": {
-      "commit": "2e904baa7f46d2752b63e6aeb8687ed471e7569b"
+      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
     },
     "sprintf/sprintf.d.ts": {
-      "commit": "2e904baa7f46d2752b63e6aeb8687ed471e7569b"
+      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
     },
     "node-uuid/node-uuid.d.ts": {
-      "commit": "2e904baa7f46d2752b63e6aeb8687ed471e7569b"
+      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
     },
     "assert/assert.d.ts": {
-      "commit": "2e904baa7f46d2752b63e6aeb8687ed471e7569b"
+      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
     }
   }
 }

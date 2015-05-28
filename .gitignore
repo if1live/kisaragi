@@ -32,6 +32,10 @@ bower-components
 publish
 .DS_Store
 
+# visual studio
+*.suo
+*.csproj.user
+
 # typescript
 typings
 app/*.js
