@@ -46,15 +46,15 @@ module kisaragi {
                 world.level.width,
                 world.level.height
             );
-            self.svrConn.sendImmediate(loginPacket);
+            self.svrConn.send(loginPacket);
 
             var newObjectPacket = factory.newObject(this.movableId, this.category, this.x, this.y);
-            self.svrConn.broadcastImmediate(newObjectPacket);
+            self.svrConn.broadcast(newObjectPacket);
     
             // give dynamic object's info to new user
             _.each(world.allObjectList(), function (ent: Entity) {
                 var newObjectPacket = factory.newObject(ent.movableId, ent.category, ent.x, ent.y);
-                self.svrConn.sendImmediate(newObjectPacket);
+                self.svrConn.send(newObjectPacket);
             });
         };
 
@@ -64,14 +64,14 @@ module kisaragi {
             
             var factory = new PacketFactory();
             var removePacket = factory.removeObject(self.movableId);
-            self.svrConn.broadcastImmediate(removePacket);
+            self.svrConn.broadcast(removePacket);
         };
 
         c2s_requestMap(world: GameWorld, packet: RequestMapPacket) {
             var self = this;
             var factory = new PacketFactory();
             var responseMapPacket = factory.responseMap(world.level);
-            self.svrConn.sendImmediate(responseMapPacket);
+            self.svrConn.send(responseMapPacket);
         };
 
         // move function

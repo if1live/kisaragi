@@ -66,7 +66,6 @@ module kisaragi {
             this.io_http.on('connection', (socket) => {
                 self.registerSocketIO_ConnectHandler(socket);
                 self.registerSocketIO_DisconnectHandler(socket);
-                self.registerSocketIO_CommonHandler(socket);
             });
         }
 
@@ -79,7 +78,7 @@ module kisaragi {
             var conn = self.connMgr.create_socketIO(socket);
             var user = self.world.createUser(conn);
             var packet = factory.createConnect();
-            conn.onEvent(packet, self.world, user);
+            conn.onEvent(packet, self.world);
             console.log(`[User=${user.movableId}] connected`);
         }
 
@@ -89,41 +88,24 @@ module kisaragi {
 
             socket.on(PacketFactory.toCommand(PacketType.Disconnect), function () {
                 var conn = self.connMgr.find({ socket_io: socket });
-                var user = conn.user;
                 var packet = factory.createDisconnect();
-                conn.onEvent(packet, self.world, user);
+                conn.onEvent(packet, self.world);
 
                 self.connMgr.destroy(conn);
-                console.log(`[User=${user.movableId}] disconnected`);
+                console.log(`[User=${conn.user.movableId}] disconnected`);
             });
         }
 
-        registerSocketIO_CommonHandler(socket: SocketIO.Socket) {
-            var self = this;
-            function registerCommand(cmd) {
-                socket.on(cmd, function (obj) {
-                    var packet = PacketFactory.createFromJson(obj);
-                    if (packet == null) {
-                        return;
-                    }
-
-                    var conn = self.connMgr.find({ socket_io: socket })
-                    //var msg = "Receive[id=" + conn.userId + "] ";
-                    //msg += packet.command + " : " + JSON.stringify(packet.toJson());
-                    //console.log(msg);
-                    conn.onEvent(packet, self.world, conn.user);
-                });
-            }
-
-            for (var i = 0; i < allPacketTypeList.length; i += 1) {
-                var packetType = allPacketTypeList[i];
-                var cmd = PacketFactory.toCommand(packetType);
-                registerCommand(cmd);
-            }
-        }
-
         update(delta: number) {
+            var recvQueue = this.connMgr.recvQueue;
+            while (recvQueue.isEmpty() == false) {
+                var recv = recvQueue.pop();
+                recv.conn.onEvent(recv.packet, this.world);
+            }
+
             this.world.update(delta);
+
+            this.connMgr.flushSendQueue();
         }
 
         run() {

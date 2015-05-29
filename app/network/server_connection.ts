@@ -56,7 +56,7 @@ module kisaragi {
             return '127.0.0.1';
         }
 
-        onEvent(packet: BasePacket, world: GameWorld, user: Player) {
+        onEvent(packet: BasePacket, world: GameWorld) {
             var self = this;
             var cmd = packet.command;
             
@@ -72,20 +72,20 @@ module kisaragi {
                 return;
             }
 
-            if (user === null) {
+            if (this.user === null) {
                 console.log("User is null!!!!");
                 return;
             }
 
             // handle event
             if (cmd === PacketFactory.toCommand(PacketType.Connect)) {
-                user.connect(world, <ConnectPacket> packet);
+                this.user.connect(world, <ConnectPacket> packet);
             } else if (cmd === PacketFactory.toCommand(PacketType.Disconnect)) {
-                user.disconnect(world, <DisconnectPacket> packet);
+                this.user.disconnect(world, <DisconnectPacket> packet);
             } else if (cmd === PacketFactory.toCommand(PacketType.RequestMap)) {
-                user.c2s_requestMap(world, <RequestMapPacket> packet);
+                this.user.c2s_requestMap(world, <RequestMapPacket> packet);
             } else if (cmd === PacketFactory.toCommand(PacketType.RequestMove)) {
-                user.c2s_requestMove(world, <RequestMovePacket> packet);
+                this.user.c2s_requestMove(world, <RequestMovePacket> packet);
             } else {
                 console.log('cmd:' + cmd + ' is unknown command');
             }

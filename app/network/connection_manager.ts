@@ -62,7 +62,13 @@ module kisaragi {
                 var packetType = allPacketTypeList[i];
                 conn.registerHandler(packetType, function(data) {
                     var packet = PacketFactory.createFromJson(data);
+                    if (packet == null) {
+                        return;
+                    }
                     var svrPacket = new ServerReceivedPacket(packet, conn);
+                    //var msg = "Receive[id=" + conn.userId + "] ";
+                    //msg += packet.command + " : " + JSON.stringify(packet.toJson());
+                    //console.log(msg);
                     self.addRecvPacket(svrPacket);
                 });
             }
