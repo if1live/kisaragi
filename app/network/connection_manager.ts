@@ -31,7 +31,7 @@ module kisaragi {
             this.connList.push(conn);
             return conn;
         }
-        createConnection_mock(): ServerConnection {
+        createConnection_mock(): MockServerConnection {
             var uuid_val = uuid.v1();
             var conn = ServerConnection.mock(uuid_val);
             conn.mgr = this;

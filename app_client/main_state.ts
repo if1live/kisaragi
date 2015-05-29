@@ -30,7 +30,6 @@ module kisaragi {
         cursors: Phaser.CursorKeys;
 
         // network
-        socket: SocketIOClient.Socket;
         conn: ClientConnection;
         ping: ClientPing;
         echoRunner: ClientEcho;
@@ -235,13 +234,13 @@ module kisaragi {
             // create network after game context created
             var host = window.location.hostname;
             var url = 'http://' + host + ':' + HTTP_PORT;
-            this.socket = io(url);
-            this.conn = ClientConnection.socketIO(this.socket);
+            var socket = io(url);
+            this.conn = ClientConnection.socketIO(socket);
             this.registerSocketHandler(this.conn);
 
             //TODO
-            //this.echoRunner = new ClientEcho(this.socket, {});
-            this.ping = new ClientPing(this.socket);
+            this.echoRunner = new ClientEcho(this.conn);
+            this.ping = new ClientPing(this.conn);
             this.ping.renderer = new HtmlPingRenderer('ping-result');
             this.ping.ping();
         }

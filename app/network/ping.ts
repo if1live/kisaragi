@@ -2,7 +2,16 @@
 ///<reference path="../app.d.ts"/>
 
 module kisaragi {
-        interface IPingRenderer {
+    export class ServerPing {
+        handle(svrPacket: ServerReceivedPacket) {
+            var packet = svrPacket.packet;
+            if (packet.packetType == PacketType.Ping) {
+                svrPacket.conn.send(packet);
+            }
+        }
+    }
+    
+    interface IPingRenderer {
         render(count: number, curr: number, average: number, min: number, max: number);
     }
 
@@ -37,20 +46,18 @@ module kisaragi {
 
     export class ClientPing {
         logs: number[] = [];
-        socket: SocketIOClient.Socket = null;
         duration: number = 2000;
         windowSize: number = 30;
         count: number = 0;
+        conn: ClientConnection;
 
         renderer: IPingRenderer = null;
 
-        constructor(socket: SocketIOClient.Socket) {
+        constructor(conn: ClientConnection) {
             var self = this;
-            self.socket = socket;
+            self.conn = conn;
 
-            socket.on(PacketFactory.toCommand(PacketType.Ping), function (obj) {
-                var packet = <PingPacket> PacketFactory.createFromJson(obj);
-                
+            conn.registerHandler(PacketType.Ping, function (packet: PingPacket) {
                 self.count += 1;
                 var now = Date.now();
                 var prev = packet.timestamp;
@@ -70,14 +77,14 @@ module kisaragi {
                     self.ping();
                 }, self.duration);
                 //console.log("ping : " + diff + "ms");
-            });
+            })
         }
 
         ping() {
             var self = this;
             var factory = new PacketFactory();
             var packet = factory.ping();
-            self.socket.emit(packet.command, packet.toJson());
+            self.conn.send(packet);
         }
 
         max() {
@@ -116,4 +123,5 @@ declare var exports: any;
 if(typeof exports !== 'undefined') {
     exports.HtmlPingRenderer = kisaragi.HtmlPingRenderer;
     exports.ClientPing = kisaragi.ClientPing;
+    exports.ServerPing = kisaragi.ServerPing;
 }

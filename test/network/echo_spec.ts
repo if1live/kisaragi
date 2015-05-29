@@ -46,3 +46,46 @@ describe('ClientEcho', () => {
         });
     });
 });
+
+
+describe('ServerEcho', function () {
+    var subject = new kisaragi.ServerEcho()
+    var factory = new kisaragi.PacketFactory();
+    var connMgr: kisaragi.ConnectionManager;
+    var conn: kisaragi.MockServerConnection;
+
+    beforeEach(function () {
+        connMgr = new kisaragi.ConnectionManager(null);
+        conn = connMgr.createConnection_mock();
+    })
+
+    describe('#handle', function () {
+        it('echo', function () {
+            var packet = factory.echo('echo');
+            var svrPacket = new kisaragi.ServerReceivedPacket(packet, conn);
+            subject.handle(svrPacket);
+            connMgr.flushSendQueue();
+
+            assert.equal(conn.sendedPacket, packet);
+            assert.equal(conn.broadcastedPacket, null);
+        })
+        it('echoAll', function () {
+            var packet = factory.echoAll('echo');
+            var svrPacket = new kisaragi.ServerReceivedPacket(packet, conn);
+            subject.handle(svrPacket);
+            connMgr.flushSendQueue();
+
+            assert.equal(conn.sendedPacket, null);
+            assert.equal(conn.broadcastedPacket, packet);
+        })
+        it('not echo packet', function () {
+            var packet = factory.ping();
+            var svrPacket = new kisaragi.ServerReceivedPacket(packet, conn);
+            subject.handle(svrPacket);
+            connMgr.flushSendQueue();
+
+            assert.equal(conn.sendedPacket, null);
+            assert.equal(conn.sendedPacket, null);
+        })
+    })
+})

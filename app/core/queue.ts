@@ -5,6 +5,10 @@ module kisaragi {
     export class Queue<T> {
         queue: T[];
 
+        constructor() {
+            this.queue = [];
+        }
+
         get length(): number {
             return this.queue.length;
         }
