@@ -30,6 +30,7 @@
     <TypeScriptCompile Include="app\network\client_connection.ts" />
     <TypeScriptCompile Include="app\network\connection_manager.ts" />
     <TypeScriptCompile Include="app\network\echo.ts" />
+    <TypeScriptCompile Include="app\network\network.ts" />
     <TypeScriptCompile Include="app\network\ping.ts" />
     <TypeScriptCompile Include="app\network\server_connection.ts" />
     <TypeScriptCompile Include="app\packet\base_packet.ts" />
@@ -62,10 +63,8 @@
     <TypeScriptCompile Include="app\level.ts" />
     <TypeScriptCompile Include="app\server_main.ts" />
     <TypeScriptCompile Include="app\game_world.ts" />
-    <TypeScriptCompile Include="app\network.ts" />
     <TypeScriptCompile Include="test\base_spec.ts" />
     <TypeScriptCompile Include="test\level_spec.ts" />
-    <TypeScriptCompile Include="test\network_spec.ts" />
     <TypeScriptCompile Include="test\test.d.ts" />
   </ItemGroup>
   <ItemGroup>

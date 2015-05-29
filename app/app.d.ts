@@ -15,8 +15,7 @@
 ///<reference path="packet/base_packet_factory.ts"/>
 ///<reference path="packet/packet_factory.ts"/>
 
-///<reference path="network.ts"/>
-
+///<reference path="network/network.ts"/>
 ///<reference path="network/ping.ts"/>
 ///<reference path="network/echo.ts"/>
 ///<reference path="network/server_connection.ts"/>

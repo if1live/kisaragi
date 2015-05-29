@@ -13,6 +13,9 @@ module kisaragi {
         static createFromJson(data: any): BasePacket {
             var packetType: PacketType = data.packetType;
             var packet = PacketFactory.create(packetType);
+            if(packet == null) {
+                return null;
+            }
             packet.loadJson(data);
             return packet;
         }

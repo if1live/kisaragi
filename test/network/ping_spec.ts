@@ -32,7 +32,7 @@ describe('ServerPing', function () {
 
     beforeEach(function () {
         connMgr = new kisaragi.ConnectionManager(null);
-        conn = connMgr.createConnection_mock();
+        conn = connMgr.create_mock();
     })
 
     describe('#handle', function () {

@@ -2,7 +2,7 @@
 ///<reference path="../app.d.ts"/>
 
 module kisaragi {
-    enum ServerConnectionCategory {
+    export enum ServerConnectionCategory {
         SocketIO,
         Mock,
     }
@@ -104,7 +104,7 @@ module kisaragi {
     /*
     client socket for server
     */
-    class ServerConnection_SocketIO extends ServerConnection {
+    export class ServerConnection_SocketIO extends ServerConnection {
         socket: SocketIO.Socket;
         io: SocketIO.Server;
 
@@ -161,6 +161,8 @@ module kisaragi {
 
 declare var exports: any;
 if (typeof exports !== 'undefined') {
+    exports.ServerConnectionCategory = kisaragi.ServerConnectionCategory;
     exports.ServerConnection = kisaragi.ServerConnection;
     exports.MockServerConnection = kisaragi.MockServerConnection;
+    exports.ServerConnection_SocketIO = kisaragi.ServerConnection_SocketIO;
 }

@@ -14,6 +14,9 @@ var kisaragi;
         BasePacketFactory.createFromJson = function (data) {
             var packetType = data.packetType;
             var packet = kisaragi.PacketFactory.create(packetType);
+            if (packet == null) {
+                return null;
+            }
             packet.loadJson(data);
             return packet;
         };

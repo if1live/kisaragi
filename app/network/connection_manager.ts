@@ -1,6 +1,10 @@
 // Ŭnicode please
 ///<reference path="../app.d.ts"/>
 
+if (typeof module !== 'undefined') {
+    var uuid = require('node-uuid');
+}
+
 module kisaragi {
     export class ConnectionManager {
         sendQueue: Queue<ServerSendablePacket>;
@@ -23,7 +27,7 @@ module kisaragi {
             this.recvQueue.push(svrPacket);
         }
         
-        createConnection_socketIO(socket: SocketIO.Socket): ServerConnection {
+        create_socketIO(socket: SocketIO.Socket): ServerConnection {
             var conn = ServerConnection.socketIO(uuid.v1(), socket, this.io);
             conn.mgr = this;
             this.registerConnectionHandler(conn);
@@ -31,7 +35,7 @@ module kisaragi {
             this.connList.push(conn);
             return conn;
         }
-        createConnection_mock(): MockServerConnection {
+        create_mock(): MockServerConnection {
             var uuid_val = uuid.v1();
             var conn = ServerConnection.mock(uuid_val);
             conn.mgr = this;
@@ -69,6 +73,40 @@ module kisaragi {
                 var svrPacket = this.sendQueue.pop();
                 this.send(svrPacket);
             }
+        }
+
+        find(opts): ServerConnection {
+            var self = this;
+
+            var filterTable = {
+                'uuid': (conn: ServerConnection) => {
+                    return conn.uuid === opts.uuid;
+                },
+                'socket_io': (conn: ServerConnection) => {
+                    if (conn.category == ServerConnectionCategory.SocketIO) {
+                        var x = <ServerConnection_SocketIO> conn;
+                        return x.socket === opts.socket_io;
+                    } else {
+                        return false;
+                    }
+                }
+            };
+
+            for (var key in filterTable) {
+                if (opts[key] !== undefined) {
+                    var filtered = self.connList.filter(filterTable[key]);
+                    return (filtered.length > 0) ? filtered[0] : null;
+                }
+            }
+            return null;
+        }
+
+        destroy(conn: ServerConnection) {
+            if (conn == null) {
+                return false;
+            }
+            this.connList = _.reject(this.connList, function (x) { return x === conn; });
+            return true;
         }
     }
 }
