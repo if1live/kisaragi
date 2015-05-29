@@ -29,11 +29,11 @@ module kisaragi {
         }
 
         send(packet: BasePacket) {
-            var elem = ServerSendablePacket.send(packet, this);
+            var elem = Response.send(packet, this);
             this.mgr.addSendPacket(elem);
         }
         broadcast(packet: BasePacket) {
-            var elem = ServerSendablePacket.broadcast(packet, this);
+            var elem = Response.broadcast(packet, this);
             this.mgr.addSendPacket(elem);
         }
 
@@ -56,22 +56,22 @@ module kisaragi {
             return '127.0.0.1';
         }
 
-        onEvent(svrPacket: ServerReceivedPacket, world: GameWorld) {
+        onEvent(req: Request, world: GameWorld) {
             var self = this;
-            var packet = svrPacket.packet;
+            var packet = req.packet;
             
             // for development
             if (packet.packetType == PacketType.Ping) {
                 var serverPing = new ServerPing();
-                serverPing.handle(svrPacket);
+                serverPing.handle(req);
                 
             } else if (packet.packetType == PacketType.Echo) {
                 var serverEcho = new ServerEcho();
-                serverEcho.handle(svrPacket);
+                serverEcho.handle(req);
                 
             } else if (packet.packetType == PacketType.EchoAll) {
                 var serverEcho = new ServerEcho();
-                serverEcho.handle(svrPacket);
+                serverEcho.handle(req);
 
             } else if (packet.packetType == PacketType.Connect) {
                 var user = world.createUser(this);

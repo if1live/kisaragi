@@ -3,12 +3,12 @@
 
 module kisaragi {
     export class ServerEcho {
-        handle(svrPacket: ServerReceivedPacket) {
-            var packet = svrPacket.packet;
+        handle(req: Request) {
+            var packet = req.packet;
             if (packet.packetType == PacketType.Echo) {
-                svrPacket.conn.send(packet);
+                req.conn.send(packet);
             } else if (packet.packetType == PacketType.EchoAll) {
-                svrPacket.conn.broadcast(packet);
+                req.conn.broadcast(packet);
             }
         }
     }

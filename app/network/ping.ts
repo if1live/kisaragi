@@ -3,10 +3,10 @@
 
 module kisaragi {
     export class ServerPing {
-        handle(svrPacket: ServerReceivedPacket) {
-            var packet = svrPacket.packet;
+        handle(req: Request) {
+            var packet = req.packet;
             if (packet.packetType == PacketType.Ping) {
-                svrPacket.conn.send(packet);
+                req.conn.send(packet);
             }
         }
     }

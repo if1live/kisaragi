@@ -38,8 +38,8 @@ describe('ServerPing', function () {
     describe('#handle', function () {
         it('ping', function () {
             var packet = factory.ping();
-            var svrPacket = new kisaragi.ServerReceivedPacket(packet, conn);
-            subject.handle(svrPacket);
+            var req = new kisaragi.Request(packet, conn);
+            subject.handle(req);
             connMgr.flushSendQueue();
 
             assert.equal(conn.sendedPacket, packet);
@@ -48,8 +48,8 @@ describe('ServerPing', function () {
 
         it('not ping', function () {
             var packet = factory.echo('echo');
-            var svrPacket = new kisaragi.ServerReceivedPacket(packet, conn);
-            subject.handle(svrPacket);
+            var req = new kisaragi.Request(packet, conn);
+            subject.handle(req);
             connMgr.flushSendQueue();
 
             assert.equal(conn.sendedPacket, null);

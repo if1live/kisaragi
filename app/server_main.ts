@@ -68,8 +68,8 @@ module kisaragi {
                 var conn = self.connMgr.create_socketIO(socket);
 
                 var packet = factory.createConnect();
-                var svrPacket = new ServerReceivedPacket(packet, conn);
-                self.connMgr.addRecvPacket(svrPacket);
+                var req = new Request(packet, conn);
+                self.connMgr.addRecvPacket(req);
             });
         }
 

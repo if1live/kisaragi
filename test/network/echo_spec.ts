@@ -62,17 +62,17 @@ describe('ServerEcho', function () {
     describe('#handle', function () {
         it('echo', function () {
             var packet = factory.echo('echo');
-            var svrPacket = new kisaragi.ServerReceivedPacket(packet, conn);
-            subject.handle(svrPacket);
+            var req = new kisaragi.Request(packet, conn);
+            subject.handle(req);
             connMgr.flushSendQueue();
-
+            
             assert.equal(conn.sendedPacket, packet);
             assert.equal(conn.broadcastedPacket, null);
         })
         it('echoAll', function () {
             var packet = factory.echoAll('echo');
-            var svrPacket = new kisaragi.ServerReceivedPacket(packet, conn);
-            subject.handle(svrPacket);
+            var req = new kisaragi.Request(packet, conn);
+            subject.handle(req);
             connMgr.flushSendQueue();
 
             assert.equal(conn.sendedPacket, null);
@@ -80,8 +80,8 @@ describe('ServerEcho', function () {
         })
         it('not echo packet', function () {
             var packet = factory.ping();
-            var svrPacket = new kisaragi.ServerReceivedPacket(packet, conn);
-            subject.handle(svrPacket);
+            var req = new kisaragi.Request(packet, conn);
+            subject.handle(req);
             connMgr.flushSendQueue();
 
             assert.equal(conn.sendedPacket, null);

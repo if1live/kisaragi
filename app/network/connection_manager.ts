@@ -7,24 +7,24 @@ if (typeof module !== 'undefined') {
 
 module kisaragi {
     export class ConnectionManager {
-        sendQueue: Queue<ServerSendablePacket>;
-        recvQueue: Queue<ServerReceivedPacket>;
+        sendQueue: Queue<Response>;
+        recvQueue: Queue<Request>;
        
         io: SocketIO.Server;
         connList: ServerConnection[];
         
         constructor(io: SocketIO.Server) {
-            this.sendQueue = new Queue<ServerSendablePacket>();
-            this.recvQueue = new Queue<ServerReceivedPacket>();
+            this.sendQueue = new Queue<Response>();
+            this.recvQueue = new Queue<Request>();
             
             this.io = io;
             this.connList = [];
         }
-        addSendPacket(svrPacket: ServerSendablePacket) {
-            this.sendQueue.push(svrPacket);
+        addSendPacket(res: Response) {
+            this.sendQueue.push(res);
         }
-        addRecvPacket(svrPacket: ServerReceivedPacket) {
-            this.recvQueue.push(svrPacket);
+        addRecvPacket(req: Request) {
+            this.recvQueue.push(req);
         }
         
         create_socketIO(socket: SocketIO.Socket): ServerConnection {
@@ -45,12 +45,12 @@ module kisaragi {
             return conn;
         }
         
-        send(svrPacket: ServerSendablePacket) {
-            var conn = svrPacket.conn;
-            if(svrPacket.sendType === ServerSendablePacketType.Send) {
-                conn.sendImmediate(svrPacket.packet);
-            } else if(svrPacket.sendType === ServerSendablePacketType.Broadcast) {
-                conn.broadcastImmediate(svrPacket.packet);
+        send(res: Response) {
+            var conn = res.conn;
+            if(res.resType === ResponseType.Send) {
+                conn.sendImmediate(res.packet);
+            } else if(res.resType === ResponseType.Broadcast) {
+                conn.broadcastImmediate(res.packet);
             } else {
                 throw "not valid packet type";
             }
@@ -62,7 +62,7 @@ module kisaragi {
                 var packetType = allPacketTypeList[i];
                 conn.registerHandler(packetType, function (data) {
                     var packet = PacketFactory.createFromJson(data);
-                    var svrPacket = new ServerReceivedPacket(packet, conn);
+                    var svrPacket = new Request(packet, conn);
                     //var msg = "Receive[id=" + conn.userId + "] ";
                     //msg += packet.command + " : " + JSON.stringify(packet.toJson());
                     //console.log(msg);

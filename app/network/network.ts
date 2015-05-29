@@ -41,11 +41,49 @@ module kisaragi {
             return new MockBrowserSocketIOClient(io);
         }
     }
+    
+    export enum ResponseType {
+        Send,
+        Broadcast
+    }
+    
+    export class Response {
+        resType: ResponseType;
+        packet: BasePacket;
+        conn: ServerConnection;
+        
+        constructor(resType: ResponseType, packet: BasePacket, conn: ServerConnection) {
+            this.resType = resType;
+            this.packet = packet;
+            this.conn = conn;
+        }
+        
+        static send(packet: BasePacket, conn: ServerConnection) {
+            return new Response(ResponseType.Send, packet, conn);
+        }
+        static broadcast(packet: BasePacket, conn: ServerConnection) {
+            return new Response(ResponseType.Broadcast, packet, conn);
+        }
+    }
+    
+    export class Request {
+        packet: BasePacket;
+        conn: ServerConnection;
+        
+        constructor(packet: BasePacket, conn: ServerConnection) {
+            this.packet = packet;
+            this.conn = conn;
+        }
+    }
 }
 
 declare var exports: any;
 if (typeof exports !== 'undefined') {
     exports.createMockSocketIOServer = kisaragi.createMockSocketIOServer;
     exports.createMockSocketIOClient = kisaragi.createMockSocketIOClient;
+    
+    exports.ResponseType = kisaragi.ResponseType;
+    exports.Response = kisaragi.Response;
+    exports.Request = kisaragi.Request;
 }
 
