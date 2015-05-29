@@ -42,38 +42,41 @@ module kisaragi {
         }
     }
     
-    export enum ServerCommandType {
-        Request,
+    export enum ResponseType {
         Response,
         Broadcast
     }
-    export class BaseServerCommand {
-        cmdType: ServerCommandType;
+    export class BaseResponse {
+        resType: ResponseType;
         packet: BasePacket;
         conn: ServerConnection;
         
-        constructor(cmdType: ServerCommandType, packet: BasePacket, conn: ServerConnection) {
-            this.cmdType = cmdType;
+        constructor(resType: ResponseType, packet: BasePacket, conn: ServerConnection) {
+            this.resType = resType;
             this.packet = packet;
             this.conn = conn;
         }
     }
     
-    export class Broadcast extends BaseServerCommand {
+    export class Broadcast extends BaseResponse {
         constructor(packet: BasePacket, conn: ServerConnection) {
-            super(ServerCommandType.Broadcast, packet, conn);
+            super(ResponseType.Broadcast, packet, conn);
         }
     }
     
-    export class Response extends BaseServerCommand {
+    export class Response extends BaseResponse {
         constructor(packet: BasePacket, conn: ServerConnection) {
-            super(ServerCommandType.Response, packet, conn);
+            super(ResponseType.Response, packet, conn);
         }
     }
     
-    export class Request extends BaseServerCommand {
+    export class Request {
+        packet: BasePacket;
+        conn: ServerConnection;
+        
         constructor(packet: BasePacket, conn: ServerConnection) {
-            super(ServerCommandType.Request, packet, conn);
+            this.packet = packet;
+            this.conn = conn;
         }
     }
 }
@@ -83,7 +86,8 @@ if (typeof exports !== 'undefined') {
     exports.createMockSocketIOServer = kisaragi.createMockSocketIOServer;
     exports.createMockSocketIOClient = kisaragi.createMockSocketIOClient;
     
-    exports.BaseServerCommand = kisaragi.BaseServerCommand;
+    exports.ResponseType = kisaragi.ResponseType;
+    exports.BaseResponse = kisaragi.BaseResponse;
     exports.Broadcast = kisaragi.Broadcast;
     exports.Response = kisaragi.Response;
     exports.Request = kisaragi.Request;

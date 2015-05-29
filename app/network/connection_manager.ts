@@ -7,20 +7,20 @@ if (typeof module !== 'undefined') {
 
 module kisaragi {
     export class ConnectionManager {
-        sendQueue: Queue<BaseServerCommand>;
+        sendQueue: Queue<BaseResponse>;
         recvQueue: Queue<Request>;
        
         io: SocketIO.Server;
         connList: ServerConnection[];
         
         constructor(io: SocketIO.Server) {
-            this.sendQueue = new Queue<BaseServerCommand>();
+            this.sendQueue = new Queue<BaseResponse>();
             this.recvQueue = new Queue<Request>();
             
             this.io = io;
             this.connList = [];
         }
-        addSendPacket(res: BaseServerCommand) {
+        addSendPacket(res: BaseResponse) {
             this.sendQueue.push(res);
         }
         addRecvPacket(req: Request) {
@@ -53,9 +53,9 @@ module kisaragi {
         flushSendQueue() {
             while(this.sendQueue.isEmpty() === false) {
                 var cmd = this.sendQueue.pop();
-                if(cmd.cmdType == ServerCommandType.Response) {
+                if(cmd.resType == ResponseType.Response) {
                     this.send(cmd);
-                } else if(cmd.cmdType == ServerCommandType.Broadcast) {
+                } else if(cmd.resType == ResponseType.Broadcast) {
                     this.broadcast(cmd);
                 } else {
                     throw "not valid";
