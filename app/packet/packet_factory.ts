@@ -9,12 +9,13 @@ module kisaragi {
             return packet;
         }
 
-        newObject(movableId: number, category: Category, x: number, y: number): NewObjectPacket {
+        newObject(movableId: number, category: Category, x: number, y: number, floor: number): NewObjectPacket {
             var packet = new NewObjectPacket();
             packet.movableId = movableId;
             packet.category = category;
             packet.x = x;
             packet.y = y;
+            packet.floor = floor;
             return packet;
         }
         removeObject(movableId: number): RemoveObjectPacket {
@@ -48,21 +49,29 @@ module kisaragi {
             return packet;
         }
 
-        login(movableId: number, x: number, y: number, width: number, height: number) {
+        login(movableId: number, x: number, y: number, floor: number, width: number, height: number) {
             var packet = new LoginPacket();
             packet.movableId = movableId;
             packet.x = x;
             packet.y = y;
+            packet.floor = floor;
             packet.width = width;
             packet.height = height;
             return packet;
         }
 
-        responseMap(level: Level): ResponseMapPacket {
+        responseMap(level: Level, floor: number): ResponseMapPacket {
             var packet = new ResponseMapPacket();
             packet.data = level.data;
             packet.width = level.width;
             packet.height = level.height;
+            packet.floor = floor;
+            return packet;
+        }
+        
+        requestMap(floor: number): RequestMapPacket {
+            var packet = new RequestMapPacket();
+            packet.floor = floor;
             return packet;
         }
     }

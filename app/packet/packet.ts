@@ -194,6 +194,7 @@ module kisaragi {
         category: Category;
         x: number;
         y: number;
+        floor: number;
         
         constructor() {
             super(PacketType.NewObject);
@@ -202,6 +203,7 @@ module kisaragi {
             this.category = null;
             this.x = 0;
             this.y = 0;
+            this.floor = 0;
         }
         
         get command(): string {
@@ -214,6 +216,7 @@ module kisaragi {
                 category: this.category, 
                 x: this.x, 
                 y: this.y, 
+                floor: this.floor, 
             };
         }
         loadJson(data: any) {
@@ -222,6 +225,7 @@ module kisaragi {
             this.category = data.category; 
             this.x = data.x; 
             this.y = data.y; 
+            this.floor = data.floor; 
         }
     }
     
@@ -255,6 +259,7 @@ module kisaragi {
         movableId: number;
         x: number;
         y: number;
+        floor: number;
         width: number;
         height: number;
         
@@ -264,6 +269,7 @@ module kisaragi {
             this.movableId = 0;
             this.x = 0;
             this.y = 0;
+            this.floor = 0;
             this.width = 0;
             this.height = 0;
         }
@@ -277,6 +283,7 @@ module kisaragi {
                 movableId: this.movableId, 
                 x: this.x, 
                 y: this.y, 
+                floor: this.floor, 
                 width: this.width, 
                 height: this.height, 
             };
@@ -286,6 +293,7 @@ module kisaragi {
             this.movableId = data.movableId; 
             this.x = data.x; 
             this.y = data.y; 
+            this.floor = data.floor; 
             this.width = data.width; 
             this.height = data.height; 
         }
@@ -293,10 +301,12 @@ module kisaragi {
     
     export class RequestMapPacket extends BasePacket {
         
+        floor: number;
         
         constructor() {
             super(PacketType.RequestMap);
 
+            this.floor = 0;
         }
         
         get command(): string {
@@ -305,10 +315,12 @@ module kisaragi {
         _generateJson(): any {
             return {
 
+                floor: this.floor, 
             };
         }
         loadJson(data: any) {
 
+            this.floor = data.floor; 
         }
     }
     
@@ -317,6 +329,7 @@ module kisaragi {
         data: Array<Array<TileCode>>;
         width: number;
         height: number;
+        floor: number;
         
         constructor() {
             super(PacketType.ResponseMap);
@@ -324,6 +337,7 @@ module kisaragi {
             this.data = null;
             this.width = 0;
             this.height = 0;
+            this.floor = 0;
         }
         
         get command(): string {
@@ -335,6 +349,7 @@ module kisaragi {
                 data: this.data, 
                 width: this.width, 
                 height: this.height, 
+                floor: this.floor, 
             };
         }
         loadJson(data: any) {
@@ -342,6 +357,7 @@ module kisaragi {
             this.data = data.data; 
             this.width = data.width; 
             this.height = data.height; 
+            this.floor = data.floor; 
         }
     }
     
