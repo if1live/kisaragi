@@ -6,18 +6,24 @@ module kisaragi {
         SocketIO,
         Mock,
     }
+    
+    interface ServerHandlerFunc {
+        (req: Request, packet: BasePacket, world: GameWorld);
+    }
 
     export class ServerConnection {
         uuid: string;
         category: ServerConnectionCategory;
         user: Player;
         mgr: ConnectionManager;
+        handlerTable: any;
 
         constructor(category: ServerConnectionCategory, uuid_val: string) {
             this.category = category;
             this.uuid = uuid_val;
             this.user = null;
             this.mgr = null;
+            this.handlerTable = {};
         }
 
         get userId(): number {
@@ -50,51 +56,61 @@ module kisaragi {
         _broadcastImpl(packet: BasePacket) { }
 
         
-        registerHandler(category: PacketType, handler: any) { }
+        registerHandler(category: PacketType, handler: ServerHandlerFunc) {
+            this.handlerTable[category] = handler;
+        }
+        
+        initializeHandler() {
+            var self = this;
+            
+            this.registerHandler(PacketType.Ping, (req: Request, packet: PingPacket, world: GameWorld) => {
+                var serverPing = new ServerPing();
+                serverPing.handle(req);
+            });
+            
+            this.registerHandler(PacketType.Echo, (req: Request, packet: EchoPacket, world: GameWorld) => {
+                var serverEcho = new ServerEcho();
+                serverEcho.handle(req);
+            });
+                
+            this.registerHandler(PacketType.EchoAll, (req: Request, packet: EchoAllPacket, world: GameWorld) => {
+                var serverEcho = new ServerEcho();
+                serverEcho.handle(req);
+            });
+                
+            this.registerHandler(PacketType.Connect, (req: Request, packet: ConnectPacket, world: GameWorld) => {
+                var user = world.createUser(self);
+                self.user = user;
+                world.addUser(user);
+                console.log(`[User=${self.user.movableId}] connected`);
+                self.user.connect(world, packet);
+            });
+            
+            this.registerHandler(PacketType.Disconnect, (req: Request, packet: DisconnectPacket, world: GameWorld) => {
+                self.user.disconnect(world, packet);
+                self.mgr.destroy(self);
+                console.log(`[User=${self.user.movableId}] disconnected`);
+            });
+                
+            this.registerHandler(PacketType.RequestMap, (req: Request, packet: RequestMapPacket, world: GameWorld) => {
+                self.user.c2s_requestMap(world, packet);
+            });
+            
+            this.registerHandler(PacketType.RequestMove, (req: Request, packet: RequestMovePacket, world: GameWorld) => {
+                self.user.c2s_requestMove(world, packet);
+            });
+        }
 
         getAddress() {
             return '127.0.0.1';
         }
 
-        onEvent(req: Request, world: GameWorld) {
-            var self = this;
-            var packet = req.packet;
-            
-            // for development
-            if (packet.packetType == PacketType.Ping) {
-                var serverPing = new ServerPing();
-                serverPing.handle(req);
-                
-            } else if (packet.packetType == PacketType.Echo) {
-                var serverEcho = new ServerEcho();
-                serverEcho.handle(req);
-                
-            } else if (packet.packetType == PacketType.EchoAll) {
-                var serverEcho = new ServerEcho();
-                serverEcho.handle(req);
-
-            } else if (packet.packetType == PacketType.Connect) {
-                var user = world.createUser(this);
-                this.user = user;
-                world.addUser(user);
-                console.log(`[User=${this.user.movableId}] connected`);
-                this.user.connect(world, <ConnectPacket> packet);
-
-            } else if (packet.packetType == PacketType.Disconnect) {
-                this.user.disconnect(world, <DisconnectPacket> packet);
-                this.mgr.destroy(this);
-                console.log(`[User=${this.user.movableId}] disconnected`);
-                
-            } else if (packet.packetType == PacketType.RequestMap) {
-                this.user.c2s_requestMap(world, <RequestMapPacket> packet);
-
-            } else if (packet.packetType == PacketType.RequestMove) {
-                this.user.c2s_requestMove(world, <RequestMovePacket> packet);
-
-            } else {
-                var cmd = PacketFactory.toCommand(packet.packetType);
-                console.log('cmd:' + cmd + ' is unknown command');
+        handle(req: Request, world: GameWorld) {
+            var handler = this.handlerTable[req.packet.packetType];
+            if(typeof handler == 'undefined') {
+                return;
             }
+            handler(req, req.packet, world);
         }
 
         static mock(uuid_val: string) {
@@ -140,9 +156,19 @@ module kisaragi {
             return this.io.emit(packet.command, packet.toJson());
         }
         
-        registerHandler(category: PacketType, handler: any) {
+        registerHandler(category: PacketType, handler: ServerHandlerFunc) {
+            var self = this;
+            self.handlerTable[category] = handler;
+            
             var command = PacketFactory.toCommand(category)
-            this.socket.on(command, handler);
+            this.socket.on(command, function(data) {
+                var packet = PacketFactory.createFromJson(data);
+                var req = new Request(packet, self);
+                //var msg = "Receive[id=" + conn.userId + "] ";
+                //msg += packet.command + " : " + JSON.stringify(packet.toJson());
+                //console.log(msg);
+                self.mgr.addRecvPacket(req);
+            });
         }
     }
 

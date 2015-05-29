@@ -66,6 +66,7 @@ module kisaragi {
             this.io_http.on('connection', (socket) => {
                 var factory = new PacketFactory();
                 var conn = self.connMgr.create_socketIO(socket);
+                conn.initializeHandler();
 
                 var packet = factory.createConnect();
                 var req = new Request(packet, conn);
@@ -77,7 +78,7 @@ module kisaragi {
             var recvQueue = this.connMgr.recvQueue;
             while (recvQueue.isEmpty() == false) {
                 var recv = recvQueue.pop();
-                recv.conn.onEvent(recv, this.world);
+                recv.conn.handle(recv, this.world);
             }
 
             this.world.update(delta);

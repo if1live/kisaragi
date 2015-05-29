@@ -7,7 +7,7 @@ module kisaragi {
         Mock
     }
 
-    interface HandlerFunc {
+    interface ClientHandlerFunc {
         (packet: BasePacket);
     }
 
@@ -29,10 +29,10 @@ module kisaragi {
             }
         }
 
-        registerHandlerPreHook(category: PacketType, handler: HandlerFunc) { }
-        registerHandlerPostHook(category: PacketType, handler: HandlerFunc) { }
+        registerHandlerPreHook(category: PacketType, handler: ClientHandlerFunc) { }
+        registerHandlerPostHook(category: PacketType, handler: ClientHandlerFunc) { }
 
-        registerHandler(category: PacketType, handler: HandlerFunc) {
+        registerHandler(category: PacketType, handler: ClientHandlerFunc) {
             this.registerHandlerPreHook(category, handler);
             this.handlerTable[category] = handler;
             this.registerHandlerPostHook(category, handler);
@@ -71,7 +71,7 @@ module kisaragi {
             this.sock.emit(packet.command, packet.toJson());
         }
 
-        registerHandlerPostHook(category: PacketType, handler: HandlerFunc) {
+        registerHandlerPostHook(category: PacketType, handler: ClientHandlerFunc) {
             var self = this;
             var command = PacketFactory.toCommand(category)
             this.sock.on(command, function (data) {

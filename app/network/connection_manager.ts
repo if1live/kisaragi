@@ -30,7 +30,6 @@ module kisaragi {
         create_socketIO(socket: SocketIO.Socket): ServerConnection {
             var conn = ServerConnection.socketIO(uuid.v1(), socket, this.io);
             conn.mgr = this;
-            this.registerConnectionHandler(conn);
             
             this.connList.push(conn);
             return conn;
@@ -39,7 +38,6 @@ module kisaragi {
             var uuid_val = uuid.v1();
             var conn = ServerConnection.mock(uuid_val);
             conn.mgr = this;
-            this.registerConnectionHandler(conn);
             
             this.connList.push(conn);
             return conn;
@@ -51,22 +49,7 @@ module kisaragi {
         broadcast(res: Broadcast) {
             res.conn.broadcastImmediate(res.packet);
         }
-        
-        registerConnectionHandler(conn: ServerConnection) {
-            var self = this;
-            for(var i = 0 ; i < allPacketTypeList.length ; i += 1) {
-                var packetType = allPacketTypeList[i];
-                conn.registerHandler(packetType, function (data) {
-                    var packet = PacketFactory.createFromJson(data);
-                    var req = new Request(packet, conn);
-                    //var msg = "Receive[id=" + conn.userId + "] ";
-                    //msg += packet.command + " : " + JSON.stringify(packet.toJson());
-                    //console.log(msg);
-                    self.addRecvPacket(req);
-                });
-            }
-        }
-        
+                
         flushSendQueue() {
             while(this.sendQueue.isEmpty() === false) {
                 var cmd = this.sendQueue.pop();
