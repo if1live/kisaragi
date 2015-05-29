@@ -7,20 +7,20 @@ if (typeof module !== 'undefined') {
 
 module kisaragi {
     export class ConnectionManager {
-        sendQueue: Queue<Response>;
+        sendQueue: Queue<BaseServerCommand>;
         recvQueue: Queue<Request>;
        
         io: SocketIO.Server;
         connList: ServerConnection[];
         
         constructor(io: SocketIO.Server) {
-            this.sendQueue = new Queue<Response>();
+            this.sendQueue = new Queue<BaseServerCommand>();
             this.recvQueue = new Queue<Request>();
             
             this.io = io;
             this.connList = [];
         }
-        addSendPacket(res: Response) {
+        addSendPacket(res: BaseServerCommand) {
             this.sendQueue.push(res);
         }
         addRecvPacket(req: Request) {
@@ -46,14 +46,10 @@ module kisaragi {
         }
         
         send(res: Response) {
-            var conn = res.conn;
-            if(res.resType === ResponseType.Send) {
-                conn.sendImmediate(res.packet);
-            } else if(res.resType === ResponseType.Broadcast) {
-                conn.broadcastImmediate(res.packet);
-            } else {
-                throw "not valid packet type";
-            }
+            res.conn.sendImmediate(res.packet);
+        }
+        broadcast(res: Broadcast) {
+            res.conn.broadcastImmediate(res.packet);
         }
         
         registerConnectionHandler(conn: ServerConnection) {
@@ -62,19 +58,25 @@ module kisaragi {
                 var packetType = allPacketTypeList[i];
                 conn.registerHandler(packetType, function (data) {
                     var packet = PacketFactory.createFromJson(data);
-                    var svrPacket = new Request(packet, conn);
+                    var req = new Request(packet, conn);
                     //var msg = "Receive[id=" + conn.userId + "] ";
                     //msg += packet.command + " : " + JSON.stringify(packet.toJson());
                     //console.log(msg);
-                    self.addRecvPacket(svrPacket);
+                    self.addRecvPacket(req);
                 });
             }
         }
         
         flushSendQueue() {
             while(this.sendQueue.isEmpty() === false) {
-                var svrPacket = this.sendQueue.pop();
-                this.send(svrPacket);
+                var cmd = this.sendQueue.pop();
+                if(cmd.cmdType == ServerCommandType.Response) {
+                    this.send(cmd);
+                } else if(cmd.cmdType == ServerCommandType.Broadcast) {
+                    this.broadcast(cmd);
+                } else {
+                    throw "not valid";
+                }
             }
         }
 

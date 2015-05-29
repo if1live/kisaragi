@@ -42,37 +42,38 @@ module kisaragi {
         }
     }
     
-    export enum ResponseType {
-        Send,
+    export enum ServerCommandType {
+        Request,
+        Response,
         Broadcast
     }
-    
-    export class Response {
-        resType: ResponseType;
+    export class BaseServerCommand {
+        cmdType: ServerCommandType;
         packet: BasePacket;
         conn: ServerConnection;
         
-        constructor(resType: ResponseType, packet: BasePacket, conn: ServerConnection) {
-            this.resType = resType;
+        constructor(cmdType: ServerCommandType, packet: BasePacket, conn: ServerConnection) {
+            this.cmdType = cmdType;
             this.packet = packet;
             this.conn = conn;
-        }
-        
-        static send(packet: BasePacket, conn: ServerConnection) {
-            return new Response(ResponseType.Send, packet, conn);
-        }
-        static broadcast(packet: BasePacket, conn: ServerConnection) {
-            return new Response(ResponseType.Broadcast, packet, conn);
         }
     }
     
-    export class Request {
-        packet: BasePacket;
-        conn: ServerConnection;
-        
+    export class Broadcast extends BaseServerCommand {
         constructor(packet: BasePacket, conn: ServerConnection) {
-            this.packet = packet;
-            this.conn = conn;
+            super(ServerCommandType.Broadcast, packet, conn);
+        }
+    }
+    
+    export class Response extends BaseServerCommand {
+        constructor(packet: BasePacket, conn: ServerConnection) {
+            super(ServerCommandType.Response, packet, conn);
+        }
+    }
+    
+    export class Request extends BaseServerCommand {
+        constructor(packet: BasePacket, conn: ServerConnection) {
+            super(ServerCommandType.Request, packet, conn);
         }
     }
 }
@@ -82,7 +83,8 @@ if (typeof exports !== 'undefined') {
     exports.createMockSocketIOServer = kisaragi.createMockSocketIOServer;
     exports.createMockSocketIOClient = kisaragi.createMockSocketIOClient;
     
-    exports.ResponseType = kisaragi.ResponseType;
+    exports.BaseServerCommand = kisaragi.BaseServerCommand;
+    exports.Broadcast = kisaragi.Broadcast;
     exports.Response = kisaragi.Response;
     exports.Request = kisaragi.Request;
 }

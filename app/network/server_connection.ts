@@ -29,11 +29,11 @@ module kisaragi {
         }
 
         send(packet: BasePacket) {
-            var elem = Response.send(packet, this);
+            var elem = new Response(packet, this);
             this.mgr.addSendPacket(elem);
         }
         broadcast(packet: BasePacket) {
-            var elem = Response.broadcast(packet, this);
+            var elem = new Broadcast(packet, this);
             this.mgr.addSendPacket(elem);
         }
 
