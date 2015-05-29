@@ -38,7 +38,7 @@ publish
 *.csproj.user
 
 # typescript
-typings
+#typings
 app/*.js
 app/network/*.js
 app/core/*.js
