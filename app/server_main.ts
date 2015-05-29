@@ -64,35 +64,12 @@ module kisaragi {
             var factory = new PacketFactory();
             
             this.io_http.on('connection', (socket) => {
-                self.registerSocketIO_ConnectHandler(socket);
-                self.registerSocketIO_DisconnectHandler(socket);
-            });
-        }
+                var factory = new PacketFactory();
+                var conn = self.connMgr.create_socketIO(socket);
 
-        registerSocketIO_ConnectHandler(socket: SocketIO.Socket) {
-            // 이름을 다른것과 맞추려고 handler라고 했지만
-            // 즉시 처리되기 때문에 핸들러라고 할수 없다
-            var self = this;
-            var factory = new PacketFactory();
-
-            var conn = self.connMgr.create_socketIO(socket);
-            var user = self.world.createUser(conn);
-            var packet = factory.createConnect();
-            conn.onEvent(packet, self.world);
-            console.log(`[User=${user.movableId}] connected`);
-        }
-
-        registerSocketIO_DisconnectHandler(socket: SocketIO.Socket) {
-            var self = this;
-            var factory = new PacketFactory();
-
-            socket.on(PacketFactory.toCommand(PacketType.Disconnect), function () {
-                var conn = self.connMgr.find({ socket_io: socket });
-                var packet = factory.createDisconnect();
-                conn.onEvent(packet, self.world);
-
-                self.connMgr.destroy(conn);
-                console.log(`[User=${conn.user.movableId}] disconnected`);
+                var packet = factory.createConnect();
+                var svrPacket = new ServerReceivedPacket(packet, conn);
+                self.connMgr.addRecvPacket(svrPacket);
             });
         }
 
@@ -100,7 +77,7 @@ module kisaragi {
             var recvQueue = this.connMgr.recvQueue;
             while (recvQueue.isEmpty() == false) {
                 var recv = recvQueue.pop();
-                recv.conn.onEvent(recv.packet, this.world);
+                recv.conn.onEvent(recv, this.world);
             }
 
             this.world.update(delta);

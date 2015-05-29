@@ -56,37 +56,43 @@ module kisaragi {
             return '127.0.0.1';
         }
 
-        onEvent(packet: BasePacket, world: GameWorld) {
+        onEvent(svrPacket: ServerReceivedPacket, world: GameWorld) {
             var self = this;
-            var cmd = packet.command;
+            var packet = svrPacket.packet;
             
             // for development
-            if (cmd === PacketFactory.toCommand(PacketType.Ping)) {
-                self.sendImmediate(packet);
-                return;
-            } else if (cmd === PacketFactory.toCommand(PacketType.Echo)) {
-                self.sendImmediate(packet);
-                return;
-            } else if (cmd === PacketFactory.toCommand(PacketType.EchoAll)) {
-                self.broadcastImmediate(packet);
-                return;
-            }
+            if (packet.packetType == PacketType.Ping) {
+                var serverPing = new ServerPing();
+                serverPing.handle(svrPacket);
+                
+            } else if (packet.packetType == PacketType.Echo) {
+                var serverEcho = new ServerEcho();
+                serverEcho.handle(svrPacket);
+                
+            } else if (packet.packetType == PacketType.EchoAll) {
+                var serverEcho = new ServerEcho();
+                serverEcho.handle(svrPacket);
 
-            if (this.user === null) {
-                console.log("User is null!!!!");
-                return;
-            }
-
-            // handle event
-            if (cmd === PacketFactory.toCommand(PacketType.Connect)) {
+            } else if (packet.packetType == PacketType.Connect) {
+                var user = world.createUser(this);
+                this.user = user;
+                world.addUser(user);
+                console.log(`[User=${this.user.movableId}] connected`);
                 this.user.connect(world, <ConnectPacket> packet);
-            } else if (cmd === PacketFactory.toCommand(PacketType.Disconnect)) {
+
+            } else if (packet.packetType == PacketType.Disconnect) {
                 this.user.disconnect(world, <DisconnectPacket> packet);
-            } else if (cmd === PacketFactory.toCommand(PacketType.RequestMap)) {
+                this.mgr.destroy(this);
+                console.log(`[User=${this.user.movableId}] disconnected`);
+                
+            } else if (packet.packetType == PacketType.RequestMap) {
                 this.user.c2s_requestMap(world, <RequestMapPacket> packet);
-            } else if (cmd === PacketFactory.toCommand(PacketType.RequestMove)) {
+
+            } else if (packet.packetType == PacketType.RequestMove) {
                 this.user.c2s_requestMove(world, <RequestMovePacket> packet);
+
             } else {
+                var cmd = PacketFactory.toCommand(packet.packetType);
                 console.log('cmd:' + cmd + ' is unknown command');
             }
         }

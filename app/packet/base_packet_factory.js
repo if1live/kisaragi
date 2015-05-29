@@ -15,9 +15,15 @@ var kisaragi;
             var packetType = data.packetType;
             var packet = kisaragi.PacketFactory.create(packetType);
             if (packet == null) {
-                return null;
+                // 연결종료할때
+                // data = transport close
+                // 가 되면서 packet파싱에 실패, packet가 null이 된다
+                var factory = new kisaragi.PacketFactory();
+                packet = factory.createDisconnect();
             }
-            packet.loadJson(data);
+            else {
+                packet.loadJson(data);
+            }
             return packet;
         };
         BasePacketFactory.create = function (packetType) {

@@ -13,10 +13,15 @@ module kisaragi {
         static createFromJson(data: any): BasePacket {
             var packetType: PacketType = data.packetType;
             var packet = PacketFactory.create(packetType);
-            if(packet == null) {
-                return null;
+            if (packet == null) {
+                // 연결종료할때
+                // data = transport close
+                // 가 되면서 packet파싱에 실패, packet가 null이 된다
+                var factory = new PacketFactory();
+                packet = factory.createDisconnect();
+            } else {
+                packet.loadJson(data);
             }
-            packet.loadJson(data);
             return packet;
         }
 
