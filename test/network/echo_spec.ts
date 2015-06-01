@@ -68,6 +68,7 @@ describe('ServerEcho', function () {
             
             assert.equal(conn.sendedPacket, packet);
             assert.equal(conn.broadcastedPacket, null);
+            assert.equal(conn.globalBroadcastedPacket, null);
         })
         it('echoAll', function () {
             var packet = factory.echoAll('echo');
@@ -76,7 +77,8 @@ describe('ServerEcho', function () {
             connMgr.flushSendQueue();
 
             assert.equal(conn.sendedPacket, null);
-            assert.equal(conn.broadcastedPacket, packet);
+            assert.equal(conn.broadcastedPacket, null);
+            assert.equal(conn.globalBroadcastedPacket, packet);
         })
         it('not echo packet', function () {
             var packet = factory.ping();
