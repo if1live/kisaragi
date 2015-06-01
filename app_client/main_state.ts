@@ -88,7 +88,7 @@ module kisaragi {
                 //assert(!"unknown category");
             }
             
-            gameObject.floor = packet.floor;
+            gameObject.zone.id = packet.zoneId;
 
             this.gameWorld.attachObject(gameObject);
 
@@ -129,17 +129,17 @@ module kisaragi {
                 self.level.height = packet.height;
 
                 var factory = new PacketFactory();
-                var newObjPacket = factory.newObject(packet.movableId, Category.Player, packet.x, packet.y, packet.floor);
+                var newObjPacket = factory.newObject(packet.movableId, Category.Player, packet.x, packet.y, packet.zoneId);
                 self.currUser = <Player> self.createGameObject(newObjPacket);
     
                 // sometime, socket io connection end before game context created
-                var requestMapPacket = factory.requestMap(packet.floor);
+                var requestMapPacket = factory.requestMap(packet.zoneId);
                 conn.send(requestMapPacket);
             });
 
             conn.registerHandler(PacketType.ResponseMap, function(packet: ResponseMapPacket) {
                 //console.log(data);
-                console.log('Load Level data from server : floor=' + packet.floor);
+                console.log('Load Level data from server : zoneId=' + packet.zoneId);
             
                 // object synchronize by serializer/deserializer
                 self.level.width = packet.width;
@@ -354,7 +354,7 @@ module kisaragi {
             }
             
             if(this.currUser) {
-                this.game.debug.text('floor : ' + this.currUser.floor, 16, 530);
+                this.game.debug.text('zoneId : ' + this.currUser.zone.id, 16, 530);
             }
         }
     }

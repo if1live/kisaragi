@@ -6,36 +6,33 @@ if(typeof module !== 'undefined') {
     var kisaragi = require('../../app/kisaragi');
 }
 
-describe('Zone', function() {
-    describe('#buildIndex()', function() {
+describe('ZoneID', function() {
+    describe('#buildId()', function() {
         it('0 = base', function() {
-            var idx = kisaragi.Zone.buildIndex(0, 0, 0);
-            assert.equal(idx, 0);
+            assert.equal(kisaragi.ZoneID.buildId(0, 0, 0), 0);
         })
         it('z = simple value', function() {
             var floor = 123;
-            var idx = kisaragi.Zone.buildIndex(0, 0, floor);
-            assert.equal(idx, floor);
+            assert.equal(kisaragi.ZoneID.buildId(0, 0, floor), floor);
         })
     })
-    describe("#zoneXYZ()", function() {
+    describe("#xyz()", function() {
         var x = 1;
         var y = 2;
         var z = 3;
-        var zone: kisaragi.Zone;
+        var zone: kisaragi.ZoneID;
         beforeEach(function() {
-            var idx = kisaragi.Zone.buildIndex(x, y, z);
-            zone = new kisaragi.Zone(idx);
+            zone = new kisaragi.ZoneID(kisaragi.ZoneID.buildId(x, y, z));
         })
         
         it('x', function() {
-            assert.equal(zone.zoneX, x);
+            assert.equal(zone.x, x);
         })
         it('y', function() {
-            assert.equal(zone.zoneY, y);
+            assert.equal(zone.y, y);
         })
         it('z == floor', function() {
-            assert.equal(zone.zoneZ, z);
+            assert.equal(zone.z, z);
             assert.equal(zone.floor, z);
         })
     })

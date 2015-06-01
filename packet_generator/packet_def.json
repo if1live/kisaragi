@@ -56,7 +56,7 @@
       [ "category", "Category" ],
       [ "x", "number" ],
       [ "y", "number" ],
-      [ "floor", "number" ]
+      [ "zoneId", "number" ]
     ]
   },
   {
@@ -73,7 +73,7 @@
       [ "movableId", "number" ],
       [ "x", "number" ],
       [ "y", "number" ],
-      [ "floor", "number" ],
+      [ "zoneId", "number" ],
       [ "width", "number" ],
       [ "height", "number" ]
     ]
@@ -82,7 +82,7 @@
     "name": "RequestMap",
     "command": "c2s_requestMap",
     "content": [
-      [ "floor", "number" ]
+      [ "zoneId", "number" ]
     ]
   },
   {
@@ -92,7 +92,7 @@
       [ "data", "Array<Array<TileCode>>" ],
       [ "width", "number" ],
       [ "height", "number" ],
-      [ "floor", "number" ]
+      [ "zoneId", "number" ]
     ]
   }
 ]

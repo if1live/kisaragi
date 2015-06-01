@@ -52,6 +52,7 @@ module kisaragi {
         conn: ServerConnection;
         
         constructor(resType: ResponseType, packet: BasePacket, conn: ServerConnection) {
+            if(packet == null) { throw "response : null packet"; }
             this.resType = resType;
             this.packet = packet;
             this.conn = conn;
@@ -75,6 +76,7 @@ module kisaragi {
         conn: ServerConnection;
         
         constructor(packet: BasePacket, conn: ServerConnection) {
+            if(packet == null) { throw "request : null packet"; }
             this.packet = packet;
             this.conn = conn;
         }

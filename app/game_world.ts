@@ -28,6 +28,7 @@ module kisaragi {
             self.objectListTable = {};
 
             // 프로토타입의 구현은 간단하게 무식한 격자 배열로 구성
+            // world contains many level(=zone)
             self.level = new Level();
         }
 

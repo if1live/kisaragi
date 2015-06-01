@@ -43,18 +43,18 @@ module kisaragi {
                 this.movableId,
                 this.x,
                 this.y,
-                this.floor,
+                this.zone.id,
                 world.level.width,
                 world.level.height
             );
             self.svrConn.send(loginPacket);
 
-            var newObjectPacket = factory.newObject(this.movableId, this.category, this.x, this.y, this.floor);
+            var newObjectPacket = factory.newObject(this.movableId, this.category, this.x, this.y, this.zone.id);
             self.svrConn.broadcast(newObjectPacket);
     
             // give dynamic object's info to new user
             _.each(world.allObjectList(), function (ent: Entity) {
-                var newObjectPacket = factory.newObject(ent.movableId, ent.category, ent.x, ent.y, ent.floor);
+                var newObjectPacket = factory.newObject(ent.movableId, ent.category, ent.x, ent.y, ent.zone.id);
                 self.svrConn.send(newObjectPacket);
             });
         };
@@ -71,7 +71,7 @@ module kisaragi {
         c2s_requestMap(world: GameWorld, packet: RequestMapPacket) {
             var self = this;
             var factory = new PacketFactory();
-            var responseMapPacket = factory.responseMap(world.level, this.floor);
+            var responseMapPacket = factory.responseMap(world.level, this.zone.id);
             self.svrConn.send(responseMapPacket);
         };
 

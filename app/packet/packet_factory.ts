@@ -9,13 +9,13 @@ module kisaragi {
             return packet;
         }
 
-        newObject(movableId: number, category: Category, x: number, y: number, floor: number): NewObjectPacket {
+        newObject(movableId: number, category: Category, x: number, y: number, zoneId: number): NewObjectPacket {
             var packet = new NewObjectPacket();
             packet.movableId = movableId;
             packet.category = category;
             packet.x = x;
             packet.y = y;
-            packet.floor = floor;
+            packet.zoneId = zoneId;
             return packet;
         }
         removeObject(movableId: number): RemoveObjectPacket {
@@ -49,29 +49,29 @@ module kisaragi {
             return packet;
         }
 
-        login(movableId: number, x: number, y: number, floor: number, width: number, height: number) {
+        login(movableId: number, x: number, y: number, zoneId: number, width: number, height: number) {
             var packet = new LoginPacket();
             packet.movableId = movableId;
             packet.x = x;
             packet.y = y;
-            packet.floor = floor;
+            packet.zoneId = zoneId;
             packet.width = width;
             packet.height = height;
             return packet;
         }
 
-        responseMap(level: Level, floor: number): ResponseMapPacket {
+        responseMap(level: Level, zoneId: number): ResponseMapPacket {
             var packet = new ResponseMapPacket();
             packet.data = level.data;
             packet.width = level.width;
             packet.height = level.height;
-            packet.floor = floor;
+            packet.zoneId = zoneId;
             return packet;
         }
         
-        requestMap(floor: number): RequestMapPacket {
+        requestMap(zoneId: number): RequestMapPacket {
             var packet = new RequestMapPacket();
-            packet.floor = floor;
+            packet.zoneId = zoneId;
             return packet;
         }
     }

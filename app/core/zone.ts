@@ -18,50 +18,50 @@ module kisaragi {
     if(BIT_SHIFT_Y != 10) { throw "invalid bit shift y"; }
     if(BIT_SHIFT_Z != 0) { throw "invalid bit shift z"; }
         
-    export class Zone {
-        zoneIdx: number;
+    export class ZoneID {
+        id: number;
 
-        constructor(zoneIdx: number) {
-            this.zoneIdx = zoneIdx;
+        constructor(id: number) {
+            this.id = id;
         }
-        static buildIndex(x: number, y: number, z: number) {
-            var idx = 0;
-            idx += (x << BIT_SHIFT_X);
-            idx += (y << BIT_SHIFT_Y);
-            idx += (z << BIT_SHIFT_Z);
-            return idx;
+        static buildId(x: number, y: number, z: number): number {
+            var id = 0;
+            id += (x << BIT_SHIFT_X);
+            id += (y << BIT_SHIFT_Y);
+            id += (z << BIT_SHIFT_Z);
+            return id;
         }
-        get zoneX(): number {
-            var retval = this.zoneIdx >> BIT_SHIFT_X;
+        get x(): number {
+            var retval = this.id >> BIT_SHIFT_X;
             return retval;
         }
-        get zoneY(): number {
+        get y(): number {
             var bitmask = 0;
             for(var i = BIT_WIDTH_Z ; i < BIT_WIDTH_Z + BIT_WIDTH_Y ; i += 1) {
                 var mask = 1 << i;
                 bitmask += mask;
             }
             
-            var retval = this.zoneIdx & bitmask;
+            var retval = this.id & bitmask;
             retval = retval >> BIT_WIDTH_Z;
             return retval;
         }
-        get zoneZ(): number {
+        get z(): number {
             var bitmask = 0;
             for(var i = 0 ; i < BIT_WIDTH_Z ; i += 1) {
                 var mask = 1 << i;
                 bitmask += mask;
             }
-            var retval = this.zoneIdx & bitmask;
+            var retval = this.id & bitmask;
             return retval;
         }
         get floor(): number {
-            return this.zoneZ;
+            return this.z;
         }
     }
 }
 
 declare var exports: any;
 if(typeof exports !== 'undefined') {
-    exports.Zone = kisaragi.Zone;
+    exports.ZoneID = kisaragi.ZoneID;
 }

@@ -11,7 +11,7 @@ module kisaragi {
 
         // position
         pos: Coord;
-        floor: number;
+        zone: ZoneID;
 
         // server/client
         role: Role;
@@ -26,7 +26,7 @@ module kisaragi {
         constructor(id: number) {
             this.movableId = id;
             this.pos = new Coord(-1, -1);
-            this.floor = 0;
+            this.zone = new ZoneID(0);
             this.targetPos = null;
             this.world = null;
             this.moveCooltime = kisaragi.COOLTIME_MOVE;
@@ -105,6 +105,7 @@ module kisaragi {
         y?: number;
         id?: number;
         floor?: number;
+        zoneId?: number;
     }
 
     export class EntityManager {
@@ -151,7 +152,12 @@ module kisaragi {
             }
             if('floor' in opts) {
                 predList.push((ent: Entity) => {
-                    return ent.floor == opts.floor; 
+                    return ent.zone.floor == opts.floor; 
+                });
+            }
+            if('zoneId' in opts) {
+                predList.push((ent: Entity) => {
+                    return ent.zone.id == opts.zoneId; 
                 });
             }
 
