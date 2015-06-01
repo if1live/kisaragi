@@ -103,10 +103,6 @@ module kisaragi {
                     self.currZoneId = packet.zoneId;
                 }
 
-                if(packet.zoneId != self.currZoneId) {
-                    return;
-                }
-
                 if (self.gameWorld.findObject(packet.movableId)) {
                     console.log('Object id=' + packet.movableId + ' is already created');
                     return;

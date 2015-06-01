@@ -167,11 +167,10 @@ module kisaragi {
             });
             
             // fill enemy
-            _.each(this.zones, (zone: Zone) => {
-                while (zone.entityMgr.findAll({category:Category.Enemy}).length <= 2) {
-                    self.generateEnemy(zone);
-                }
-            });
+            var zone = this.zone(0);
+            while (zone.entityMgr.findAll({category:Category.Enemy}).length <= 2) {
+                self.generateEnemy(zone);
+            }
         }
     }
 }

@@ -47,16 +47,21 @@ module kisaragi {
             res.conn.sendImmediate(res.packet);
         }
         broadcast(res: Broadcast) {
-            res.conn.broadcastImmediate(res.packet);
+            res.conn.broadcastImmediate(res.packet, res.zoneId);
+        }
+        globalBroadcast(res: GlobalBroadcast) {
+            res.conn.globalBroadcastImmediate(res.packet);
         }
                 
         flushSendQueue() {
             while(this.sendQueue.isEmpty() === false) {
                 var cmd = this.sendQueue.pop();
-                if(cmd.resType == ResponseType.Response) {
-                    this.send(cmd);
-                } else if(cmd.resType == ResponseType.Broadcast) {
-                    this.broadcast(cmd);
+                if (cmd.resType == ResponseType.Response) {
+                    this.send(<Response> cmd);
+                } else if (cmd.resType == ResponseType.Broadcast) {
+                    this.broadcast(<Broadcast> cmd);
+                } else if (cmd.resType == ResponseType.GlobalBroadcast) {
+                    this.globalBroadcast(<GlobalBroadcast> cmd);
                 } else {
                     throw "not valid";
                 }

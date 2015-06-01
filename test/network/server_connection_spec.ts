@@ -18,6 +18,7 @@ describe('ServerConnection', function () {
             subject.sendImmediate(packet);
             assert.equal(subject.sendedPacket, packet);
             assert.equal(subject.broadcastedPacket, null);
+            assert.equal(subject.globalBroadcastedPacket, null);
         })
     })
 
@@ -29,9 +30,25 @@ describe('ServerConnection', function () {
 
         it('success', function () {
             var packet = new kisaragi.PingPacket();
-            subject.broadcastImmediate(packet);
+            subject.broadcastImmediate(packet, 0);
             assert.equal(subject.sendedPacket, null);
             assert.equal(subject.broadcastedPacket, packet);
+            assert.equal(subject.globalBroadcastedPacket, null);
+        })
+    })
+
+    describe('#globalBroadcastImmediate()', function () {
+        var subject: kisaragi.MockServerConnection;
+        before(function () {
+            subject = kisaragi.ServerConnection.mock('dummy');
+        })
+
+        it('success', function () {
+            var packet = new kisaragi.PingPacket();
+            subject.globalBroadcastImmediate(packet);
+            assert.equal(subject.sendedPacket, null);
+            assert.equal(subject.broadcastedPacket, null);
+            assert.equal(subject.globalBroadcastedPacket, packet);
         })
     })
 })

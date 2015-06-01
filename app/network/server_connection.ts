@@ -38,8 +38,12 @@ module kisaragi {
             var elem = new Response(packet, this);
             this.mgr.addSendPacket(elem);
         }
-        broadcast(packet: BasePacket) {
-            var elem = new Broadcast(packet, this);
+        broadcast(packet: BasePacket, zoneId: number) {
+            var elem = new Broadcast(packet, this, zoneId);
+            this.mgr.addSendPacket(elem);
+        }
+        globalBroadcast(packet: BasePacket) {
+            var elem = new GlobalBroadcast(packet, this);
             this.mgr.addSendPacket(elem);
         }
 
@@ -47,13 +51,18 @@ module kisaragi {
             //console.log("Send[id=" + this.userId + "] " + packet.command + " : " + JSON.stringify(packet.toJson()));
             this._sendImpl(packet);
         }
-        broadcastImmediate(packet: BasePacket) {
+        broadcastImmediate(packet: BasePacket, zoneId: number) {
             //console.log("Broadcast[id=" + this.userId + "] " + packet.command + " : " + JSON.stringify(packet.toJson()));
-            this._broadcastImpl(packet);
+            this._broadcastImpl(packet, zoneId);
+        }
+        globalBroadcastImmediate(packet: BasePacket) {
+            //console.log("GlobalBroadcast[id=" + this.userId + "] " + packet.command + " : " + JSON.stringify(packet.toJson()));
+            this._globalBroadcastImpl(packet);
         }
 
         _sendImpl(packet: BasePacket) { }
-        _broadcastImpl(packet: BasePacket) { }
+        _broadcastImpl(packet: BasePacket, zoneId: number) { }
+        _globalBroadcastImpl(packet: BasePacket) { }
 
         
         registerHandler(category: PacketType, handler: ServerHandlerFunc) {
@@ -154,10 +163,22 @@ module kisaragi {
         }
 
         _sendImpl(packet: BasePacket) {
-            return this.socket.emit(packet.command, packet.toJson());
+            this.socket.emit(packet.command, packet.toJson());
         }
-        _broadcastImpl(packet: BasePacket) {
-            return this.io.emit(packet.command, packet.toJson());
+        _broadcastImpl(packet: BasePacket, zoneId: number) {
+            // 같은 구역한테만 알림 보내기
+            // user room
+            // queue로 처리하기 때문에 this.user를 쓰면 꼬일수 있다
+            // 미리 획득해놓은 zone id를 이용한다
+            var world = this.user.world;
+            var zone = world.zone(zoneId);
+            var players = zone.entityMgr.findAll({ category: Category.Player });
+            _.each(players, (player: Player) => {
+                player.svrConn._sendImpl(packet);
+            });
+        }
+        _globalBroadcastImpl(packet: BasePacket) {
+            this.io.emit(packet.command, packet.toJson());
         }
         
         registerHandler(category: PacketType, handler: ServerHandlerFunc) {
@@ -179,11 +200,13 @@ module kisaragi {
     export class MockServerConnection extends ServerConnection {
         sendedPacket: BasePacket;
         broadcastedPacket: BasePacket;
+        globalBroadcastedPacket: BasePacket;
 
         constructor(uuid_val: string) {
             super(ServerConnectionCategory.Mock, uuid_val);
             this.sendedPacket = null;
             this.broadcastedPacket = null;
+            this.globalBroadcastedPacket = null;
         }
 
         _sendImpl(packet: BasePacket) {
@@ -191,6 +214,9 @@ module kisaragi {
         }
         _broadcastImpl(packet: BasePacket) {
             this.broadcastedPacket = packet;
+        }
+        _globalBroadcastImpl(packet: BasePacket) {
+            this.globalBroadcastedPacket = packet;
         }
     }
 }

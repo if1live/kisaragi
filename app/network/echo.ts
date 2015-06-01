@@ -8,7 +8,7 @@ module kisaragi {
             if (packet.packetType == PacketType.Echo) {
                 req.conn.send(packet);
             } else if (packet.packetType == PacketType.EchoAll) {
-                req.conn.broadcast(packet);
+                req.conn.globalBroadcast(packet);
             }
         }
     }

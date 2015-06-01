@@ -52,7 +52,7 @@ module kisaragi {
             self.svrConn.send(loginPacket);
 
             var newObjectPacket = factory.newObject(this.movableId, this.category, this.x, this.y, zone.id);
-            self.svrConn.broadcast(newObjectPacket);
+            self.svrConn.broadcast(newObjectPacket, zone.id);
     
             // give dynamic object's info to new user
             _.each(this.zone.entityMgr.all(), function (ent: Entity) {
@@ -67,7 +67,7 @@ module kisaragi {
             
             var factory = new PacketFactory();
             var removePacket = factory.removeObject(self.movableId);
-            self.svrConn.broadcast(removePacket);
+            self.svrConn.broadcast(removePacket, self.zoneId);
         };
 
         c2s_requestMap(world: GameWorld, packet: RequestMapPacket) {
@@ -150,7 +150,7 @@ module kisaragi {
             var prevZoneUsers = prevZone.entityMgr.findAll({category: Category.Player});
             _.each(prevZoneUsers, function(ent: Player) {
                 var packet = factory.removeObject(self.movableId);
-                self.svrConn.broadcast(packet);
+                self.svrConn.broadcast(packet, self.zoneId);
             })
             prevZone.detach(this);
             
@@ -167,7 +167,7 @@ module kisaragi {
             var nextZoneUsers = nextZone.entityMgr.findAll({category: Category.Player});
             _.each(nextZoneUsers, function (ent: Player) {
                 var packet = factory.newObject(self.movableId, self.category, self.x, self.y, nextZone.id);
-                self.svrConn.broadcast(packet);
+                self.svrConn.broadcast(packet, self.zoneId);
             });
 
             _.each(this.zone.entityMgr.all(), function (ent: Entity) {

@@ -44,7 +44,8 @@ module kisaragi {
     
     export enum ResponseType {
         Response,
-        Broadcast
+        Broadcast,
+        GlobalBroadcast,
     }
     export class BaseResponse {
         resType: ResponseType;
@@ -60,14 +61,23 @@ module kisaragi {
     }
     
     export class Broadcast extends BaseResponse {
-        constructor(packet: BasePacket, conn: ServerConnection) {
+        zoneId: number;
+
+        constructor(packet: BasePacket, conn: ServerConnection, zoneId: number) {
             super(ResponseType.Broadcast, packet, conn);
+            this.zoneId = zoneId;
         }
     }
     
     export class Response extends BaseResponse {
         constructor(packet: BasePacket, conn: ServerConnection) {
             super(ResponseType.Response, packet, conn);
+        }
+    }
+
+    export class GlobalBroadcast extends BaseResponse {
+        constructor(packet: BasePacket, conn: ServerConnection) {
+            super(ResponseType.GlobalBroadcast, packet, conn);
         }
     }
     
@@ -90,6 +100,7 @@ if (typeof exports !== 'undefined') {
     
     exports.ResponseType = kisaragi.ResponseType;
     exports.BaseResponse = kisaragi.BaseResponse;
+    exports.GlobalBroadcast = kisaragi.GlobalBroadcast;
     exports.Broadcast = kisaragi.Broadcast;
     exports.Response = kisaragi.Response;
     exports.Request = kisaragi.Request;

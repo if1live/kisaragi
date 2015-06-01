@@ -75,10 +75,18 @@ module kisaragi {
             }
         }
         get zoneEntityMgr(): EntityManager {
-            return this._zone.entityMgr;
+            if (this._zone) {
+                return this._zone.entityMgr;
+            } else {
+                return null;
+            }
         }
         get globalEntityMgr(): EntityManager {
-            return this.world.entityMgr;
+            if (this.world) {
+                return this.world.entityMgr;
+            } else {
+                return null;
+            }
         }
 
         moveNotify() {
