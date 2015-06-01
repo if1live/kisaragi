@@ -7,7 +7,8 @@
 
 ///<reference path="constants.ts"/>
 
-///<reference path="core/zone.ts"/>
+///<reference path="core/core.ts"/>
+///<reference path="core/zone_id.ts"/>
 ///<reference path="core/queue.ts"/>
 
 ///<reference path="packet/base_packet.ts"/>
@@ -31,6 +32,7 @@
 ///<reference path="player.ts"/>
 
 ///<reference path="level.ts"/>
+///<reference path="zone.ts"/>
 ///<reference path="game_world.ts"/>
 
 ///<reference path="server_main.ts"/>

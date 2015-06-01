@@ -10,7 +10,6 @@ describe('GameWorld', function () {
     var topic: kisaragi.GameWorld = null;
     beforeEach(function () {
         topic = new kisaragi.GameWorld(kisaragi.Role.Server);
-        topic.level.reset(10, 10);
     });
 
     describe('#getNextId()', function () {
@@ -22,36 +21,8 @@ describe('GameWorld', function () {
     });
 
     // General
-    describe('#objectList()', function () {
-        describe('not exist', function () {
-            it('create list', function () {
-                assert.equal(topic.objectList(kisaragi.Category.Item).length, 0);
-            });
-        });
-        describe('exist', function () {
-            beforeEach(function () {
-                var ent = new kisaragi.Entity(1);
-                topic.objectList(kisaragi.Category.Item).push(ent);
-            });
-            it('use prev list', function () {
-                assert.equal(topic.objectList(kisaragi.Category.Item).length, 1);
-            });
-        });
-    });
-    describe('#allObjectList()', function () {
-        describe('simple', function () {
-            beforeEach(function () {
-                var ent_1 = new kisaragi.Entity(1);
-                var ent_2 = new kisaragi.Entity(2);
-                topic.objectList(kisaragi.Category.Item).push(ent_1);
-                topic.objectList(kisaragi.Category.Enemy).push(ent_2);
-            });
-            it('success', function () {
-                assert.equal(topic.allObjectList().length, 2);
-            });
-        });
-    });
     
+    /*
     describe('#findObject()', function () {
         var enemy = null;
 
@@ -62,6 +33,7 @@ describe('GameWorld', function () {
             assert.equal(topic.findObject(enemy.movableId), enemy);
         });
     });
+    */
     // User
     /*
     describe('#createUser()', function () {
@@ -131,6 +103,7 @@ describe('GameWorld', function () {
     });
     */
     // Enemy
+    /*
     describe('#generateEnemy()', function () {
         describe('simple', function () {
             it('success', function () {
@@ -139,4 +112,5 @@ describe('GameWorld', function () {
             });
         });
     });
+    */
 });

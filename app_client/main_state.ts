@@ -41,7 +41,8 @@ module kisaragi {
         prevRightPressed: boolean = false;
 
         get level(): Level {
-            return this.gameWorld.level;
+            //TODO temp code
+            return this.gameWorld.zone(0).level;
         }
 
         getUserSprite(gameObject: Entity) {
@@ -73,41 +74,41 @@ module kisaragi {
         }
 
         createGameObject(packet: NewObjectPacket) {
-            var gameObject: Entity = null;
+            var ent: Entity = null;
 
             var movableId = packet.movableId;
             var pos = new Coord(packet.x, packet.y);
 
             if (packet.category === Category.Player) {
-                gameObject = Player.createClientEntity(movableId, this.conn);
-                gameObject.pos = pos;
+                ent = Player.createClientEntity(movableId, this.conn);
+                ent.pos = pos;
             } else if (packet.category === Category.Enemy) {
-                gameObject = new Enemy(movableId, Role.Client, pos);
+                ent = new Enemy(movableId, Role.Client, pos);
                 //gameObject = new Enemy();
             } else {
                 //assert(!"unknown category");
             }
             
-            gameObject.zone.id = packet.zoneId;
+            ent.zoneId = packet.zoneId;
 
-            this.gameWorld.attachObject(gameObject);
+            this.gameWorld.add(ent);
 
             var sprite = null;
-            if (gameObject.category === Category.Player) {
+            if (ent.category === Category.Player) {
                 if (packet.movableId === this.currUserId) {
-                    sprite = this.getCurrUserSprite(gameObject);
+                    sprite = this.getCurrUserSprite(ent);
                 } else {
-                    sprite = this.getUserSprite(gameObject);
+                    sprite = this.getUserSprite(ent);
                 }
-            } else if (gameObject.category === Category.Enemy) {
-                sprite = this.getEnemySprite(gameObject);
-            } else if (gameObject.category === Category.Item) {
-                sprite = this.getItemSprite(gameObject);
+            } else if (ent.category === Category.Enemy) {
+                sprite = this.getEnemySprite(ent);
+            } else if (ent.category === Category.Item) {
+                sprite = this.getItemSprite(ent);
             }
 
-            this.updateGameObjectPos(gameObject);
+            this.updateGameObjectPos(ent);
 
-            return gameObject;
+            return ent;
         }
 
         updateGameObjectPos(gameObject: Entity) {

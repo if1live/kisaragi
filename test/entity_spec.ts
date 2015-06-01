@@ -76,10 +76,10 @@ describe('EntityManager', () => {
 
             ent_b = new kisaragi.Entity(200);
             ent_b.pos = new kisaragi.Coord(1, 3);
-            ent_b.zone.id = kisaragi.ZoneID.buildId(0, 0, 1);
+            ent_b.zoneId = kisaragi.ZoneID.buildId(0, 0, 1);
 
             mgr.add(ent_a);
-            mgr.add(ent_b);
+            mgr.add(ent_b); 
         });
         it('pos based == combine based', () => {
             var elemList:kisaragi.Entity[] = mgr.findAll({
@@ -98,7 +98,7 @@ describe('EntityManager', () => {
         });
         it('floor based', () => {
             var elemList = mgr.findAll({
-                floor: ent_b.zone.floor
+                floor: 1
             });
             assert.equal(elemList.length, 1);
             assert.equal(elemList[0], ent_b);

@@ -43,9 +43,9 @@ module kisaragi {
                 this.movableId,
                 this.x,
                 this.y,
-                this.zone.id,
-                world.level.width,
-                world.level.height
+                this.zone.zoneId.id,
+                this.zone.level.width,
+                this.zone.level.height
             );
             self.svrConn.send(loginPacket);
 
@@ -53,7 +53,7 @@ module kisaragi {
             self.svrConn.broadcast(newObjectPacket);
     
             // give dynamic object's info to new user
-            _.each(world.allObjectList(), function (ent: Entity) {
+            _.each(this.zone.entityMgr.all(), function (ent: Entity) {
                 var newObjectPacket = factory.newObject(ent.movableId, ent.category, ent.x, ent.y, ent.zone.id);
                 self.svrConn.send(newObjectPacket);
             });
@@ -71,7 +71,7 @@ module kisaragi {
         c2s_requestMap(world: GameWorld, packet: RequestMapPacket) {
             var self = this;
             var factory = new PacketFactory();
-            var responseMapPacket = factory.responseMap(world.level, this.zone.id);
+            var responseMapPacket = factory.responseMap(this.zone.level, this.zone.id);
             self.svrConn.send(responseMapPacket);
         };
 
@@ -112,7 +112,7 @@ module kisaragi {
 
         requestMoveTo(x: number, y: number) {
             var self = this;
-            if (self.world && !self.world.isMovablePos(x, y)) {
+            if (self.world && !self.zone.isMovablePos(x, y)) {
                 return;
             }
             var factory = new PacketFactory();
@@ -121,7 +121,7 @@ module kisaragi {
         };
 
         c2s_requestMove(world: GameWorld, packet: RequestMovePacket) {
-            if (world.isMovablePos(packet.x, packet.y)) {
+            if (this.zone.isMovablePos(packet.x, packet.y)) {
                 this.targetPos = new Coord(packet.x, packet.y);
             }
         };

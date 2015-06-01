@@ -25,7 +25,9 @@ module kisaragi {
 
             this.connMgr = new ConnectionManager(this.io_http);
             this.world = new GameWorld(Role.Server);
-            this.world.loadLevelFile(__dirname + '/../res/map.txt');
+            this.world.zone(0).loadLevelFile(__dirname + '/../res/map.txt');
+            this.world.zone(1).loadLevelFile(__dirname + '/../res/map.txt');
+            this.world.zone(2).loadLevelFile(__dirname + '/../res/map.txt');
 
             this.registerView();
             this.registerSocketIO();

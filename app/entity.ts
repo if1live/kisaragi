@@ -5,13 +5,15 @@ module kisaragi {
         // core attribute
         category: Category;
         movableId: number;
-        entityMgr: EntityManager;
-
+        
         world: GameWorld;
 
         // position
         pos: Coord;
-        zone: ZoneID;
+        
+        // zone
+        _zoneId: number;
+        _zone: Zone;
 
         // server/client
         role: Role;
@@ -26,7 +28,8 @@ module kisaragi {
         constructor(id: number) {
             this.movableId = id;
             this.pos = new Coord(-1, -1);
-            this.zone = new ZoneID(0);
+            this._zone = null;
+            this._zoneId = 0;
             this.targetPos = null;
             this.world = null;
             this.moveCooltime = kisaragi.COOLTIME_MOVE;
@@ -44,12 +47,45 @@ module kisaragi {
         set y(val: number) {
             this.pos.y = val;
         }
+        
+        get zoneId(): number {
+            if(this._zone) {
+                return this._zone.zoneId.id;
+            } else {
+                return this._zoneId;
+            }
+        }
+        set zoneId(id: number) {
+            if(this._zone) {
+                this._zone.zoneId.id = id;
+            } else {
+                this._zoneId = id;
+            }
+        }
+        get zone(): Zone {
+            return this._zone;
+        }
+        set zone(zone: Zone) {
+            if(zone) {
+                this._zone = zone;
+                this._zoneId = zone.id;
+            } else {
+                this._zone = null;
+                this._zoneId = 0;
+            }
+        }
+        get zoneEntityMgr(): EntityManager {
+            return this._zone.entityMgr;
+        }
+        get globalEntityMgr(): EntityManager {
+            return this.world.entityMgr;
+        }
 
-        moveNotify(world: GameWorld) {
+        moveNotify() {
             var self = this;
             var factory = new PacketFactory();
             // send move notify to closed user
-            var userList = world.objectList(Category.Player);
+            var userList = this.zoneEntityMgr.findAll({ category: Category.Player});
             _.each(userList, function (user: Player) {
                 //TODO how to calculate distance?
                 var maxDist = 1000000;
@@ -81,15 +117,16 @@ module kisaragi {
                 this.moveCooltime = 0;
             }
 
+            var zone  = this.zone;
             if (this.targetPos !== null && this.moveCooltime === 0) {
-                var nextPos = self.world.level.findNextPos(self.pos, self.targetPos, self.world);
+                var nextPos = zone.level.findNextPos(self.pos, self.targetPos, zone);
                 if (!nextPos) {
                     self.targetPos = null;
                     return;
                 }
 
                 this.pos = nextPos;
-                this.moveNotify(self.world);
+                this.moveNotify();
 
                 if (self.pos.x === self.targetPos.x && self.pos.y === self.targetPos.y) {
                     self.targetPos = null;
@@ -106,6 +143,7 @@ module kisaragi {
         id?: number;
         floor?: number;
         zoneId?: number;
+        category?: Category;
     }
 
     export class EntityManager {
@@ -152,12 +190,18 @@ module kisaragi {
             }
             if('floor' in opts) {
                 predList.push((ent: Entity) => {
-                    return ent.zone.floor == opts.floor; 
+                    var zoneId = new ZoneID(ent.zoneId);
+                    return zoneId.floor == opts.floor; 
                 });
             }
             if('zoneId' in opts) {
                 predList.push((ent: Entity) => {
-                    return ent.zone.id == opts.zoneId; 
+                    return ent.zoneId == opts.zoneId; 
+                });
+            }
+            if('category' in opts) {
+                predList.push((ent: Entity) => {
+                    return ent.category == opts.category; 
                 });
             }
 
@@ -175,6 +219,10 @@ module kisaragi {
             } else {
                 return null;
             }
+        }
+        
+        all() {
+            return _.values(this.table);
         }
     };
 }
