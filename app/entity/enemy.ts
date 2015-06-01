@@ -1,5 +1,5 @@
 ﻿// Ŭnicode please
-///<reference path="app.d.ts"/>
+///<reference path="../app.d.ts"/>
 
 if (typeof module !== 'undefined') {
     _ = require('underscore');
@@ -33,7 +33,7 @@ module kisaragi {
         }
 
         think() {
-            var nextPos = this.world.findAnyEmptyPos();
+            var nextPos = this.zone.findAnyEmptyPos();
             this.targetPos = nextPos;
         }
     };

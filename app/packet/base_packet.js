@@ -24,37 +24,7 @@ var kisaragi;
         return BasePacket;
     })();
     kisaragi.BasePacket = BasePacket;
-    var Queue = (function () {
-        function Queue() {
-        }
-        Object.defineProperty(Queue.prototype, "length", {
-            get: function () {
-                return this.queue.length;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Queue.prototype.isEmpty = function () {
-            return (0 === this.length);
-        };
-        Queue.prototype.push = function (elem) {
-            if (elem === null) {
-                return false;
-            }
-            this.queue.push(elem);
-            return true;
-        };
-        Queue.prototype.pop = function () {
-            if (this.length === 0) {
-                return null;
-            }
-            return this.queue.shift();
-        };
-        return Queue;
-    })();
-    kisaragi.Queue = Queue;
 })(kisaragi || (kisaragi = {}));
 if (typeof exports !== 'undefined') {
     exports.BasePacket = kisaragi.BasePacket;
-    exports.Queue = kisaragi.Queue;
 }

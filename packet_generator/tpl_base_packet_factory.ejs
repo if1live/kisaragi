@@ -4,24 +4,28 @@ Auto generated code
 */
 
 module kisaragi {
-	export class BasePacketFactory {
-		static toCommand(packetType: PacketType): string {
+    export class BasePacketFactory {
+        static toCommand(packetType: PacketType): string {
             var packet = PacketFactory.create(packetType);
             return packet.command;
         }
 
-		static createFromJson(data: any): BasePacket {
+        static createFromJson(data: any): BasePacket {
             var packetType: PacketType = data.packetType;
             var packet = PacketFactory.create(packetType);
-            packet.loadJson(data);
-            return packet;
+            if(packet == null) {
+                return PacketFactory.create(PacketType.Disconnect);
+            } else {
+                packet.loadJson(data);
+                return packet;
+            }
         }
 
-		static create(packetType: PacketType): BasePacket {
+        static create(packetType: PacketType): BasePacket {
             var packetClassList = [
-			<% for(var i = 0 ; i < packets.length ; i += 1) { %>
-				<%= packets[i].classname() -%>,
-			<% } %>
+<% for(var i = 0 ; i < packets.length ; i += 1) { %>
+                <%= packets[i].classname() -%>,
+<% } %>
             ];
             for (var i = 0; i < packetClassList.length; ++i) {
                 var packetClass = packetClassList[i];
@@ -33,12 +37,12 @@ module kisaragi {
             return null;
         }
 
-		<% for(var i = 0 ; i < packets.length ; i += 1) { %>
-		create<%=packets[i].name%>(): <%=packets[i].classname()%> {
-			return new <%=packets[i].classname()%>();
-		}
-		<% } %>
-	}
+<% for(var i = 0 ; i < packets.length ; i += 1) { -%>
+        create<%=packets[i].name%>(): <%=packets[i].classname()%> {
+            return new <%=packets[i].classname()%>();
+        }
+<% } -%>
+    }
 }
 
 declare var exports: any;

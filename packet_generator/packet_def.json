@@ -55,7 +55,8 @@
       [ "movableId", "number" ],
       [ "category", "Category" ],
       [ "x", "number" ],
-      [ "y", "number" ]
+      [ "y", "number" ],
+      [ "zoneId", "number" ]
     ]
   },
   {
@@ -72,6 +73,7 @@
       [ "movableId", "number" ],
       [ "x", "number" ],
       [ "y", "number" ],
+      [ "zoneId", "number" ],
       [ "width", "number" ],
       [ "height", "number" ]
     ]
@@ -79,7 +81,9 @@
   {
     "name": "RequestMap",
     "command": "c2s_requestMap",
-    "content": []
+    "content": [
+      [ "zoneId", "number" ]
+    ]
   },
   {
     "name": "ResponseMap",
@@ -87,7 +91,15 @@
     "content": [
       [ "data", "Array<Array<TileCode>>" ],
       [ "width", "number" ],
-      [ "height", "number" ]
+      [ "height", "number" ],
+      [ "zoneId", "number" ]
+    ]
+  },
+  {
+    "name": "RequestJumpZone",
+    "command": "c2s_requestJumpZone",
+    "content": [
+      [ "zoneId", "number"]
     ]
   }
 ]

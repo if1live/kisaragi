@@ -8,172 +8,126 @@ module kisaragi {
     var WALL_MARKER_COLOR = 0x000000;
     var UNKNOWN_MARKER_COLOR = 0xffff00;
 
-    // layer order
-    var GROUND_DEPTH = 1;
-    var CHARACTER_DEPTH = 2;
-
     export class MainState extends Phaser.State {
         gameWorld: GameWorld;
         currUser: Player;
         currUserId: number;
+        currZoneId: number;
 
         map: Phaser.Tilemap;
         tileLayer: Phaser.TilemapLayer;
-        tileSize: number;
 
         marker: Phaser.Graphics;
+
+        entityFactory: ClientEntityFactory;
 
         // dynamic elem
         characterGroup: Phaser.Group;
 
         // input
         cursors: Phaser.CursorKeys;
+        // for dev
+        zone0Key: Phaser.Key;
+        zone1Key: Phaser.Key;
+        zone2Key: Phaser.Key;
 
         // network
-        socket: SocketIOClient.Socket;
         conn: ClientConnection;
         ping: ClientPing;
         echoRunner: ClientEcho;
 
-        // previous key down state
-        prevUpPressed: boolean = false;
-        prevDownPressed: boolean = false;
-        prevLeftPressed: boolean = false;
-        prevRightPressed: boolean = false;
-
-        get level(): Level {
-            return this.gameWorld.level;
-        }
-
-        getUserSprite(gameObject: Entity) {
-            return this.getCommonSprite(gameObject, 'user');
-        }
-
-        getCurrUserSprite(gameObject: Entity) {
-            return this.getCommonSprite(gameObject, 'current_user');
-        }
-
-        getEnemySprite(gameObject: Entity) {
-            return this.getCommonSprite(gameObject, 'enemy');
-        }
-
-        getItemSprite(gameObject: Entity) {
-            return this.getCommonSprite(gameObject, 'item');
-        }
-        getCommonSprite(gameObject: Entity, spriteName: string) {
-            if (gameObject.sprite === undefined || gameObject.sprite === null) {
-                var sprite = this.add.sprite(-100, -100, spriteName);
-                this.characterGroup.add(sprite);
-
-                sprite.anchor.set(0, 0);
-                gameObject.sprite = sprite;
-                gameObject.sprite.width = this.tileSize;
-                gameObject.sprite.height = this.tileSize;
-            }
-            return gameObject.sprite;
-        }
-
-        createGameObject(packet: NewObjectPacket) {
-            var gameObject: Entity = null;
-
-            var movableId = packet.movableId;
-            var pos = new Coord(packet.x, packet.y);
-
-            if (packet.category === Category.Player) {
-                gameObject = Player.createClientEntity(movableId, this.conn);
-                gameObject.pos = pos;
-            } else if (packet.category === Category.Enemy) {
-                gameObject = new Enemy(movableId, Role.Client, pos);
-                //gameObject = new Enemy();
-            } else {
-                //assert(!"unknown category");
-            }
-
-            this.gameWorld.attachObject(gameObject);
-
-            var sprite = null;
-            if (gameObject.category === Category.Player) {
-                if (packet.movableId === this.currUserId) {
-                    sprite = this.getCurrUserSprite(gameObject);
-                } else {
-                    sprite = this.getUserSprite(gameObject);
-                }
-            } else if (gameObject.category === Category.Enemy) {
-                sprite = this.getEnemySprite(gameObject);
-            } else if (gameObject.category === Category.Item) {
-                sprite = this.getItemSprite(gameObject);
-            }
-
-            this.updateGameObjectPos(gameObject);
-
-            return gameObject;
-        }
-
-        updateGameObjectPos(gameObject: Entity) {
-            var tileX = gameObject.pos.x;
-            var tileY = this.level.height - gameObject.pos.y - 1;
-            var x = tileX * this.tileSize;
-            var y = tileY * this.tileSize;
-            var sprite = gameObject.sprite;
-            sprite.position.x = x;
-            sprite.position.y = y;
-        }
-
         registerSocketHandler(conn: ClientConnection) {
             var self = this;
+            var factory = new PacketFactory();
+
             conn.registerHandler(PacketType.Login, function (packet: LoginPacket) {
                 console.log('Login : userId=' + packet.movableId);
                 self.currUserId = packet.movableId;
-                self.level.width = packet.width;
-                self.level.height = packet.height;
+                self.currZoneId = packet.zoneId;
 
-                var factory = new PacketFactory();
-                var newObjPacket = factory.newObject(packet.movableId, Category.Player, packet.x, packet.y);
-                self.currUser = <Player> self.createGameObject(newObjPacket);
+                // 최초월드의 기본 정보도 없으면 객체 생성이 잘 안된다
+                var zone = self.gameWorld.zone(packet.zoneId);
+                zone.level.width = packet.width;
+                zone.level.height = packet.height;
     
                 // sometime, socket io connection end before game context created
-                var requestMapPacket = factory.createRequestMap();
-                conn.sendImmediate(requestMapPacket);
+                var requestMapPacket = factory.requestMap(packet.zoneId);
+                conn.send(requestMapPacket);
             });
 
             conn.registerHandler(PacketType.ResponseMap, function(packet: ResponseMapPacket) {
                 //console.log(data);
-                console.log('Load Level data from server');
+                console.log('Load Level data from server : zoneId=' + packet.zoneId);
+
+                // 다른 zone에 속하는 객체는 클라에서 유지할 필요 없으니 파기한다
+                var allEntityList = self.gameWorld.entityMgr.all();
+                var notSameZoneEntityList = _.filter(allEntityList, (ent: Entity) => { return ent.zoneId != packet.zoneId; });
+                _.each(notSameZoneEntityList, (ent: Entity) => { self.gameWorld.remove(ent); });
             
                 // object synchronize by serializer/deserializer
-                self.level.width = packet.width;
-                self.level.height = packet.height;
-                self.level.data = packet.data;
+                var zone = self.gameWorld.zone(packet.zoneId);
+                zone.level.width = packet.width;
+                zone.level.height = packet.height;
+                zone.level.data = packet.data;
 
                 // generate tile map from server data
                 // TODO lazy level loading
                 if (self.tileLayer) {
                     self.tileLayer.destroy();
                 }
-                self.tileLayer = self.map.create('level', self.level.width, self.level.height, self.tileSize, self.tileSize);
-                self.tileLayer.z = GROUND_DEPTH;
-                self.world.sort();
+                self.tileLayer = self.map.create('level', zone.level.width, zone.level.height, TILE_SIZE, TILE_SIZE);
 
                 var groundTile = 29;
                 var wallTile = 9;
-                for (var y = 0; y < self.level.width; y += 1) {
-                    for (var x = 0; x < self.level.width; x += 1) {
-                        if (self.level.tile(x, y) === TileCode.Obstacle) {
-                            self.map.putTile(wallTile, x, y, self.tileLayer);
+                for (var y = 0; y < zone.level.width; y += 1) {
+                    var tileY = zone.level.height - y - 1
+                    for (var x = 0; x < zone.level.width; x += 1) {
+                        if (zone.level.tile(x, y) === TileCode.Obstacle) {
+                            self.map.putTile(wallTile, x, tileY, self.tileLayer);
                         } else {
-                            self.map.putTile(groundTile, x, y, self.tileLayer);
+                            self.map.putTile(groundTile, x, tileY, self.tileLayer);
                         }
                     }
                 }
+
+                // 레이어 생성후 z를 다시 정렬
+                self.tileLayer.z = GROUND_DEPTH;
+                self.characterGroup.z = CHARACTER_DEPTH;
+                self.world.sort();
             });
 
             conn.registerHandler(PacketType.NewObject, function (packet: NewObjectPacket) {
                 console.log('New Object : id=' + packet.movableId);
-                if (!self.gameWorld.findObject(packet.movableId)) {
-                    // create user to world
-                    self.createGameObject(packet);
-                } else {
+                if (packet.movableId == self.currUserId) {
+                    // 플레이어가 지역을 이동한 경우
+                    self.currZoneId = packet.zoneId;
+                }
+
+                if (self.gameWorld.findObject(packet.movableId)) {
                     console.log('Object id=' + packet.movableId + ' is already created');
+                    return;
+                }
+                
+                // create user to world
+                if (packet.movableId == self.currUserId) {
+                    var player = self.entityFactory.createLoginPlayer(
+                        packet.movableId,
+                        packet.x,
+                        packet.y,
+                        packet.zoneId,
+                        self.characterGroup,
+                        conn
+                        );
+                    self.gameWorld.add(player);
+                    player.updateSpritePosition();
+
+                    self.currUser = player;
+                    self.currZoneId = packet.zoneId;
+
+                } else {
+                    var ent = self.entityFactory.create(packet, self.characterGroup);
+                    self.gameWorld.add(ent);
+                    ent.updateSpritePosition();
                 }
             });
 
@@ -183,73 +137,78 @@ module kisaragi {
             });
 
             conn.registerHandler(PacketType.MoveNotify, function (packet: MoveNotifyPacket) {
-                var gameObject = self.gameWorld.findObject(packet.movableId);
-                gameObject.x = packet.x;
-                gameObject.y = packet.y;
-                self.updateGameObjectPos(gameObject);
+                var ent = self.gameWorld.findObject(packet.movableId);
+                if(ent == null) { return; }
+                if(ent.zoneId != self.currUser.zoneId) { return; }
+                
+                ent.x = packet.x;
+                ent.y = packet.y;
+                ent.updateSpritePosition();
             });
         }
 
         preload() {
             // dummy sprite
-            this.load.image('user', 'static/assets/sprites/kisaragi.png');
-            this.load.image('current_user', 'static/assets/sprites/mutsuki.png');
-            this.load.image('enemy', 'static/assets/sprites/space-baddie-purple.png');
-            this.load.image('item', 'static/assets/sprites/blue_ball.png');
+            this.entityFactory = new ClientEntityFactory(this);
+            this.entityFactory.preload();
 
             // dummy tilemap
-            this.load.image('desert', 'static/assets/tilemaps/tiles/tmw_desert_spacing.png');
+            this.load.image('desert', ASSET_PATH + 'tilemaps/tiles/tmw_desert_spacing.png');
         }
 
 
         create() {
+
             // initialize game context
             this.gameWorld = new GameWorld(Role.Client);
             this.currUser = null;
             this.currUserId = null;
+            this.currZoneId = null;
 
             // tilemap - static elem
             this.map = null;
             this.tileLayer = null;
-            this.tileSize = 32;
 
             ///////////////////////////
             this.stage.backgroundColor = '#2d2d2d';
 
             this.map = this.add.tilemap();
-            this.map.addTilesetImage('desert', undefined, this.tileSize, this.tileSize, 1, 1);
+            this.map.addTilesetImage('desert', undefined, TILE_SIZE, TILE_SIZE, 1, 1);
 
             this.characterGroup = this.add.group();
             this.characterGroup.z = CHARACTER_DEPTH;
 
+            // input
             this.cursors = this.input.keyboard.createCursorKeys();
+            
+            this.zone0Key = this.game.input.keyboard.addKey(Phaser.Keyboard.ONE);
+            this.zone1Key = this.game.input.keyboard.addKey(Phaser.Keyboard.TWO);
+            this.zone2Key = this.game.input.keyboard.addKey(Phaser.Keyboard.THREE);
 
             // cursor + tile select
             //TODO
             this.marker = this.add.graphics(1, 1);
             this.marker.lineStyle(2, EMPTY_MARKER_COLOR, 1);
-            this.marker.drawRect(0, 0, this.tileSize, this.tileSize);
+            this.marker.drawRect(0, 0, TILE_SIZE, TILE_SIZE);
 
             this.input.addMoveCallback(this.updateMarker, this);
 
             // create network after game context created
             var host = window.location.hostname;
             var url = 'http://' + host + ':' + HTTP_PORT;
-            this.socket = io(url);
-            this.conn = ClientConnection.socketIO(this.socket);
+            var socket = io(url);
+            this.conn = ClientConnection.socketIO(socket);
             this.registerSocketHandler(this.conn);
 
-            this.echoRunner = new ClientEcho(this.socket, {});
-            this.ping = new ClientPing(this.socket);
+            //TODO
+            this.echoRunner = new ClientEcho(this.conn);
+            this.ping = new ClientPing(this.conn);
             this.ping.renderer = new HtmlPingRenderer('ping-result');
             this.ping.ping();
         }
 
         updateMarker() {
-            if (!this.tileLayer) {
-                return;
-            }
-            if (!this.marker) {
+            if (!this.tileLayer || !this.marker || !this.currUser || !this.currUser.zone) {
                 return;
             }
 
@@ -257,15 +216,18 @@ module kisaragi {
             var rawTileX = this.tileLayer.getTileX(this.input.activePointer.worldX);
             var rawTileY = this.tileLayer.getTileY(this.input.activePointer.worldY);
 
-            if (rawTileX >= this.level.width) {
-                rawTileX = this.level.width - 1;
+            var zone = this.currUser.zone;
+            var level = zone.level;
+
+            if (rawTileX >= level.width) {
+                rawTileX = level.width - 1;
             }
-            if (rawTileY >= this.level.height) {
-                rawTileY = this.level.height - 1;
+            if (rawTileY >= level.height) {
+                rawTileY = level.height - 1;
             }
 
-            this.marker.x = rawTileX * this.tileSize;
-            this.marker.y = rawTileY * this.tileSize;
+            this.marker.x = rawTileX * TILE_SIZE;
+            this.marker.y = rawTileY * TILE_SIZE;
 
             var tileCoord = this.markerToTileCoord(this.marker);
             var tileObj = this.gameWorld.getObject(tileCoord.x, tileCoord.y);
@@ -279,13 +241,14 @@ module kisaragi {
                     color = UNKNOWN_MARKER_COLOR;
                 }
             } else {
-                if (this.level.tile(tileCoord.x, tileCoord.y) === TileCode.Obstacle) {
+                var level = this.currUser.zone.level;
+                if (level.tile(tileCoord.x, tileCoord.y) === TileCode.Obstacle) {
                     color = WALL_MARKER_COLOR;
                 }
             }
             this.marker.clear();
             this.marker.lineStyle(2, color, 1);
-            this.marker.drawRect(0, 0, this.tileSize, this.tileSize);
+            this.marker.drawRect(0, 0, TILE_SIZE, TILE_SIZE);
 
             // TODO why double clicked?
             if (this.input.mousePointer.isDown) {
@@ -296,50 +259,36 @@ module kisaragi {
         }
 
         markerToTileCoord(marker) {
-            if (marker == null) {
+            if (!marker || !this.currUser || !this.currUser.zone) {
                 return;
             }
-            var tileX = marker.x / this.tileSize;
-            var tileY = this.level.height - marker.y / this.tileSize - 1;
+            var level = this.currUser.zone.level;
+            var tileX = marker.x / TILE_SIZE;
+            var tileY = level.height - marker.y / TILE_SIZE - 1;
             return { x: tileX, y: tileY };
         }
 
         update() {
-            if (this.cursors.up.isDown) {
-                if (this.prevUpPressed === false) {
-                    this.currUser.moveUp();
-                }
-                this.prevUpPressed = true;
-            } else {
-                this.prevUpPressed = false;
+            // 이동처리는 동시에 눌리는거를 고려하지 않는다
+            // 어차피 4-way 니까 하나씩만 처리하면된다
+            if (this.cursors.up.justDown) {
+                this.currUser.moveUp();
+            } else if (this.cursors.down.justDown) {
+                this.currUser.moveDown();
+            } else if (this.cursors.left.justDown) {
+                this.currUser.moveLeft();
+            } else if (this.cursors.right.justDown) {
+                this.currUser.moveRight();
             }
-
-            if (this.cursors.down.isDown) {
-                if (this.prevDownPressed === false) {
-                    this.currUser.moveDown();
-                }
-                this.prevDownPressed = true;
-            } else {
-                this.prevDownPressed = false;
-
+            
+            if(this.zone0Key.justDown) {
+                this.currUser.requestJumpZone(0)
             }
-
-            if (this.cursors.right.isDown) {
-                if (this.prevRightPressed === false) {
-                    this.currUser.moveRight();
-                }
-                this.prevRightPressed = true;
-            } else {
-                this.prevRightPressed = false;
+            if(this.zone1Key.justDown) {
+                this.currUser.requestJumpZone(1);
             }
-
-            if (this.cursors.left.isDown) {
-                if (this.prevLeftPressed === false) {
-                    this.currUser.moveLeft();
-                }
-                this.prevLeftPressed = true;
-            } else {
-                this.prevLeftPressed = false;
+            if(this.zone2Key.justDown) {
+                this.currUser.requestJumpZone(2);
             }
         }
 
@@ -349,6 +298,10 @@ module kisaragi {
             var tileCoord = this.markerToTileCoord(this.marker);
             if (tileCoord) {
                 this.game.debug.text('Tile Coord : ' + tileCoord.x + ',' + tileCoord.y, 16, 550);
+            }
+            
+            if(this.currUser && this.currUser.zone) {
+                this.game.debug.text('zoneId : ' + this.currUser.zone.id, 16, 530);
             }
         }
     }

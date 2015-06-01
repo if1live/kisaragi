@@ -5,16 +5,23 @@ Auto generated code
 
 module kisaragi {
     export enum PacketType {
-    <% for(var i = 0 ; i < packets.length ; i += 1) { %>
+<% for(var i = 0 ; i < packets.length ; i += 1) { %>
         <%= packets[i].name -%>,
-    <% } %>
+<% } %>
     }
+    
+    export var allPacketTypeList = [
+<% for(var i = 0 ; i < packets.length ; i += 1) { %>
+        PacketType.<%= packets[i].name -%>,
+<% } %>
+    ];
 }
 
 
 declare var exports: any;
 if (typeof exports !== 'undefined') {
     exports.PacketType = kisaragi.PacketType;
+    exports.allPacketTypeList = kisaragi.allPacketTypeList;
 }
 
 

@@ -12,7 +12,7 @@ before_script:
   - bower install
 
 script:
-  - grunt tsd
+  - echo "skip - grunt tsd"
   - grunt tslint
   - grunt test
   - grunt coverage

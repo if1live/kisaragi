@@ -17,9 +17,26 @@ var kisaragi;
         PacketType[PacketType["Login"] = 9] = "Login";
         PacketType[PacketType["RequestMap"] = 10] = "RequestMap";
         PacketType[PacketType["ResponseMap"] = 11] = "ResponseMap";
+        PacketType[PacketType["RequestJumpZone"] = 12] = "RequestJumpZone";
     })(kisaragi.PacketType || (kisaragi.PacketType = {}));
     var PacketType = kisaragi.PacketType;
+    kisaragi.allPacketTypeList = [
+        PacketType.Ping,
+        PacketType.Echo,
+        PacketType.EchoAll,
+        PacketType.Connect,
+        PacketType.Disconnect,
+        PacketType.RequestMove,
+        PacketType.MoveNotify,
+        PacketType.NewObject,
+        PacketType.RemoveObject,
+        PacketType.Login,
+        PacketType.RequestMap,
+        PacketType.ResponseMap,
+        PacketType.RequestJumpZone,
+    ];
 })(kisaragi || (kisaragi = {}));
 if (typeof exports !== 'undefined') {
     exports.PacketType = kisaragi.PacketType;
+    exports.allPacketTypeList = kisaragi.allPacketTypeList;
 }

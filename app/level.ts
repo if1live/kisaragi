@@ -65,7 +65,7 @@ module kisaragi {
 
             this.data = [];
 
-            for (var i: number = 0; i < this.height; i += 1) {
+            for (var i: number = this.height - 1; i >= 0 ; i -= 1) {
                 var cols = rows[i].split('');
                 var line = [];
                 for (var j: number = 0; j < this.width; j += 1) {
@@ -92,7 +92,7 @@ module kisaragi {
             return obstacles;
         }
 
-        createGrid(world: GameWorld) {
+        createGrid(zone: Zone) {
             // static elem
             var matrix = JSON.parse(JSON.stringify(this.data));
             for (var y: number = 0; y < this.height; y += 1) {
@@ -104,7 +104,7 @@ module kisaragi {
             }
 
             // dynamic elem
-            var allObjectList: Entity[] = world.allObjectList();
+            var allObjectList: Entity[] = zone.entityMgr.all();
             _.each(allObjectList, (obj: Entity) => {
                 matrix[obj.y][obj.x] = 1;
             });
@@ -131,8 +131,8 @@ module kisaragi {
             return this.tile(x, y) === TileCode.Empty;
         }
 
-        findPath(start_pos: Coord, target_pos: Coord, world: GameWorld): Array<Coord> {
-            var grid = this.createGrid(world);
+        findPath(start_pos: Coord, target_pos: Coord, zone: Zone): Array<Coord> {
+            var grid = this.createGrid(zone);
             var finder = new PF.AStarFinder();
             var rawPath = finder.findPath(start_pos.x, start_pos.y, target_pos.x, target_pos.y, grid);
 
@@ -143,8 +143,8 @@ module kisaragi {
             return path;
         }
 
-        findNextPos(start_pos: Coord, target_pos: Coord, world: GameWorld): Coord {
-            var path = this.findPath(start_pos, target_pos, world);
+        findNextPos(start_pos: Coord, target_pos: Coord, zone: Zone): Coord {
+            var path = this.findPath(start_pos, target_pos, zone);
             if (path.length === 0) {
                 return null;
             } else {

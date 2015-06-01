@@ -1,16 +1,19 @@
 ﻿// Ŭnicode please
-///<reference path="app.d.ts"/>
+///<reference path="../app.d.ts"/>
 module kisaragi {
     export class Entity {
         // core attribute
         category: Category;
         movableId: number;
-        entityMgr: EntityManager;
-
+        
         world: GameWorld;
 
         // position
         pos: Coord;
+        
+        // zone
+        _zoneId: number;
+        _zone: Zone;
 
         // server/client
         role: Role;
@@ -25,6 +28,8 @@ module kisaragi {
         constructor(id: number) {
             this.movableId = id;
             this.pos = new Coord(-1, -1);
+            this._zone = null;
+            this._zoneId = 0;
             this.targetPos = null;
             this.world = null;
             this.moveCooltime = kisaragi.COOLTIME_MOVE;
@@ -42,19 +47,60 @@ module kisaragi {
         set y(val: number) {
             this.pos.y = val;
         }
+        
+        get zoneId(): number {
+            if(this._zone) {
+                return this._zone.zoneId.id;
+            } else {
+                return this._zoneId;
+            }
+        }
+        set zoneId(id: number) {
+            if(this._zone) {
+                this._zone.zoneId.id = id;
+            } else {
+                this._zoneId = id;
+            }
+        }
+        get zone(): Zone {
+            return this._zone;
+        }
+        set zone(zone: Zone) {
+            if(zone) {
+                this._zone = zone;
+                this._zoneId = zone.id;
+            } else {
+                this._zone = null;
+                this._zoneId = 0;
+            }
+        }
+        get zoneEntityMgr(): EntityManager {
+            if (this._zone) {
+                return this._zone.entityMgr;
+            } else {
+                return null;
+            }
+        }
+        get globalEntityMgr(): EntityManager {
+            if (this.world) {
+                return this.world.entityMgr;
+            } else {
+                return null;
+            }
+        }
 
-        moveNotify(world: GameWorld) {
+        moveNotify() {
             var self = this;
             var factory = new PacketFactory();
             // send move notify to closed user
-            var userList = world.objectList(Category.Player);
+            var userList = this.zoneEntityMgr.findAll({ category: Category.Player});
             _.each(userList, function (user: Player) {
                 //TODO how to calculate distance?
                 var maxDist = 1000000;
                 var dist = Math.abs(self.x - user.x) + Math.abs(self.y - user.y);
                 if (dist < maxDist) {
                     var packet = factory.moveNotify(self.movableId, self.x, self.y);
-                    user.svrConn.sendImmediate(packet);
+                    user.svrConn.send(packet);
                 }
             });
         };
@@ -79,15 +125,16 @@ module kisaragi {
                 this.moveCooltime = 0;
             }
 
+            var zone  = this.zone;
             if (this.targetPos !== null && this.moveCooltime === 0) {
-                var nextPos = self.world.level.findNextPos(self.pos, self.targetPos, self.world);
+                var nextPos = zone.level.findNextPos(self.pos, self.targetPos, zone);
                 if (!nextPos) {
                     self.targetPos = null;
                     return;
                 }
 
                 this.pos = nextPos;
-                this.moveNotify(self.world);
+                this.moveNotify();
 
                 if (self.pos.x === self.targetPos.x && self.pos.y === self.targetPos.y) {
                     self.targetPos = null;
@@ -95,13 +142,29 @@ module kisaragi {
 
                 this.moveCooltime = COOLTIME_MOVE;
             }
-        };
+        }
+
+        updateSpritePosition() {
+            if (!this.sprite) {
+                throw "sprite not exist";
+            }
+
+            var tileX = this.pos.x;
+            var tileY = this.zone.level.height - this.pos.y - 1;
+            var x = tileX * TILE_SIZE;
+            var y = tileY * TILE_SIZE;
+            this.sprite.position.x = x;
+            this.sprite.position.y = y;
+        }
     };
 
     interface SearchOption {
         x?: number;
         y?: number;
         id?: number;
+        floor?: number;
+        zoneId?: number;
+        category?: Category;
     }
 
     export class EntityManager {
@@ -113,10 +176,15 @@ module kisaragi {
 
         add(ent: Entity) {
             this.table[ent.movableId] = ent;
+            //console.log(`[Entity=${ent.movableId}][Zone=${ent.zone.id}] added`);
         }
 
         removeId(movableId: number) {
-            delete this.table[movableId];
+            var ent = this.table[movableId]
+            if (ent) {
+                //console.log(`[Entity=${ent.movableId}][Zone=${ent.zone.id}] deleted`);
+                delete this.table[movableId];
+            }
         }
 
         remove(opts: SearchOption) {
@@ -146,6 +214,22 @@ module kisaragi {
                     return ent.y === opts.y;
                 });
             }
+            if('floor' in opts) {
+                predList.push((ent: Entity) => {
+                    var zoneId = new ZoneID(ent.zoneId);
+                    return zoneId.floor == opts.floor; 
+                });
+            }
+            if('zoneId' in opts) {
+                predList.push((ent: Entity) => {
+                    return ent.zoneId == opts.zoneId; 
+                });
+            }
+            if('category' in opts) {
+                predList.push((ent: Entity) => {
+                    return ent.category == opts.category; 
+                });
+            }
 
             _.each(predList, function (pred) {
                 elemList = _.filter(elemList, pred);
@@ -161,6 +245,10 @@ module kisaragi {
             } else {
                 return null;
             }
+        }
+        
+        all() {
+            return _.values(this.table);
         }
     };
 }

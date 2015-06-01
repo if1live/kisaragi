@@ -4,101 +4,104 @@
 if (typeof module !== 'undefined') {
     var express = require('express');
     var serveStatic = require('serve-static');
-    var app = express();
-    var http = require('http').Server(app);
-    var io_http = require('socket.io')(http);
     var gameloop = require('node-gameloop');
+    var http = require('http');
+    var socketio = require('socket.io');
 }
 
 module kisaragi {
     export class ServerMain {
-        main() {
+        app: any;
+        http: any;
+        io_http: any;
+
+        connMgr: ConnectionManager;
+        world: GameWorld;
+
+        constructor() {
+            this.app = express();
+            this.http = http.Server(this.app);
+            this.io_http = socketio(this.http);
+
+            this.connMgr = new ConnectionManager(this.io_http);
+            this.world = new GameWorld(Role.Server);
+            this.world.zone(0).loadLevelFile(__dirname + '/../res/map-0.txt');
+            this.world.zone(1).loadLevelFile(__dirname + '/../res/map-1.txt');
+            this.world.zone(2).loadLevelFile(__dirname + '/../res/map-2.txt');
+
+            this.registerView();
+            this.registerSocketIO();
+        }
+
+        registerView() {
             // all environments
-            app.set('port', HTTP_PORT);
-            app.set('view engine', 'ejs');
-            app.use('/static', serveStatic(__dirname + '/../static'));
-            app.use(serveStatic(__dirname + '/../publish'));
-            app.use(serveStatic(__dirname + '/../lib'));
+            this.app.set('port', HTTP_PORT);
+            this.app.set('view engine', 'ejs');
+            this.app.use('/static', serveStatic(__dirname + '/../static'));
+            this.app.use(serveStatic(__dirname + '/../publish'));
+            this.app.use(serveStatic(__dirname + '/../lib'));
             // http://stackoverflow.com/questions/12488930/dump-an-object-in-ejs-templates-from-express3-x-views
-            app.locals.inspect = require('util').inspect;
+            this.app.locals.inspect = require('util').inspect;
 
-            // Game World
-            var server = new Server(io_http);
-            var world = new GameWorld(Role.Server);
-            world.loadLevelFile(__dirname + '/../res/map.txt');
 
-            app.get('/', (req, res) => {
+            this.app.get('/', (req, res) => {
                 res.render('pages/index');
             });
 
-            app.get('/game', (req, res) => {
+            this.app.get('/game', (req, res) => {
                 res.render('pages/game');
             });
 
-            app.get('/admin', (req, res) => {
+            this.app.get('/admin', (req, res) => {
                 res.render('pages/admin', {
-                    world: world,
-                    server: server,
+                    world: this.world,
+                    connMgr: this.connMgr,
                     helper: new AdminHelper()
                 });
             });
+        }
 
+        registerSocketIO() {
+            var self = this;
             var factory = new PacketFactory();
+            
+            this.io_http.on('connection', (socket) => {
+                var factory = new PacketFactory();
+                var conn = self.connMgr.create_socketIO(socket);
+                conn.initializeHandler();
 
-            io_http.on('connection', (socket) => {
-                var client = server.connectSocketIO(socket);
-                var user = world.createUser(client);
                 var packet = factory.createConnect();
-                client.onEvent(packet, world, user);
-                console.log(`[User=${user.movableId}] connected`);
-
-                socket.on(PacketFactory.toCommand(PacketType.Disconnect), function () {
-                    var client = server.find({ socket_io: socket });
-                    var user = client.user;
-                    var packet = factory.createDisconnect();
-                    client.onEvent(packet, world, user);
-
-                    server.disconnectSocketIO(socket);
-                    console.log(`[User=${user.movableId}] disconnected`);
-                });
-
-
-                var cmdList = [
-                    // for development
-                    PacketFactory.toCommand(PacketType.Ping),
-                    PacketFactory.toCommand(PacketType.Echo),
-                    PacketFactory.toCommand(PacketType.EchoAll),
-        
-                    // for game
-                    PacketFactory.toCommand(PacketType.RequestMap),
-                    PacketFactory.toCommand(PacketType.RequestMove),
-                ];
-
-                function registerCommand(cmd) {
-                    socket.on(cmd, function (obj) {
-                        var client = server.find({ socket_io: socket });
-                        var packet = PacketFactory.createFromJson(obj);
-                        //console.log("Receive[id=" + client.userId + "] " + packet.command + " : " + JSON.stringify(packet.toJson()));
-                        client.onEvent(packet, world, client.user);
-                    });
-                }
-                for (var i = 0; i < cmdList.length; i += 1) {
-                    registerCommand(cmdList[i]);
-                }
+                var req = new Request(packet, conn);
+                self.connMgr.addRecvPacket(req);
             });
+        }
 
+        update(delta: number) {
+            var recvQueue = this.connMgr.recvQueue;
+            while (recvQueue.isEmpty() == false) {
+                var recv = recvQueue.pop();
+                recv.conn.handle(recv, this.world);
+            }
 
-            http.listen(app.get('port'), function () {
-                console.log('http listening on *:' + app.get('port'));
+            this.world.update(delta);
+
+            this.connMgr.flushSendQueue();
+        }
+
+        run() {
+            var self = this;
+
+            this.http.listen(self.app.get('port'), function () {
+                console.log('http listening on *:' + self.app.get('port'));
             });
-
-            // game loop
-            var loopId = gameloop.setGameLoop(function (delta) {
-                world.update(delta);
+            //create game loop
+            var loopId = gameloop.setGameLoop(function (delta: number) {
+                self.update(delta);
             }, 1000.0 / TARGET_FPS);
         }
     }
 }
+
 if (typeof exports !== 'undefined') {
     exports.ServerMain = kisaragi.ServerMain;
 }

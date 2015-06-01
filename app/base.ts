@@ -7,19 +7,6 @@ if (typeof module !== 'undefined') {
 
 
 module kisaragi {
-
-    
-
-    export class Coord {
-        x: number;
-        y: number;
-
-        constructor(x: number, y: number) {
-            this.x = x;
-            this.y = y;
-        }
-    }
-
     export class EntityListHelper {
         list: Entity[];
 
@@ -80,7 +67,6 @@ module kisaragi {
 
 declare var exports: any;
 if (typeof exports !== 'undefined') {
-    exports.Coord = kisaragi.Coord;
     exports.Entity = kisaragi.Entity;
     exports.EntityManager = kisaragi.EntityManager;
     exports.EntityListHelper = kisaragi.EntityListHelper;

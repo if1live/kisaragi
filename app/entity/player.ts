@@ -1,5 +1,5 @@
 ﻿// Ŭnicode please
-///<reference path="app.d.ts"/>
+///<reference path="../app.d.ts"/>
 
 if (typeof module !== 'undefined') {
     //import assert = require('assert');
@@ -38,23 +38,26 @@ module kisaragi {
             var self = this;
             world.addUser(self);
 
+            var zone = this.zone;
+            
             var factory = new PacketFactory();
             var loginPacket = factory.login(
                 this.movableId,
                 this.x,
                 this.y,
-                world.level.width,
-                world.level.height
+                zone.zoneId.id,
+                zone.level.width,
+                zone.level.height
             );
-            self.svrConn.sendImmediate(loginPacket);
+            self.svrConn.send(loginPacket);
 
-            var newObjectPacket = factory.newObject(this.movableId, this.category, this.x, this.y);
-            self.svrConn.broadcastImmediate(newObjectPacket);
+            var newObjectPacket = factory.newObject(this.movableId, this.category, this.x, this.y, zone.id);
+            self.svrConn.broadcast(newObjectPacket, zone.id);
     
             // give dynamic object's info to new user
-            _.each(world.allObjectList(), function (ent: Entity) {
-                var newObjectPacket = factory.newObject(ent.movableId, ent.category, ent.x, ent.y);
-                self.svrConn.sendImmediate(newObjectPacket);
+            _.each(this.zone.entityMgr.all(), function (ent: Entity) {
+                var newObjectPacket = factory.newObject(ent.movableId, ent.category, ent.x, ent.y, ent.zone.id);
+                self.svrConn.send(newObjectPacket);
             });
         };
 
@@ -64,14 +67,15 @@ module kisaragi {
             
             var factory = new PacketFactory();
             var removePacket = factory.removeObject(self.movableId);
-            self.svrConn.broadcastImmediate(removePacket);
+            self.svrConn.broadcast(removePacket, self.zoneId);
         };
 
         c2s_requestMap(world: GameWorld, packet: RequestMapPacket) {
             var self = this;
             var factory = new PacketFactory();
-            var responseMapPacket = factory.responseMap(world.level);
-            self.svrConn.sendImmediate(responseMapPacket);
+            var zone = world.zone(packet.zoneId);
+            var responseMapPacket = factory.responseMap(zone.level, zone.id);
+            self.svrConn.send(responseMapPacket);
         };
 
         // move function
@@ -111,19 +115,66 @@ module kisaragi {
 
         requestMoveTo(x: number, y: number) {
             var self = this;
-            if (self.world && !self.world.isMovablePos(x, y)) {
+            if (self.world && !self.zone.isMovablePos(x, y)) {
                 return;
             }
             var factory = new PacketFactory();
             var packet:RequestMovePacket = factory.requestMove(this.movableId, x, y);
-            self.cliConn.sendImmediate(packet);
+            self.cliConn.send(packet);
         };
 
         c2s_requestMove(world: GameWorld, packet: RequestMovePacket) {
-            if (world.isMovablePos(packet.x, packet.y)) {
+            if (this.zone.isMovablePos(packet.x, packet.y)) {
                 this.targetPos = new Coord(packet.x, packet.y);
             }
         };
+        
+        requestJumpZone(zoneId: number) {
+            var factory = new PacketFactory();
+            var packet = factory.requestJumpZone(zoneId);
+            this.cliConn.send(packet);
+        }
+        
+        c2s_requestJumpZone(world: GameWorld, packet: RequestJumpZonePacket) {
+            var self = this;
+            if(this.zoneId == packet.zoneId) {
+                return;
+            }
+            
+            var prevZone = this.zone;
+            var nextZone = world.zone(packet.zoneId);
+
+            var factory = new PacketFactory();
+            
+            // send remove packet to previous zone user
+            var prevZoneUsers = prevZone.entityMgr.findAll({category: Category.Player});
+            _.each(prevZoneUsers, function(ent: Player) {
+                var packet = factory.removeObject(self.movableId);
+                self.svrConn.broadcast(packet, self.zoneId);
+            })
+            prevZone.detach(this);
+            
+            nextZone.attach(this);
+            // 적당한 빈자리로 이동
+            // TODO nextZone의 리스폰 지점으로 교체할것
+            this.pos = nextZone.findAnyEmptyPos();
+
+            // send next map info
+            var mapPacket = factory.responseMap(nextZone.level, nextZone.zoneId.id);
+            this.svrConn.send(mapPacket);
+            
+            // send new object notify to next zone
+            var nextZoneUsers = nextZone.entityMgr.findAll({category: Category.Player});
+            _.each(nextZoneUsers, function (ent: Player) {
+                var packet = factory.newObject(self.movableId, self.category, self.x, self.y, nextZone.id);
+                self.svrConn.broadcast(packet, self.zoneId);
+            });
+
+            _.each(this.zone.entityMgr.all(), function (ent: Entity) {
+                var newObjectPacket = factory.newObject(ent.movableId, ent.category, ent.x, ent.y, ent.zone.id);
+                self.svrConn.send(newObjectPacket);
+            });
+        }
     }
 }
 

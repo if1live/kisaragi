@@ -3,6 +3,7 @@
 # Logs
 logs
 *.log
+npm-debug.log.*
 
 # Runtime data
 pids
@@ -32,12 +33,25 @@ bower-components
 publish
 .DS_Store
 
+# visual studio
+*.suo
+*.csproj.user
+
 # typescript
-typings
+#typings
 app/*.js
+app/core/*.js
+app/entity/*.js
 app/network/*.js
-app_client/*.js
+app/packet/*.js
+
 test/*.js
+test/core/*.js
+test/entity/*.js
+test/network/*.js
+test/packet/*.js
+app_client/*.js
+
 *.map
 build
 bin

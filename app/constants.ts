@@ -6,6 +6,15 @@ module kisaragi {
 
     export var COOLTIME_MOVE: number = 0.1;
 
+    // for server
+
+    // for client
+    export var TILE_SIZE = 32;
+    export var ASSET_PATH = '/static/assets/';
+
+    export var GROUND_DEPTH = 1;
+    export var CHARACTER_DEPTH = 2;
+
     export enum Role {
         Server,
         Client
@@ -30,6 +39,8 @@ if (typeof exports !== 'undefined') {
     exports.HTTP_PORT = kisaragi.HTTP_PORT;
     exports.TARGET_FPS = kisaragi.TARGET_FPS;
     exports.COOLTIME_MOVE = kisaragi.COOLTIME_MOVE;
+    exports.TILE_SIZE = kisaragi.TILE_SIZE;
+    exports.ASSET_PATH = kisaragi.ASSET_PATH;
 
     exports.Role = kisaragi.Role;
     exports.Category = kisaragi.Category;
