@@ -47,12 +47,12 @@ module kisaragi {
             return ent;
         }
 
-        createLoginPlayer(packet: LoginPacket, group: Phaser.Group, conn: ClientConnection) {
+        createLoginPlayer(id: number, x: number, y:number, zoneId: number, group: Phaser.Group, conn: ClientConnection) {
             // 현재 유저의 경우만 네트워크같은 추가 처리가 필요하다
             // 그래서 함수 하나로 하는것보다는 둘로 쪼개는게 관리하기 편할거같더라
-            var player = Player.createClientEntity(packet.movableId, conn);
-            player.pos = new Coord(packet.x, packet.y);
-            player.zoneId = packet.zoneId;
+            var player = Player.createClientEntity(id, conn);
+            player.pos = new Coord(x, y);
+            player.zoneId = zoneId;
             player.sprite = this._createSprite(CURRENT_USER_SPRITE, group);
             return player;
         }

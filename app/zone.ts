@@ -68,9 +68,9 @@ module kisaragi {
             if(ent.zone == null) { throw "zone#detach : not attched entity"; }
             if(ent.zone != this) { throw "zone#detach : parent zone is not curr zone"; }
             
+            this.entityMgr.removeId(ent.movableId);
             ent.zone = null;
             ent.zoneEntityMgr = null;
-            this.entityMgr.removeId(ent.movableId);
         }
         
         // level

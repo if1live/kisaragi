@@ -168,10 +168,15 @@ module kisaragi {
 
         add(ent: Entity) {
             this.table[ent.movableId] = ent;
+            //console.log(`[Entity=${ent.movableId}][Zone=${ent.zone.id}] added`);
         }
 
         removeId(movableId: number) {
-            delete this.table[movableId];
+            var ent = this.table[movableId]
+            if (ent) {
+                //console.log(`[Entity=${ent.movableId}][Zone=${ent.zone.id}] deleted`);
+                delete this.table[movableId];
+            }
         }
 
         remove(opts: SearchOption) {

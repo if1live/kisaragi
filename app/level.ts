@@ -65,7 +65,7 @@ module kisaragi {
 
             this.data = [];
 
-            for (var i: number = 0; i < this.height; i += 1) {
+            for (var i: number = this.height - 1; i >= 0 ; i -= 1) {
                 var cols = rows[i].split('');
                 var line = [];
                 for (var j: number = 0; j < this.width; j += 1) {

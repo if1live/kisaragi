@@ -8,14 +8,11 @@ module kisaragi {
     var WALL_MARKER_COLOR = 0x000000;
     var UNKNOWN_MARKER_COLOR = 0xffff00;
 
-    // layer order
-    var GROUND_DEPTH = 1;
-    var CHARACTER_DEPTH = 2;
-
     export class MainState extends Phaser.State {
         gameWorld: GameWorld;
         currUser: Player;
         currUserId: number;
+        currZoneId: number;
 
         map: Phaser.Tilemap;
         tileLayer: Phaser.TilemapLayer;
@@ -46,16 +43,12 @@ module kisaragi {
             conn.registerHandler(PacketType.Login, function (packet: LoginPacket) {
                 console.log('Login : userId=' + packet.movableId);
                 self.currUserId = packet.movableId;
+                self.currZoneId = packet.zoneId;
 
+                // 최초월드의 기본 정보도 없으면 객체 생성이 잘 안된다
                 var zone = self.gameWorld.zone(packet.zoneId);
                 zone.level.width = packet.width;
                 zone.level.height = packet.height;
-
-                var player = self.entityFactory.createLoginPlayer(packet, self.characterGroup, conn);
-                self.gameWorld.add(player);
-                player.updateSpritePosition();
-
-                self.currUser = player;
     
                 // sometime, socket io connection end before game context created
                 var requestMapPacket = factory.requestMap(packet.zoneId);
@@ -65,6 +58,11 @@ module kisaragi {
             conn.registerHandler(PacketType.ResponseMap, function(packet: ResponseMapPacket) {
                 //console.log(data);
                 console.log('Load Level data from server : zoneId=' + packet.zoneId);
+
+                // 다른 zone에 속하는 객체는 클라에서 유지할 필요 없으니 파기한다
+                var allEntityList = self.gameWorld.entityMgr.all();
+                var notSameZoneEntityList = _.filter(allEntityList, (ent: Entity) => { return ent.zoneId != packet.zoneId; });
+                _.each(notSameZoneEntityList, (ent: Entity) => { self.gameWorld.remove(ent); });
             
                 // object synchronize by serializer/deserializer
                 var zone = self.gameWorld.zone(packet.zoneId);
@@ -78,36 +76,62 @@ module kisaragi {
                     self.tileLayer.destroy();
                 }
                 self.tileLayer = self.map.create('level', zone.level.width, zone.level.height, TILE_SIZE, TILE_SIZE);
-                self.tileLayer.z = GROUND_DEPTH;
-                self.world.sort();
 
                 var groundTile = 29;
                 var wallTile = 9;
                 for (var y = 0; y < zone.level.width; y += 1) {
+                    var tileY = zone.level.height - y - 1
                     for (var x = 0; x < zone.level.width; x += 1) {
                         if (zone.level.tile(x, y) === TileCode.Obstacle) {
-                            self.map.putTile(wallTile, x, y, self.tileLayer);
+                            self.map.putTile(wallTile, x, tileY, self.tileLayer);
                         } else {
-                            self.map.putTile(groundTile, x, y, self.tileLayer);
+                            self.map.putTile(groundTile, x, tileY, self.tileLayer);
                         }
                     }
                 }
+
+                // 레이어 생성후 z를 다시 정렬
+                self.tileLayer.z = GROUND_DEPTH;
+                self.characterGroup.z = CHARACTER_DEPTH;
+                self.world.sort();
             });
 
             conn.registerHandler(PacketType.NewObject, function (packet: NewObjectPacket) {
                 console.log('New Object : id=' + packet.movableId);
-                if(packet.zoneId != self.currUser.zoneId) {
+                if (packet.movableId == self.currUserId) {
+                    // 플레이어가 지역을 이동한 경우
+                    self.currZoneId = packet.zoneId;
+                }
+
+                if(packet.zoneId != self.currZoneId) {
+                    return;
+                }
+
+                if (self.gameWorld.findObject(packet.movableId)) {
+                    console.log('Object id=' + packet.movableId + ' is already created');
                     return;
                 }
                 
-                if (!self.gameWorld.findObject(packet.movableId)) {
-                    // create user to world
+                // create user to world
+                if (packet.movableId == self.currUserId) {
+                    var player = self.entityFactory.createLoginPlayer(
+                        packet.movableId,
+                        packet.x,
+                        packet.y,
+                        packet.zoneId,
+                        self.characterGroup,
+                        conn
+                        );
+                    self.gameWorld.add(player);
+                    player.updateSpritePosition();
+
+                    self.currUser = player;
+                    self.currZoneId = packet.zoneId;
+
+                } else {
                     var ent = self.entityFactory.create(packet, self.characterGroup);
                     self.gameWorld.add(ent);
                     ent.updateSpritePosition();
-
-                } else {
-                    console.log('Object id=' + packet.movableId + ' is already created');
                 }
             });
 
@@ -143,6 +167,7 @@ module kisaragi {
             this.gameWorld = new GameWorld(Role.Client);
             this.currUser = null;
             this.currUserId = null;
+            this.currZoneId = null;
 
             // tilemap - static elem
             this.map = null;
@@ -187,10 +212,7 @@ module kisaragi {
         }
 
         updateMarker() {
-            if (!this.tileLayer) {
-                return;
-            }
-            if (!this.marker) {
+            if (!this.tileLayer || !this.marker || !this.currUser || !this.currUser.zone) {
                 return;
             }
 
@@ -241,7 +263,7 @@ module kisaragi {
         }
 
         markerToTileCoord(marker) {
-            if (!marker || !this.currUser) {
+            if (!marker || !this.currUser || !this.currUser.zone) {
                 return;
             }
             var level = this.currUser.zone.level;
@@ -282,7 +304,7 @@ module kisaragi {
                 this.game.debug.text('Tile Coord : ' + tileCoord.x + ',' + tileCoord.y, 16, 550);
             }
             
-            if(this.currUser) {
+            if(this.currUser && this.currUser.zone) {
                 this.game.debug.text('zoneId : ' + this.currUser.zone.id, 16, 530);
             }
         }

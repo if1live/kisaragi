@@ -59,11 +59,12 @@ module kisaragi {
                 ent.movableId = this.getNextId();
             }
             
+            var zone = _.filter(this.zones, (zone: Zone) => { return zone.id == ent.zoneId; })[0];
+            zone.attach(ent);
+
             ent.world = this;
             this.entityMgr.add(ent);
             
-            var zone = _.filter(this.zones, (zone: Zone) => { return zone.id == ent.zoneId; })[0];
-            zone.attach(ent);
             return true;
         };
 
@@ -71,12 +72,13 @@ module kisaragi {
             if(ent.world) { return false; }
             if(ent.zone) { return false; }
             if(!ent.movableId) { return false; }
-            
-            ent.world = this;
-            this.entityMgr.add(ent);
-            
+
             var zone = _.filter(this.zones, (zone: Zone) => { return zone.id == ent.zoneId; })[0];
             zone.attach(ent);
+                        
+            ent.world = this;
+            this.entityMgr.add(ent);
+
             return true;
         };
 
@@ -85,8 +87,8 @@ module kisaragi {
                 ent.sprite.parent.removeChild(ent.sprite);
                 ent.sprite.destroy();
             }
-            ent.zone.detach(ent);
             this.entityMgr.removeId(ent.movableId);
+            ent.zone.detach(ent);
         };
 
         removeId(pk: number) {

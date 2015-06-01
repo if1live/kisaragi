@@ -143,8 +143,6 @@ module kisaragi {
             
             var prevZone = this.zone;
             var nextZone = world.zone(packet.zoneId);
-            prevZone.detach(this);
-            nextZone.attach(this);
 
             var factory = new PacketFactory();
             
@@ -154,16 +152,27 @@ module kisaragi {
                 var packet = factory.removeObject(self.movableId);
                 self.svrConn.broadcast(packet);
             })
+            prevZone.detach(this);
             
+            nextZone.attach(this);
+            // 적당한 빈자리로 이동
+            // TODO nextZone의 리스폰 지점으로 교체할것
+            this.pos = nextZone.findAnyEmptyPos();
+
             // send next map info
             var mapPacket = factory.responseMap(nextZone.level, nextZone.zoneId.id);
             this.svrConn.send(mapPacket);
             
             // send new object notify to next zone
             var nextZoneUsers = nextZone.entityMgr.findAll({category: Category.Player});
-            _.each(nextZoneUsers, function(ent: Player) {
-                var packet = factory.newObject(this.movableId, this.category, this.x, this.y, nextZone.id);
+            _.each(nextZoneUsers, function (ent: Player) {
+                var packet = factory.newObject(self.movableId, self.category, self.x, self.y, nextZone.id);
                 self.svrConn.broadcast(packet);
+            });
+
+            _.each(this.zone.entityMgr.all(), function (ent: Entity) {
+                var newObjectPacket = factory.newObject(ent.movableId, ent.category, ent.x, ent.y, ent.zone.id);
+                self.svrConn.send(newObjectPacket);
             });
         }
     }
