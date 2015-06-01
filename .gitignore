@@ -45,6 +45,7 @@ app/core/*.js
 app/packet/*.js
 app_client/*.js
 test/*.js
+test/core/*.js
 test/network/*.js
 *.map
 build

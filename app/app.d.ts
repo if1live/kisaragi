@@ -7,6 +7,7 @@
 
 ///<reference path="constants.ts"/>
 
+///<reference path="core/zone.ts"/>
 ///<reference path="core/queue.ts"/>
 
 ///<reference path="packet/base_packet.ts"/>
