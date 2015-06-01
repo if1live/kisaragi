@@ -145,6 +145,8 @@ module kisaragi {
             var nextZone = world.zone(packet.zoneId);
             prevZone.detach(this);
             nextZone.attach(this);
+
+            var factory = new PacketFactory();
             
             // send remove packet to previous zone user
             var prevZoneUsers = prevZone.entityMgr.findAll({category: Category.Player});
@@ -154,7 +156,6 @@ module kisaragi {
             })
             
             // send next map info
-            var factory = new PacketFactory();
             var mapPacket = factory.responseMap(nextZone.level, nextZone.zoneId.id);
             this.svrConn.send(mapPacket);
             

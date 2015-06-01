@@ -134,7 +134,20 @@ module kisaragi {
 
                 this.moveCooltime = COOLTIME_MOVE;
             }
-        };
+        }
+
+        updateSpritePosition() {
+            if (!this.sprite) {
+                throw "sprite not exist";
+            }
+
+            var tileX = this.pos.x;
+            var tileY = this.zone.level.height - this.pos.y - 1;
+            var x = tileX * TILE_SIZE;
+            var y = tileY * TILE_SIZE;
+            this.sprite.position.x = x;
+            this.sprite.position.y = y;
+        }
     };
 
     interface SearchOption {

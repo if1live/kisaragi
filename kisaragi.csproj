@@ -29,6 +29,7 @@
     <TypeScriptCompile Include="app\core\queue.ts" />
     <TypeScriptCompile Include="app\core\zone_id.ts" />
     <TypeScriptCompile Include="app\entity\entity.ts" />
+    <TypeScriptCompile Include="app\entity\entity_factory.ts" />
     <TypeScriptCompile Include="app\network\client_connection.ts" />
     <TypeScriptCompile Include="app\network\connection_manager.ts" />
     <TypeScriptCompile Include="app\network\echo.ts" />

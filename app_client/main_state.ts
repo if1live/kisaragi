@@ -19,124 +19,43 @@ module kisaragi {
 
         map: Phaser.Tilemap;
         tileLayer: Phaser.TilemapLayer;
-        tileSize: number;
 
         marker: Phaser.Graphics;
+
+        entityFactory: ClientEntityFactory;
 
         // dynamic elem
         characterGroup: Phaser.Group;
 
         // input
         cursors: Phaser.CursorKeys;
+        // for dev
+        zone0Key: Phaser.Key;
+        zone1Key: Phaser.Key;
+        zone2Key: Phaser.Key;
 
         // network
         conn: ClientConnection;
         ping: ClientPing;
         echoRunner: ClientEcho;
 
-        // previous key down state
-        prevUpPressed: boolean = false;
-        prevDownPressed: boolean = false;
-        prevLeftPressed: boolean = false;
-        prevRightPressed: boolean = false;
-        
-        // TODO
-        zone0Key: Phaser.Key;
-        zone1Key: Phaser.Key;
-        zone2Key: Phaser.Key;
-
-        get level(): Level {
-            //TODO temp code
-            return this.gameWorld.zone(0).level;
-        }
-
-        getUserSprite(gameObject: Entity) {
-            return this.getCommonSprite(gameObject, 'user');
-        }
-
-        getCurrUserSprite(gameObject: Entity) {
-            return this.getCommonSprite(gameObject, 'current_user');
-        }
-
-        getEnemySprite(gameObject: Entity) {
-            return this.getCommonSprite(gameObject, 'enemy');
-        }
-
-        getItemSprite(gameObject: Entity) {
-            return this.getCommonSprite(gameObject, 'item');
-        }
-        getCommonSprite(gameObject: Entity, spriteName: string) {
-            if (gameObject.sprite === undefined || gameObject.sprite === null) {
-                var sprite = this.add.sprite(-100, -100, spriteName);
-                this.characterGroup.add(sprite);
-
-                sprite.anchor.set(0, 0);
-                gameObject.sprite = sprite;
-                gameObject.sprite.width = this.tileSize;
-                gameObject.sprite.height = this.tileSize;
-            }
-            return gameObject.sprite;
-        }
-
-        createGameObject(packet: NewObjectPacket) {
-            var ent: Entity = null;
-
-            var movableId = packet.movableId;
-            var pos = new Coord(packet.x, packet.y);
-
-            if (packet.category === Category.Player) {
-                ent = Player.createClientEntity(movableId, this.conn);
-                ent.pos = pos;
-            } else if (packet.category === Category.Enemy) {
-                ent = new Enemy(movableId, Role.Client, pos);
-                //gameObject = new Enemy();
-            } else {
-                //assert(!"unknown category");
-            }
-            
-            ent.zoneId = packet.zoneId;
-
-            this.gameWorld.add(ent);
-
-            var sprite = null;
-            if (ent.category === Category.Player) {
-                if (packet.movableId === this.currUserId) {
-                    sprite = this.getCurrUserSprite(ent);
-                } else {
-                    sprite = this.getUserSprite(ent);
-                }
-            } else if (ent.category === Category.Enemy) {
-                sprite = this.getEnemySprite(ent);
-            } else if (ent.category === Category.Item) {
-                sprite = this.getItemSprite(ent);
-            }
-
-            this.updateGameObjectPos(ent);
-
-            return ent;
-        }
-
-        updateGameObjectPos(gameObject: Entity) {
-            var tileX = gameObject.pos.x;
-            var tileY = this.level.height - gameObject.pos.y - 1;
-            var x = tileX * this.tileSize;
-            var y = tileY * this.tileSize;
-            var sprite = gameObject.sprite;
-            sprite.position.x = x;
-            sprite.position.y = y;
-        }
-
         registerSocketHandler(conn: ClientConnection) {
             var self = this;
+            var factory = new PacketFactory();
+
             conn.registerHandler(PacketType.Login, function (packet: LoginPacket) {
                 console.log('Login : userId=' + packet.movableId);
                 self.currUserId = packet.movableId;
-                self.level.width = packet.width;
-                self.level.height = packet.height;
 
-                var factory = new PacketFactory();
-                var newObjPacket = factory.newObject(packet.movableId, Category.Player, packet.x, packet.y, packet.zoneId);
-                self.currUser = <Player> self.createGameObject(newObjPacket);
+                var zone = self.gameWorld.zone(packet.zoneId);
+                zone.level.width = packet.width;
+                zone.level.height = packet.height;
+
+                var player = self.entityFactory.createLoginPlayer(packet, self.characterGroup, conn);
+                self.gameWorld.add(player);
+                player.updateSpritePosition();
+
+                self.currUser = player;
     
                 // sometime, socket io connection end before game context created
                 var requestMapPacket = factory.requestMap(packet.zoneId);
@@ -148,24 +67,25 @@ module kisaragi {
                 console.log('Load Level data from server : zoneId=' + packet.zoneId);
             
                 // object synchronize by serializer/deserializer
-                self.level.width = packet.width;
-                self.level.height = packet.height;
-                self.level.data = packet.data;
+                var zone = self.gameWorld.zone(packet.zoneId);
+                zone.level.width = packet.width;
+                zone.level.height = packet.height;
+                zone.level.data = packet.data;
 
                 // generate tile map from server data
                 // TODO lazy level loading
                 if (self.tileLayer) {
                     self.tileLayer.destroy();
                 }
-                self.tileLayer = self.map.create('level', self.level.width, self.level.height, self.tileSize, self.tileSize);
+                self.tileLayer = self.map.create('level', zone.level.width, zone.level.height, TILE_SIZE, TILE_SIZE);
                 self.tileLayer.z = GROUND_DEPTH;
                 self.world.sort();
 
                 var groundTile = 29;
                 var wallTile = 9;
-                for (var y = 0; y < self.level.width; y += 1) {
-                    for (var x = 0; x < self.level.width; x += 1) {
-                        if (self.level.tile(x, y) === TileCode.Obstacle) {
+                for (var y = 0; y < zone.level.width; y += 1) {
+                    for (var x = 0; x < zone.level.width; x += 1) {
+                        if (zone.level.tile(x, y) === TileCode.Obstacle) {
                             self.map.putTile(wallTile, x, y, self.tileLayer);
                         } else {
                             self.map.putTile(groundTile, x, y, self.tileLayer);
@@ -182,7 +102,10 @@ module kisaragi {
                 
                 if (!self.gameWorld.findObject(packet.movableId)) {
                     // create user to world
-                    self.createGameObject(packet);
+                    var ent = self.entityFactory.create(packet, self.characterGroup);
+                    self.gameWorld.add(ent);
+                    ent.updateSpritePosition();
+
                 } else {
                     console.log('Object id=' + packet.movableId + ' is already created');
                 }
@@ -194,29 +117,28 @@ module kisaragi {
             });
 
             conn.registerHandler(PacketType.MoveNotify, function (packet: MoveNotifyPacket) {
-                var gameObject = self.gameWorld.findObject(packet.movableId);
-                if(gameObject == null) { return; }
-                if(gameObject.zoneId != self.currUser.zoneId) { return; }
+                var ent = self.gameWorld.findObject(packet.movableId);
+                if(ent == null) { return; }
+                if(ent.zoneId != self.currUser.zoneId) { return; }
                 
-                gameObject.x = packet.x;
-                gameObject.y = packet.y;
-                self.updateGameObjectPos(gameObject);
+                ent.x = packet.x;
+                ent.y = packet.y;
+                ent.updateSpritePosition();
             });
         }
 
         preload() {
             // dummy sprite
-            this.load.image('user', '/static/assets/sprites/kisaragi.png');
-            this.load.image('current_user', '/static/assets/sprites/mutsuki.png');
-            this.load.image('enemy', '/static/assets/sprites/space-baddie-purple.png');
-            this.load.image('item', '/static/assets/sprites/blue_ball.png');
+            this.entityFactory = new ClientEntityFactory(this);
+            this.entityFactory.preload();
 
             // dummy tilemap
-            this.load.image('desert', '/static/assets/tilemaps/tiles/tmw_desert_spacing.png');
+            this.load.image('desert', ASSET_PATH + 'tilemaps/tiles/tmw_desert_spacing.png');
         }
 
 
         create() {
+
             // initialize game context
             this.gameWorld = new GameWorld(Role.Client);
             this.currUser = null;
@@ -225,17 +147,17 @@ module kisaragi {
             // tilemap - static elem
             this.map = null;
             this.tileLayer = null;
-            this.tileSize = 32;
 
             ///////////////////////////
             this.stage.backgroundColor = '#2d2d2d';
 
             this.map = this.add.tilemap();
-            this.map.addTilesetImage('desert', undefined, this.tileSize, this.tileSize, 1, 1);
+            this.map.addTilesetImage('desert', undefined, TILE_SIZE, TILE_SIZE, 1, 1);
 
             this.characterGroup = this.add.group();
             this.characterGroup.z = CHARACTER_DEPTH;
 
+            // input
             this.cursors = this.input.keyboard.createCursorKeys();
             
             this.zone0Key = this.game.input.keyboard.addKey(Phaser.Keyboard.ONE);
@@ -246,7 +168,7 @@ module kisaragi {
             //TODO
             this.marker = this.add.graphics(1, 1);
             this.marker.lineStyle(2, EMPTY_MARKER_COLOR, 1);
-            this.marker.drawRect(0, 0, this.tileSize, this.tileSize);
+            this.marker.drawRect(0, 0, TILE_SIZE, TILE_SIZE);
 
             this.input.addMoveCallback(this.updateMarker, this);
 
@@ -276,15 +198,18 @@ module kisaragi {
             var rawTileX = this.tileLayer.getTileX(this.input.activePointer.worldX);
             var rawTileY = this.tileLayer.getTileY(this.input.activePointer.worldY);
 
-            if (rawTileX >= this.level.width) {
-                rawTileX = this.level.width - 1;
+            var zone = this.currUser.zone;
+            var level = zone.level;
+
+            if (rawTileX >= level.width) {
+                rawTileX = level.width - 1;
             }
-            if (rawTileY >= this.level.height) {
-                rawTileY = this.level.height - 1;
+            if (rawTileY >= level.height) {
+                rawTileY = level.height - 1;
             }
 
-            this.marker.x = rawTileX * this.tileSize;
-            this.marker.y = rawTileY * this.tileSize;
+            this.marker.x = rawTileX * TILE_SIZE;
+            this.marker.y = rawTileY * TILE_SIZE;
 
             var tileCoord = this.markerToTileCoord(this.marker);
             var tileObj = this.gameWorld.getObject(tileCoord.x, tileCoord.y);
@@ -298,13 +223,14 @@ module kisaragi {
                     color = UNKNOWN_MARKER_COLOR;
                 }
             } else {
-                if (this.level.tile(tileCoord.x, tileCoord.y) === TileCode.Obstacle) {
+                var level = this.currUser.zone.level;
+                if (level.tile(tileCoord.x, tileCoord.y) === TileCode.Obstacle) {
                     color = WALL_MARKER_COLOR;
                 }
             }
             this.marker.clear();
             this.marker.lineStyle(2, color, 1);
-            this.marker.drawRect(0, 0, this.tileSize, this.tileSize);
+            this.marker.drawRect(0, 0, TILE_SIZE, TILE_SIZE);
 
             // TODO why double clicked?
             if (this.input.mousePointer.isDown) {
@@ -315,50 +241,26 @@ module kisaragi {
         }
 
         markerToTileCoord(marker) {
-            if (marker == null) {
+            if (!marker || !this.currUser) {
                 return;
             }
-            var tileX = marker.x / this.tileSize;
-            var tileY = this.level.height - marker.y / this.tileSize - 1;
+            var level = this.currUser.zone.level;
+            var tileX = marker.x / TILE_SIZE;
+            var tileY = level.height - marker.y / TILE_SIZE - 1;
             return { x: tileX, y: tileY };
         }
 
         update() {
-            if (this.cursors.up.isDown) {
-                if (this.prevUpPressed === false) {
-                    this.currUser.moveUp();
-                }
-                this.prevUpPressed = true;
-            } else {
-                this.prevUpPressed = false;
-            }
-
-            if (this.cursors.down.isDown) {
-                if (this.prevDownPressed === false) {
-                    this.currUser.moveDown();
-                }
-                this.prevDownPressed = true;
-            } else {
-                this.prevDownPressed = false;
-
-            }
-
-            if (this.cursors.right.isDown) {
-                if (this.prevRightPressed === false) {
-                    this.currUser.moveRight();
-                }
-                this.prevRightPressed = true;
-            } else {
-                this.prevRightPressed = false;
-            }
-
-            if (this.cursors.left.isDown) {
-                if (this.prevLeftPressed === false) {
-                    this.currUser.moveLeft();
-                }
-                this.prevLeftPressed = true;
-            } else {
-                this.prevLeftPressed = false;
+            // 이동처리는 동시에 눌리는거를 고려하지 않는다
+            // 어차피 4-way 니까 하나씩만 처리하면된다
+            if (this.cursors.up.justDown) {
+                this.currUser.moveUp();
+            } else if (this.cursors.down.justDown) {
+                this.currUser.moveDown();
+            } else if (this.cursors.left.justDown) {
+                this.currUser.moveLeft();
+            } else if (this.cursors.right.justDown) {
+                this.currUser.moveRight();
             }
             
             if(this.zone0Key.justDown) {

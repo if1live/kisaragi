@@ -20,6 +20,7 @@
 ///<reference path="entity/entity.ts"/>
 ///<reference path="entity/enemy.ts"/>
 ///<reference path="entity/player.ts"/>
+///<reference path="entity/entity_factory.ts"/>
 
 ///<reference path="network/network.ts"/>
 ///<reference path="network/ping.ts"/>
