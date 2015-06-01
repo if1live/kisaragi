@@ -17,6 +17,10 @@
 ///<reference path="packet/base_packet_factory.ts"/>
 ///<reference path="packet/packet_factory.ts"/>
 
+///<reference path="entity/entity.ts"/>
+///<reference path="entity/enemy.ts"/>
+///<reference path="entity/player.ts"/>
+
 ///<reference path="network/network.ts"/>
 ///<reference path="network/ping.ts"/>
 ///<reference path="network/echo.ts"/>
@@ -24,12 +28,10 @@
 ///<reference path="network/client_connection.ts"/>
 ///<reference path="network/connection_manager.ts"/>
 
-///<reference path="base.ts"/>
-///<reference path="entity.ts"/>
+///<reference path="admin/admin.ts"/>
 
-///<reference path="admin.ts"/>
-///<reference path="enemy.ts"/>
-///<reference path="player.ts"/>
+///<reference path="base.ts"/>
+
 
 ///<reference path="level.ts"/>
 ///<reference path="zone.ts"/>
