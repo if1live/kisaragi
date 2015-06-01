@@ -17,6 +17,7 @@ var kisaragi;
         PacketType[PacketType["Login"] = 9] = "Login";
         PacketType[PacketType["RequestMap"] = 10] = "RequestMap";
         PacketType[PacketType["ResponseMap"] = 11] = "ResponseMap";
+        PacketType[PacketType["RequestJumpZone"] = 12] = "RequestJumpZone";
     })(kisaragi.PacketType || (kisaragi.PacketType = {}));
     var PacketType = kisaragi.PacketType;
     kisaragi.allPacketTypeList = [
@@ -32,6 +33,7 @@ var kisaragi;
         PacketType.Login,
         PacketType.RequestMap,
         PacketType.ResponseMap,
+        PacketType.RequestJumpZone,
     ];
 })(kisaragi || (kisaragi = {}));
 if (typeof exports !== 'undefined') {

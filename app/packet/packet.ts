@@ -361,6 +361,31 @@ module kisaragi {
         }
     }
     
+    export class RequestJumpZonePacket extends BasePacket {
+        
+        zoneId: number;
+        
+        constructor() {
+            super(PacketType.RequestJumpZone);
+
+            this.zoneId = 0;
+        }
+        
+        get command(): string {
+            return 'c2s_requestJumpZone';
+        }
+        _generateJson(): any {
+            return {
+
+                zoneId: this.zoneId, 
+            };
+        }
+        loadJson(data: any) {
+
+            this.zoneId = data.zoneId; 
+        }
+    }
+    
 }
 
 declare var exports: any;
@@ -378,5 +403,6 @@ if (typeof exports !== 'undefined') {
     exports.LoginPacket = kisaragi.LoginPacket;
     exports.RequestMapPacket = kisaragi.RequestMapPacket;
     exports.ResponseMapPacket = kisaragi.ResponseMapPacket;
+    exports.RequestJumpZonePacket = kisaragi.RequestJumpZonePacket;
 }
 

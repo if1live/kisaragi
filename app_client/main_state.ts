@@ -39,6 +39,11 @@ module kisaragi {
         prevDownPressed: boolean = false;
         prevLeftPressed: boolean = false;
         prevRightPressed: boolean = false;
+        
+        // TODO
+        zone0Key: Phaser.Key;
+        zone1Key: Phaser.Key;
+        zone2Key: Phaser.Key;
 
         get level(): Level {
             //TODO temp code
@@ -171,6 +176,10 @@ module kisaragi {
 
             conn.registerHandler(PacketType.NewObject, function (packet: NewObjectPacket) {
                 console.log('New Object : id=' + packet.movableId);
+                if(packet.zoneId != self.currUser.zoneId) {
+                    return;
+                }
+                
                 if (!self.gameWorld.findObject(packet.movableId)) {
                     // create user to world
                     self.createGameObject(packet);
@@ -186,6 +195,9 @@ module kisaragi {
 
             conn.registerHandler(PacketType.MoveNotify, function (packet: MoveNotifyPacket) {
                 var gameObject = self.gameWorld.findObject(packet.movableId);
+                if(gameObject == null) { return; }
+                if(gameObject.zoneId != self.currUser.zoneId) { return; }
+                
                 gameObject.x = packet.x;
                 gameObject.y = packet.y;
                 self.updateGameObjectPos(gameObject);
@@ -225,6 +237,10 @@ module kisaragi {
             this.characterGroup.z = CHARACTER_DEPTH;
 
             this.cursors = this.input.keyboard.createCursorKeys();
+            
+            this.zone0Key = this.game.input.keyboard.addKey(Phaser.Keyboard.ONE);
+            this.zone1Key = this.game.input.keyboard.addKey(Phaser.Keyboard.TWO);
+            this.zone2Key = this.game.input.keyboard.addKey(Phaser.Keyboard.THREE);
 
             // cursor + tile select
             //TODO
@@ -343,6 +359,16 @@ module kisaragi {
                 this.prevLeftPressed = true;
             } else {
                 this.prevLeftPressed = false;
+            }
+            
+            if(this.zone0Key.justDown) {
+                this.currUser.requestJumpZone(0)
+            }
+            if(this.zone1Key.justDown) {
+                this.currUser.requestJumpZone(1);
+            }
+            if(this.zone2Key.justDown) {
+                this.currUser.requestJumpZone(2);
             }
         }
 

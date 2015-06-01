@@ -36,6 +36,7 @@ module kisaragi {
                 LoginPacket,
                 RequestMapPacket,
                 ResponseMapPacket,
+                RequestJumpZonePacket,
             ];
             for (var i = 0; i < packetClassList.length; ++i) {
                 var packetClass = packetClassList[i];
@@ -82,6 +83,9 @@ module kisaragi {
         }
         createResponseMap(): ResponseMapPacket {
             return new ResponseMapPacket();
+        }
+        createRequestJumpZone(): RequestJumpZonePacket {
+            return new RequestJumpZonePacket();
         }
     }
 }

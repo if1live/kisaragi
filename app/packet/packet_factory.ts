@@ -74,6 +74,11 @@ module kisaragi {
             packet.zoneId = zoneId;
             return packet;
         }
+        requestJumpZone(zoneId: number): RequestJumpZonePacket {
+            var packet = new RequestJumpZonePacket();
+            packet.zoneId = zoneId;
+            return packet;
+        }
     }
 }
 declare var exports: any;

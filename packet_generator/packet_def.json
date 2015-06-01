@@ -94,5 +94,12 @@
       [ "height", "number" ],
       [ "zoneId", "number" ]
     ]
+  },
+  {
+    "name": "RequestJumpZone",
+    "command": "c2s_requestJumpZone",
+    "content": [
+      [ "zoneId", "number"]
+    ]
   }
 ]

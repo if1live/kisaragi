@@ -18,6 +18,7 @@ module kisaragi {
         Login,
         RequestMap,
         ResponseMap,
+        RequestJumpZone,
     }
     
     export var allPacketTypeList = [
@@ -34,6 +35,7 @@ module kisaragi {
         PacketType.Login,
         PacketType.RequestMap,
         PacketType.ResponseMap,
+        PacketType.RequestJumpZone,
     ];
 }
 

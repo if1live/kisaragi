@@ -38,18 +38,20 @@ module kisaragi {
             var self = this;
             world.addUser(self);
 
+            var zone = this.zone;
+            
             var factory = new PacketFactory();
             var loginPacket = factory.login(
                 this.movableId,
                 this.x,
                 this.y,
-                this.zone.zoneId.id,
-                this.zone.level.width,
-                this.zone.level.height
+                zone.zoneId.id,
+                zone.level.width,
+                zone.level.height
             );
             self.svrConn.send(loginPacket);
 
-            var newObjectPacket = factory.newObject(this.movableId, this.category, this.x, this.y, this.zone.id);
+            var newObjectPacket = factory.newObject(this.movableId, this.category, this.x, this.y, zone.id);
             self.svrConn.broadcast(newObjectPacket);
     
             // give dynamic object's info to new user
@@ -71,7 +73,8 @@ module kisaragi {
         c2s_requestMap(world: GameWorld, packet: RequestMapPacket) {
             var self = this;
             var factory = new PacketFactory();
-            var responseMapPacket = factory.responseMap(this.zone.level, this.zone.id);
+            var zone = world.zone(packet.zoneId);
+            var responseMapPacket = factory.responseMap(zone.level, zone.id);
             self.svrConn.send(responseMapPacket);
         };
 
@@ -125,6 +128,43 @@ module kisaragi {
                 this.targetPos = new Coord(packet.x, packet.y);
             }
         };
+        
+        requestJumpZone(zoneId: number) {
+            var factory = new PacketFactory();
+            var packet = factory.requestJumpZone(zoneId);
+            this.cliConn.send(packet);
+        }
+        
+        c2s_requestJumpZone(world: GameWorld, packet: RequestJumpZonePacket) {
+            var self = this;
+            if(this.zoneId == packet.zoneId) {
+                return;
+            }
+            
+            var prevZone = this.zone;
+            var nextZone = world.zone(packet.zoneId);
+            prevZone.detach(this);
+            nextZone.attach(this);
+            
+            // send remove packet to previous zone user
+            var prevZoneUsers = prevZone.entityMgr.findAll({category: Category.Player});
+            _.each(prevZoneUsers, function(ent: Player) {
+                var packet = factory.removeObject(self.movableId);
+                self.svrConn.broadcast(packet);
+            })
+            
+            // send next map info
+            var factory = new PacketFactory();
+            var mapPacket = factory.responseMap(nextZone.level, nextZone.zoneId.id);
+            this.svrConn.send(mapPacket);
+            
+            // send new object notify to next zone
+            var nextZoneUsers = nextZone.entityMgr.findAll({category: Category.Player});
+            _.each(nextZoneUsers, function(ent: Player) {
+                var packet = factory.newObject(this.movableId, this.category, this.x, this.y, nextZone.id);
+                self.svrConn.broadcast(packet);
+            });
+        }
     }
 }
 

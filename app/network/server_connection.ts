@@ -99,6 +99,10 @@ module kisaragi {
             this.registerHandler(PacketType.RequestMove, (req: Request, packet: RequestMovePacket, world: GameWorld) => {
                 self.user.c2s_requestMove(world, packet);
             });
+            
+            this.registerHandler(PacketType.RequestJumpZone, (req: Request, packet: RequestJumpZonePacket, world: GameWorld) => {
+                self.user.c2s_requestJumpZone(world, packet);
+            })
         }
 
         getAddress() {

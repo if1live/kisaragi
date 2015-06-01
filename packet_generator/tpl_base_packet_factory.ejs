@@ -14,10 +14,11 @@ module kisaragi {
             var packetType: PacketType = data.packetType;
             var packet = PacketFactory.create(packetType);
             if(packet == null) {
-                return null;
+                return PacketFactory.create(PacketType.Disconnect);
+            } else {
+                packet.loadJson(data);
+                return packet;
             }
-            packet.loadJson(data);
-            return packet;
         }
 
         static create(packetType: PacketType): BasePacket {
