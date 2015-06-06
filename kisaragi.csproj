@@ -31,6 +31,15 @@
     <TypeScriptCompile Include="app\core\zone_id.ts" />
     <TypeScriptCompile Include="app\entity\entity.ts" />
     <TypeScriptCompile Include="app\entity\entity_factory.ts" />
+    <TypeScriptCompile Include="app\external\tsm\common.ts" />
+    <TypeScriptCompile Include="app\external\tsm\mat2.ts" />
+    <TypeScriptCompile Include="app\external\tsm\mat3.ts" />
+    <TypeScriptCompile Include="app\external\tsm\mat4.ts" />
+    <TypeScriptCompile Include="app\external\tsm\quat.ts" />
+    <TypeScriptCompile Include="app\external\tsm\tsm.ts" />
+    <TypeScriptCompile Include="app\external\tsm\vec2.ts" />
+    <TypeScriptCompile Include="app\external\tsm\vec3.ts" />
+    <TypeScriptCompile Include="app\external\tsm\vec4.ts" />
     <TypeScriptCompile Include="app\level_data.ts" />
     <TypeScriptCompile Include="app\network\client_connection.ts" />
     <TypeScriptCompile Include="app\network\connection_manager.ts" />
