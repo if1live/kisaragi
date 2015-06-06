@@ -33,7 +33,7 @@
 ///<reference path='./common.ts' />
 
 
-module TSM {
+module kisaragi {
 
     export class vec3 {
 

@@ -41,4 +41,16 @@
 ///<reference path='./quat.ts' />
 
 
+declare var exports: any;
+if (typeof exports !== 'undefined') {
+    exports.vec2 = kisaragi.vec2;
+    exports.vec3 = kisaragi.vec3;
+    exports.vec4 = kisaragi.vec4;
+
+    exports.mat2 = kisaragi.mat2;
+    exports.mat3 = kisaragi.mat3;
+    exports.mat4 = kisaragi.mat4;
+
+    exports.quat = kisaragi.quat;
+}
 

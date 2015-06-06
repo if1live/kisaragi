@@ -12,12 +12,16 @@ var kisaragi;
         PacketType[PacketType["Disconnect"] = 4] = "Disconnect";
         PacketType[PacketType["RequestMove"] = 5] = "RequestMove";
         PacketType[PacketType["MoveNotify"] = 6] = "MoveNotify";
-        PacketType[PacketType["NewObject"] = 7] = "NewObject";
-        PacketType[PacketType["RemoveObject"] = 8] = "RemoveObject";
-        PacketType[PacketType["Login"] = 9] = "Login";
-        PacketType[PacketType["RequestMap"] = 10] = "RequestMap";
-        PacketType[PacketType["ResponseMap"] = 11] = "ResponseMap";
-        PacketType[PacketType["RequestJumpZone"] = 12] = "RequestJumpZone";
+        PacketType[PacketType["RequestAttack"] = 7] = "RequestAttack";
+        PacketType[PacketType["RequestEntityStatus"] = 8] = "RequestEntityStatus";
+        PacketType[PacketType["ResponseEntityStatus"] = 9] = "ResponseEntityStatus";
+        PacketType[PacketType["AttackNotify"] = 10] = "AttackNotify";
+        PacketType[PacketType["NewObject"] = 11] = "NewObject";
+        PacketType[PacketType["RemoveObject"] = 12] = "RemoveObject";
+        PacketType[PacketType["Login"] = 13] = "Login";
+        PacketType[PacketType["RequestMap"] = 14] = "RequestMap";
+        PacketType[PacketType["ResponseMap"] = 15] = "ResponseMap";
+        PacketType[PacketType["RequestJumpZone"] = 16] = "RequestJumpZone";
     })(kisaragi.PacketType || (kisaragi.PacketType = {}));
     var PacketType = kisaragi.PacketType;
     kisaragi.allPacketTypeList = [
@@ -28,6 +32,10 @@ var kisaragi;
         PacketType.Disconnect,
         PacketType.RequestMove,
         PacketType.MoveNotify,
+        PacketType.RequestAttack,
+        PacketType.RequestEntityStatus,
+        PacketType.ResponseEntityStatus,
+        PacketType.AttackNotify,
         PacketType.NewObject,
         PacketType.RemoveObject,
         PacketType.Login,
