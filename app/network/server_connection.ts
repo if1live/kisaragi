@@ -39,8 +39,8 @@ module kisaragi {
             var elem = new Response(packet, this);
             this.mgr.addSendPacket(elem);
         }
-        broadcast(packet: BasePacket, zoneId: number) {
-            var elem = new Broadcast(packet, this, zoneId);
+        broadcast(packet: BasePacket) {
+            var elem = new Broadcast(packet, this);
             this.mgr.addSendPacket(elem);
         }
         globalBroadcast(packet: BasePacket) {
@@ -52,9 +52,9 @@ module kisaragi {
             //console.log("Send[id=" + this.userId + "] " + packet.command + " : " + JSON.stringify(packet.toJson()));
             this._sendImpl(packet);
         }
-        broadcastImmediate(packet: BasePacket, zoneId: number) {
+        broadcastImmediate(packet: BasePacket, players: Player[]) {
             //console.log("Broadcast[id=" + this.userId + "] " + packet.command + " : " + JSON.stringify(packet.toJson()));
-            this._broadcastImpl(packet, zoneId);
+            this._broadcastImpl(packet, players);
         }
         globalBroadcastImmediate(packet: BasePacket) {
             //console.log("GlobalBroadcast[id=" + this.userId + "] " + packet.command + " : " + JSON.stringify(packet.toJson()));
@@ -62,7 +62,7 @@ module kisaragi {
         }
 
         _sendImpl(packet: BasePacket) { }
-        _broadcastImpl(packet: BasePacket, zoneId: number) { }
+        _broadcastImpl(packet: BasePacket, players: Player[]) { }
         _globalBroadcastImpl(packet: BasePacket) { }
 
         
@@ -169,14 +169,9 @@ module kisaragi {
         _sendImpl(packet: BasePacket) {
             this.socket.emit(packet.command, packet.toJson());
         }
-        _broadcastImpl(packet: BasePacket, zoneId: number) {
+        _broadcastImpl(packet: BasePacket, players: Player[]) {
             // 같은 구역한테만 알림 보내기
             // user room
-            // queue로 처리하기 때문에 this.user를 쓰면 꼬일수 있다
-            // 미리 획득해놓은 zone id를 이용한다
-            var world = this.user.world;
-            var zone = world.zone(zoneId);
-            var players = zone.entityMgr.findAll({ category: Category.Player });
             _.each(players, (player: Player) => {
                 player.svrConn._sendImpl(packet);
             });
@@ -212,7 +207,7 @@ module kisaragi {
         _sendImpl(packet: BasePacket) {
             this.sendQueue.push(packet);
         }
-        _broadcastImpl(packet: BasePacket) {
+        _broadcastImpl(packet: BasePacket, players: Player[]) {
             this.sendQueue.push(packet);
         }
         _globalBroadcastImpl(packet: BasePacket) {
@@ -235,7 +230,7 @@ module kisaragi {
         _sendImpl(packet: BasePacket) {
             this.sendedPacket = packet;
         }
-        _broadcastImpl(packet: BasePacket) {
+        _broadcastImpl(packet: BasePacket, players: Player[]) {
             this.broadcastedPacket = packet;
         }
         _globalBroadcastImpl(packet: BasePacket) {

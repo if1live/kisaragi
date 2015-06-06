@@ -78,6 +78,18 @@ module kisaragi {
             var packet = new RequestJumpZonePacket();
             return packet;
         }
+        attackNotify(attackerId: number, attackedId: number, damage: number): AttackNotifyPacket {
+            var packet = new AttackNotifyPacket();
+            packet.attackerMovableId = attackerId;
+            packet.attackedMovableId = attackedId;
+            packet.damage = damage;
+            return packet;
+        }
+        requestAttack(movableId: number): RequestAttackPacket {
+            var packet = new RequestAttackPacket();
+            packet.movableId = movableId;
+            return packet;
+        }
     }
 }
 declare var exports: any;

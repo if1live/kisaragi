@@ -7,7 +7,8 @@ if (typeof module !== 'undefined') {
 
 module kisaragi {
     var COOLTIME_MOVE: number = 0.1;
-    var PLAYER_HP: number = 10;
+    //var PLAYER_HP: number = 10;
+    var PLAYER_HP: number = 3;
 
     export class Player extends Entity {
         svrConn: ServerConnection;
@@ -58,7 +59,7 @@ module kisaragi {
             self.svrConn.send(loginPacket);
 
             var newObjectPacket = factory.newObject(this.movableId, this.category, this.x, this.y, zone.id);
-            self.svrConn.broadcast(newObjectPacket, zone.id);
+            self.svrConn.broadcast(newObjectPacket);
     
             // give dynamic object's info to new user
             _.each(this.zone.entityMgr.all(), function (ent: Entity) {
@@ -69,11 +70,17 @@ module kisaragi {
 
         disconnect(world: GameWorld, packet: DisconnectPacket) {
             var self = this;
-            world.removeUser(self);
+
+            // 이미 플레이어가 죽은 경우는 다른 유저들이 알고있어서 특별한 대응을 할 필요 없다
+            if (self.zone == null) {
+                return;
+            }
             
             var factory = new PacketFactory();
             var removePacket = factory.removeObject(self.movableId);
-            self.svrConn.broadcast(removePacket, self.zoneId);
+            self.svrConn.broadcast(removePacket);
+
+            world.removeUser(self);
         };
 
         c2s_requestMap(world: GameWorld, packet: RequestMapPacket) {
@@ -239,7 +246,7 @@ module kisaragi {
             var prevZoneUsers = prevZone.entityMgr.findAll({category: Category.Player});
             _.each(prevZoneUsers, function(ent: Player) {
                 var packet = factory.removeObject(self.movableId);
-                self.svrConn.broadcast(packet, self.zoneId);
+                self.svrConn.broadcast(packet);
             })
             prevZone.detach(this);
             
@@ -254,7 +261,7 @@ module kisaragi {
             var nextZoneUsers = nextZone.entityMgr.findAll({category: Category.Player});
             _.each(nextZoneUsers, function (ent: Player) {
                 var packet = factory.newObject(self.movableId, self.category, self.x, self.y, nextZone.id);
-                self.svrConn.broadcast(packet, self.zoneId);
+                self.svrConn.broadcast(packet);
             });
 
             _.each(this.zone.entityMgr.all(), function (ent: Entity) {

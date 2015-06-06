@@ -59,6 +59,7 @@
     <TypeScriptCompile Include="app_client\main_state.ts" />
     <Content Include=".travis.yml" />
     <None Include="packet_generator\tpl_base_packet_factory.ejs" />
+    <TypeScriptCompile Include="test\core\core_spec.ts" />
     <TypeScriptCompile Include="test\core\zone_id_spec.ts" />
     <TypeScriptCompile Include="test\entity\enemy_spec.ts" />
     <TypeScriptCompile Include="test\entity\entity_spec.ts" />

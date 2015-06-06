@@ -54,7 +54,7 @@ module kisaragi {
             res.conn.sendImmediate(res.packet);
         }
         broadcast(res: Broadcast) {
-            res.conn.broadcastImmediate(res.packet, res.zoneId);
+            res.conn.broadcastImmediate(res.packet, res.players);
         }
         globalBroadcast(res: GlobalBroadcast) {
             res.conn.globalBroadcastImmediate(res.packet);

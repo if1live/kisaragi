@@ -144,6 +144,9 @@ module kisaragi {
             conn.registerHandler(PacketType.RemoveObject, function (packet: RemoveObjectPacket) {
                 console.log('Remove Object : id=' + packet.movableId);
                 self.gameWorld.removeId(packet.movableId);
+                if (packet.movableId == self.currUserId) {
+                    self.currUser = null;
+                }
             });
 
             conn.registerHandler(PacketType.MoveNotify, function (packet: MoveNotifyPacket) {
@@ -155,6 +158,35 @@ module kisaragi {
                 ent.y = packet.y;
                 ent.updateSpritePosition();
             });
+            
+            conn.registerHandler(PacketType.AttackNotify, function (packet: AttackNotifyPacket) {
+                var attackerId = packet.attackerMovableId;
+                var attackedId = packet.attackedMovableId;
+                var damage = packet.damage;
+                console.log(`Attack notify : ${attackerId} -> ${attackedId} : ${damage}`)
+
+                var ent = self.gameWorld.findObject(attackedId);
+                if (!ent) {
+                    return;
+                }
+                if (ent.category == Category.Player) {
+                    var player = <Player> ent;
+                    player.hp -= damage;
+                    console.log('1');
+                    if (player.hp <= 0) {
+                        console.log('3');
+                        self.gameWorld.remove(player);
+                    }
+                } else if (ent.category == Category.Enemy) {
+                    var enemy = <Enemy> ent;
+                    enemy.hp -= damage;
+                    console.log('2');
+                    if (enemy.hp <= 0) {
+                        console.log('4');
+                        self.gameWorld.remove(enemy);
+                    }
+                }
+            })
         }
 
         preload() {
@@ -312,20 +344,22 @@ module kisaragi {
         }
 
         updateClient() {
-            // 이동처리는 동시에 눌리는거를 고려하지 않는다
-            // 어차피 4-way 니까 하나씩만 처리하면된다
-            if (this.cursors.up.justDown) {
-                this.currUser.moveUp();
-            } else if (this.cursors.down.justDown) {
-                this.currUser.moveDown();
-            } else if (this.cursors.left.justDown) {
-                this.currUser.moveLeft();
-            } else if (this.cursors.right.justDown) {
-                this.currUser.moveRight();
-            }
+            if (this.currUser) {
+                // 이동처리는 동시에 눌리는거를 고려하지 않는다
+                // 어차피 4-way 니까 하나씩만 처리하면된다
+                if (this.cursors.up.justDown) {
+                    this.currUser.moveUp();
+                } else if (this.cursors.down.justDown) {
+                    this.currUser.moveDown();
+                } else if (this.cursors.left.justDown) {
+                    this.currUser.moveLeft();
+                } else if (this.cursors.right.justDown) {
+                    this.currUser.moveRight();
+                }
 
-            if (this.jumpZoneKey.justDown) {
-                this.currUser.requestJumpZone()
+                if (this.jumpZoneKey.justDown) {
+                    this.currUser.requestJumpZone()
+                }
             }
         }
 

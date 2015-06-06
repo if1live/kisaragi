@@ -61,11 +61,17 @@ module kisaragi {
     }
     
     export class Broadcast extends BaseResponse {
-        zoneId: number;
+        players: Player[];
 
-        constructor(packet: BasePacket, conn: ServerConnection, zoneId: number) {
+        constructor(packet: BasePacket, conn: ServerConnection) {
             super(ResponseType.Broadcast, packet, conn);
-            this.zoneId = zoneId;
+            var zone = conn.user.zone;
+            
+            var self = this;
+            this.players = [];
+            _.each(zone.entityMgr.findAll({ category: Category.Player }), (ent: Player) => {
+                self.players.push(ent);
+            });
         }
     }
     

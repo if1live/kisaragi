@@ -30,7 +30,7 @@ describe('ServerConnection', function () {
 
         it('success', function () {
             var packet = new kisaragi.PingPacket();
-            subject.broadcastImmediate(packet, 0);
+            subject.broadcastImmediate(packet, []);
             assert.equal(subject.sendedPacket, null);
             assert.equal(subject.broadcastedPacket, packet);
             assert.equal(subject.globalBroadcastedPacket, null);
