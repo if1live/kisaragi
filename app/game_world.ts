@@ -119,8 +119,7 @@ module kisaragi {
         }
 
         addUser(user: Player): Player {
-            // 유저를 적당한 곳에 배치하기
-            var pos = this.zone(0).findAnyEmptyPos();
+            var pos = this.zone(user.zoneId).level.getSpecialCoord(TileCode.LevelStart);
             user.pos = pos;
             this.add(user);
             return user;

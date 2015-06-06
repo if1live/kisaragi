@@ -90,6 +90,8 @@ module kisaragi {
                 TILE_TABLE[TileCode.FloorRight] = 44;
                 TILE_TABLE[TileCode.FloorTop] = 26;
                 TILE_TABLE[TileCode.FloorBottom] = 42;
+                TILE_TABLE[TileCode.LevelStart] = 31;
+                TILE_TABLE[TileCode.LevelGoal] = 45;
 
                 for (var y = 0; y < zone.level.width; y += 1) {
                     var tileY = zone.level.height - y - 1

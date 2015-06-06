@@ -144,6 +144,61 @@ module kisaragi {
             var prevZone = this.zone;
             var nextZone = world.zone(packet.zoneId);
 
+            var dstPos: Coord;
+            var srcPos: Coord;
+
+            var prevZoneX = prevZone.zoneId.x;
+            var nextZoneX = nextZone.zoneId.x;
+            var prevZoneY = prevZone.zoneId.y;
+            var nextZoneY = nextZone.zoneId.y;
+            var prevZoneZ = prevZone.zoneId.z;
+            var nextZoneZ = nextZone.zoneId.z;
+
+            if (prevZoneX < nextZoneX) {
+                // jump right
+                srcPos = prevZone.level.getSpecialCoord(TileCode.FloorRight);
+                dstPos = nextZone.level.getSpecialCoord(TileCode.FloorLeft);
+            } else if (prevZoneX > nextZoneX) {
+                // jump left
+                srcPos = prevZone.level.getSpecialCoord(TileCode.FloorLeft);
+                dstPos = nextZone.level.getSpecialCoord(TileCode.FloorRight);
+            }
+            if (prevZoneY < nextZoneY) {
+                // jump up
+                srcPos = prevZone.level.getSpecialCoord(TileCode.FloorUp);
+                dstPos = nextZone.level.getSpecialCoord(TileCode.FloorDown);
+            } else if (prevZoneY > nextZoneY) {
+                // jump down
+                srcPos = prevZone.level.getSpecialCoord(TileCode.FloorDown);
+                dstPos = nextZone.level.getSpecialCoord(TileCode.FloorUp);
+            }
+            if (prevZoneZ < nextZoneZ) {
+                // jump top
+                srcPos = prevZone.level.getSpecialCoord(TileCode.FloorTop);
+                dstPos = nextZone.level.getSpecialCoord(TileCode.FloorBottom);
+            } else if (prevZoneZ > nextZoneZ) {
+                // jump bottom
+                srcPos = prevZone.level.getSpecialCoord(TileCode.FloorBottom);
+                dstPos = nextZone.level.getSpecialCoord(TileCode.FloorTop);
+            }
+
+            // 점프 도착지가 정의되어있는가?
+            if (!dstPos) {
+                return;
+            }
+            // 점프 시작 위치에 현재 플레이어가 있는가?
+            if (srcPos.x != this.pos.x || srcPos.y != this.pos.y) {
+                return;
+            }
+
+            //now allow too long zone jump
+            var diffZoneX = Math.abs(prevZoneX - nextZoneX);
+            var diffZoneY = Math.abs(prevZoneY - nextZoneY);
+            var diffZoneZ = Math.abs(prevZoneZ - nextZoneZ);
+            if (diffZoneX + diffZoneY + diffZoneZ > 1) {
+                return;
+            }
+
             var factory = new PacketFactory();
             
             // send remove packet to previous zone user
@@ -155,9 +210,7 @@ module kisaragi {
             prevZone.detach(this);
             
             nextZone.attach(this);
-            // 적당한 빈자리로 이동
-            // TODO nextZone의 리스폰 지점으로 교체할것
-            this.pos = nextZone.findAnyEmptyPos();
+            this.pos = dstPos;
 
             // send next map info
             var mapPacket = factory.responseMap(nextZone.level, nextZone.zoneId.id);

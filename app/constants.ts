@@ -42,6 +42,8 @@ module kisaragi {
         FloorRight,
         FloorTop,
         FloorBottom,
+        LevelStart,
+        LevelGoal,
     }
 
     export var MOVABLIE_TILE_LIST = [
@@ -52,6 +54,8 @@ module kisaragi {
         TileCode.FloorRight,
         TileCode.FloorTop,
         TileCode.FloorBottom,
+        TileCode.LevelStart,
+        TileCode.LevelGoal,
     ];
 }
 

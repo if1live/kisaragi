@@ -36,25 +36,25 @@ module kisaragi {
         }
 
         characterToTileCode(ch: string): TileCode {
-            switch (ch.toLowerCase()) {
-                case '.':
-                    return TileCode.Empty;
-                case 'x':
-                    return TileCode.Obstacle;
-                case 'u':
-                    return TileCode.FloorUp;
-                case 'd':
-                    return TileCode.FloorDown;
-                case 'l':
-                    return TileCode.FloorLeft;
-                case 'r':
-                    return TileCode.FloorRight;
-                case 't':
-                    return TileCode.FloorTop;
-                case 'b':
-                    return TileCode.FloorBottom;
-                default:
-                    return TileCode.Empty;
+            var TILE_TABLE = {};
+            TILE_TABLE['.'] = TileCode.Empty;
+            TILE_TABLE['x'] = TileCode.Obstacle;
+
+            TILE_TABLE['u'] = TileCode.FloorUp;
+            TILE_TABLE['d'] = TileCode.FloorDown;
+            TILE_TABLE['l'] = TileCode.FloorLeft;
+            TILE_TABLE['r'] = TileCode.FloorRight;
+            TILE_TABLE['t'] = TileCode.FloorTop;
+            TILE_TABLE['b'] = TileCode.FloorBottom;
+            
+            TILE_TABLE['s'] = TileCode.LevelStart;
+            TILE_TABLE['g'] = TileCode.LevelGoal;            
+
+            var tilecode = TILE_TABLE[ch.toLowerCase()];
+            if (typeof tilecode === 'undefined') {
+                return TileCode.Empty;
+            } else {
+                return tilecode;
             }
         }
 
@@ -187,6 +187,18 @@ module kisaragi {
             } else {
                 return path[1];
             }
+        }
+
+        getSpecialCoord(tilecode: TileCode): Coord {
+            for (var y = 0; y < this.height; y += 1) {
+                for (var x = 0; x < this.width; x += 1) {
+                    var tile = this.tile(x, y);
+                    if (tile == tilecode) {
+                        return new Coord(x, y);
+                    }
+                }
+            }
+            return null;
         }
     }
 }
