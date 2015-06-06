@@ -40,7 +40,7 @@ module kisaragi {
                 // 유저를 적당한 곳에 배치하기
                 var y = Math.floor(Math.random() * self.level.height);
                 var x = Math.floor(Math.random() * self.level.width);
-                if (self.level.isEmptyTile(x, y) === false) {
+                if (self.level.isWallTile(x, y)) {
                     continue;
                 }
                 var obj = self.getObject(x, y);
@@ -78,8 +78,7 @@ module kisaragi {
             if (pos[0] !== x || pos[1] !== y) {
                 return false;
             }
-            // empty tile?
-            if (self.level.isEmptyTile(pos[0], pos[1]) === false) {
+            if (self.level.isWallTile(pos[0], pos[1]) === true) {
                 return false;
             }
             // prev object exist?

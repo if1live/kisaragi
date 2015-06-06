@@ -32,12 +32,27 @@ module kisaragi {
         Item,
     };
 
+    // tile = static level data
     export enum TileCode {
         Empty,
         Obstacle,
-        Player,
-        Enemy,
+        FloorUp,
+        FloorDown,
+        FloorLeft,
+        FloorRight,
+        FloorTop,
+        FloorBottom,
     }
+
+    export var MOVABLIE_TILE_LIST = [
+        TileCode.Empty,
+        TileCode.FloorUp,
+        TileCode.FloorDown,
+        TileCode.FloorLeft,
+        TileCode.FloorRight,
+        TileCode.FloorTop,
+        TileCode.FloorBottom,
+    ];
 }
 
 declare var exports: any;

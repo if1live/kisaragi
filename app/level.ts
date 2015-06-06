@@ -35,6 +35,29 @@ module kisaragi {
             return true;
         }
 
+        characterToTileCode(ch: string): TileCode {
+            switch (ch.toLowerCase()) {
+                case '.':
+                    return TileCode.Empty;
+                case 'x':
+                    return TileCode.Obstacle;
+                case 'u':
+                    return TileCode.FloorUp;
+                case 'd':
+                    return TileCode.FloorDown;
+                case 'l':
+                    return TileCode.FloorLeft;
+                case 'r':
+                    return TileCode.FloorRight;
+                case 't':
+                    return TileCode.FloorTop;
+                case 'b':
+                    return TileCode.FloorBottom;
+                default:
+                    return TileCode.Empty;
+            }
+        }
+
         generate() {
             // TODO
             // make random level data
@@ -69,12 +92,8 @@ module kisaragi {
                 var cols = rows[i].split('');
                 var line = [];
                 for (var j: number = 0; j < this.width; j += 1) {
-                    if (cols[j] === 'x') {
-                        line.push(TileCode.Obstacle);
-                    }
-                    else {
-                        line.push(TileCode.Empty);
-                    }
+                    var tile = this.characterToTileCode(cols[j]);
+                    line.push(tile);
                 }
                 this.data.push(line);
             }
@@ -89,12 +108,8 @@ module kisaragi {
                 var cols = levelData[i].split('');
                 var line = [];
                 for (var j: number = 0; j < this.width; j += 1) {
-                    if (cols[j] === 'x') {
-                        line.push(TileCode.Obstacle);
-                    }
-                    else {
-                        line.push(TileCode.Empty);
-                    }
+                    var tile = this.characterToTileCode(cols[j]);
+                    line.push(tile);
                 }
                 this.data.push(line);
             }
@@ -117,8 +132,10 @@ module kisaragi {
             var matrix = JSON.parse(JSON.stringify(this.data));
             for (var y: number = 0; y < this.height; y += 1) {
                 for (var x: number = 0; x < this.width; x += 1) {
-                    if (matrix[y][x] !== TileCode.Empty) {
+                    if (matrix[y][x] == TileCode.Obstacle) {
                         matrix[y][x] = 1;
+                    } else {
+                        matrix[y][x] = 0;
                     }
                 }
             }
@@ -147,8 +164,8 @@ module kisaragi {
             ];
         }
 
-        isEmptyTile(x: number, y: number): boolean {
-            return this.tile(x, y) === TileCode.Empty;
+        isWallTile(x: number, y: number): boolean {
+            return this.tile(x, y) === TileCode.Obstacle;
         }
 
         findPath(start_pos: Coord, target_pos: Coord, zone: Zone): Array<Coord> {

@@ -81,16 +81,22 @@ module kisaragi {
                 }
                 self.tileLayer = self.map.create('level', zone.level.width, zone.level.height, TILE_SIZE, TILE_SIZE);
 
-                var groundTile = 29;
-                var wallTile = 9;
+                var TILE_TABLE = {}
+                TILE_TABLE[TileCode.Obstacle] = 9;
+                TILE_TABLE[TileCode.Empty] = 29;
+                TILE_TABLE[TileCode.FloorUp] = 35;
+                TILE_TABLE[TileCode.FloorDown] = 36;
+                TILE_TABLE[TileCode.FloorLeft] = 43;
+                TILE_TABLE[TileCode.FloorRight] = 44;
+                TILE_TABLE[TileCode.FloorTop] = 26;
+                TILE_TABLE[TileCode.FloorBottom] = 42;
+
                 for (var y = 0; y < zone.level.width; y += 1) {
                     var tileY = zone.level.height - y - 1
                     for (var x = 0; x < zone.level.width; x += 1) {
-                        if (zone.level.tile(x, y) === TileCode.Obstacle) {
-                            self.map.putTile(wallTile, x, tileY, self.tileLayer);
-                        } else {
-                            self.map.putTile(groundTile, x, tileY, self.tileLayer);
-                        }
+                        var tile = zone.level.tile(x, y);
+                        var tileIdx = TILE_TABLE[tile];
+                        self.map.putTile(tileIdx, x, tileY, self.tileLayer);
                     }
                 }
 
