@@ -31,6 +31,10 @@ module kisaragi {
                 DisconnectPacket,
                 RequestMovePacket,
                 MoveNotifyPacket,
+                RequestAttackPacket,
+                RequestEntityStatusPacket,
+                ResponseEntityStatusPacket,
+                AttackNotifyPacket,
                 NewObjectPacket,
                 RemoveObjectPacket,
                 LoginPacket,
@@ -68,6 +72,18 @@ module kisaragi {
         }
         createMoveNotify(): MoveNotifyPacket {
             return new MoveNotifyPacket();
+        }
+        createRequestAttack(): RequestAttackPacket {
+            return new RequestAttackPacket();
+        }
+        createRequestEntityStatus(): RequestEntityStatusPacket {
+            return new RequestEntityStatusPacket();
+        }
+        createResponseEntityStatus(): ResponseEntityStatusPacket {
+            return new ResponseEntityStatusPacket();
+        }
+        createAttackNotify(): AttackNotifyPacket {
+            return new AttackNotifyPacket();
         }
         createNewObject(): NewObjectPacket {
             return new NewObjectPacket();

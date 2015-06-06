@@ -23,12 +23,12 @@
   {
     "name": "Connect",
     "command": "connect",
-    "content": []
+    "content": [ ]
   },
   {
     "name": "Disconnect",
     "command": "disconnect",
-    "content": []
+    "content": [ ]
   },
   {
     "name": "RequestMove",
@@ -46,6 +46,40 @@
       [ "movableId", "number" ],
       [ "x", "number" ],
       [ "y", "number" ]
+    ]
+  },
+  {
+    "name": "RequestAttack",
+    "command": "c2s_requestAttack",
+    "content": [
+      [ "movableId", "number" ]
+    ]
+  },
+  {
+    "name": "RequestEntityStatus",
+    "command": "c2s_requestEntityStatus",
+    "content": [
+      [ "movableId", "number" ]
+    ]
+  },
+  {
+    "name": "ResponseEntityStatus",
+    "command": "s2c_responseEntityStatus",
+    "content": [
+      [ "x", "number" ],
+      [ "y", "number" ],
+      [ "zoneId", "number" ],
+      [ "category", "Category" ],
+      [ "hp", "number" ]
+    ]
+  },
+  {
+    "name": "AttackNotify",
+    "command": "s2c_attackNotify",
+    "content": [
+      [ "attackerMovableId", "number" ],
+      [ "attackedMovableId", "number" ],
+      [ "damage", "number" ]
     ]
   },
   {

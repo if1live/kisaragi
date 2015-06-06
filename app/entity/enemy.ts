@@ -8,9 +8,12 @@ if (typeof module !== 'undefined') {
 module kisaragi {
     var COOLTIME_THINK: number = 1.0;
     var COOLTIME_MOVE: number = 0.3;
+
+    var ENEMY_HP: number = 2;
     
     export class Enemy extends Entity {
         thinkCooltime: number;
+        hp: number;
 
         constructor(id: number, role: Role, pos: Coord) {
             super(id, COOLTIME_MOVE);
@@ -18,6 +21,7 @@ module kisaragi {
             this.role = role;
             this.pos = pos;
 
+            this.hp = ENEMY_HP;
             this.thinkCooltime = 0;
         }
 

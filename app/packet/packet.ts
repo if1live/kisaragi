@@ -188,6 +188,130 @@ module kisaragi {
         }
     }
     
+    export class RequestAttackPacket extends BasePacket {
+        
+        movableId: number;
+        
+        constructor() {
+            super(PacketType.RequestAttack);
+
+            this.movableId = 0;
+        }
+        
+        get command(): string {
+            return 'c2s_requestAttack';
+        }
+        _generateJson(): any {
+            return {
+
+                movableId: this.movableId, 
+            };
+        }
+        loadJson(data: any) {
+
+            this.movableId = data.movableId; 
+        }
+    }
+    
+    export class RequestEntityStatusPacket extends BasePacket {
+        
+        movableId: number;
+        
+        constructor() {
+            super(PacketType.RequestEntityStatus);
+
+            this.movableId = 0;
+        }
+        
+        get command(): string {
+            return 'c2s_requestEntityStatus';
+        }
+        _generateJson(): any {
+            return {
+
+                movableId: this.movableId, 
+            };
+        }
+        loadJson(data: any) {
+
+            this.movableId = data.movableId; 
+        }
+    }
+    
+    export class ResponseEntityStatusPacket extends BasePacket {
+        
+        x: number;
+        y: number;
+        zoneId: number;
+        category: Category;
+        hp: number;
+        
+        constructor() {
+            super(PacketType.ResponseEntityStatus);
+
+            this.x = 0;
+            this.y = 0;
+            this.zoneId = 0;
+            this.category = null;
+            this.hp = 0;
+        }
+        
+        get command(): string {
+            return 's2c_responseEntityStatus';
+        }
+        _generateJson(): any {
+            return {
+
+                x: this.x, 
+                y: this.y, 
+                zoneId: this.zoneId, 
+                category: this.category, 
+                hp: this.hp, 
+            };
+        }
+        loadJson(data: any) {
+
+            this.x = data.x; 
+            this.y = data.y; 
+            this.zoneId = data.zoneId; 
+            this.category = data.category; 
+            this.hp = data.hp; 
+        }
+    }
+    
+    export class AttackNotifyPacket extends BasePacket {
+        
+        attackerMovableId: number;
+        attackedMovableId: number;
+        damage: number;
+        
+        constructor() {
+            super(PacketType.AttackNotify);
+
+            this.attackerMovableId = 0;
+            this.attackedMovableId = 0;
+            this.damage = 0;
+        }
+        
+        get command(): string {
+            return 's2c_attackNotify';
+        }
+        _generateJson(): any {
+            return {
+
+                attackerMovableId: this.attackerMovableId, 
+                attackedMovableId: this.attackedMovableId, 
+                damage: this.damage, 
+            };
+        }
+        loadJson(data: any) {
+
+            this.attackerMovableId = data.attackerMovableId; 
+            this.attackedMovableId = data.attackedMovableId; 
+            this.damage = data.damage; 
+        }
+    }
+    
     export class NewObjectPacket extends BasePacket {
         
         movableId: number;
@@ -394,6 +518,10 @@ if (typeof exports !== 'undefined') {
     exports.DisconnectPacket = kisaragi.DisconnectPacket;
     exports.RequestMovePacket = kisaragi.RequestMovePacket;
     exports.MoveNotifyPacket = kisaragi.MoveNotifyPacket;
+    exports.RequestAttackPacket = kisaragi.RequestAttackPacket;
+    exports.RequestEntityStatusPacket = kisaragi.RequestEntityStatusPacket;
+    exports.ResponseEntityStatusPacket = kisaragi.ResponseEntityStatusPacket;
+    exports.AttackNotifyPacket = kisaragi.AttackNotifyPacket;
     exports.NewObjectPacket = kisaragi.NewObjectPacket;
     exports.RemoveObjectPacket = kisaragi.RemoveObjectPacket;
     exports.LoginPacket = kisaragi.LoginPacket;
