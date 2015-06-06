@@ -97,9 +97,13 @@ module kisaragi {
                 user.update(delta);
             });
 
-            _.each(enemyList, function (enemy: Entity) {
-                enemy.update(delta);
-            });
+            // enemy AI는 플레이어의 위치 정보를 이용해서 돌아간다
+            // 그렇다면 현재 zone에 AI가 없다면 로직을 씹어도됨
+            if (enemyList.length > 0) {
+                _.each(enemyList, function (enemy: Entity) {
+                    enemy.update(delta);
+                });
+            }
         }
     }
 }

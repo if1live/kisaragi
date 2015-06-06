@@ -127,13 +127,16 @@ module kisaragi {
             return obstacles;
         }
 
-        createGrid(zone: Zone) {
+        createGrid(zone: Zone, target: Coord) {
+            var STATIC_ELEM = 1;
+            var DYNAMIC_ELEM = 2;
+
             // static elem
             var matrix = JSON.parse(JSON.stringify(this.data));
             for (var y: number = 0; y < this.height; y += 1) {
                 for (var x: number = 0; x < this.width; x += 1) {
                     if (matrix[y][x] == TileCode.Obstacle) {
-                        matrix[y][x] = 1;
+                        matrix[y][x] = STATIC_ELEM;
                     } else {
                         matrix[y][x] = 0;
                     }
@@ -143,8 +146,15 @@ module kisaragi {
             // dynamic elem
             var allObjectList: Entity[] = zone.entityMgr.all();
             _.each(allObjectList, (obj: Entity) => {
-                matrix[obj.y][obj.x] = 1;
+                matrix[obj.y][obj.x] = DYNAMIC_ELEM;
             });
+
+            // 목표 지점이 언젠가는 갈수 있는거면 빈거로 바꾸기
+            // 이렇게 하지 않으면 다른 객체가 목표지점에 자리차지하는 순간 
+            // 길찾기가 무효화되어버린다
+            if (matrix[target.y][target.x] == DYNAMIC_ELEM) {
+                matrix[target.y][target.x] = 0;
+            }
         
             //console.log(matrix);
             var grid = new PF.Grid(matrix);
@@ -169,7 +179,7 @@ module kisaragi {
         }
 
         findPath(start_pos: Coord, target_pos: Coord, zone: Zone): Array<Coord> {
-            var grid = this.createGrid(zone);
+            var grid = this.createGrid(zone, target_pos);
             var finder = new PF.AStarFinder();
             var rawPath = finder.findPath(start_pos.x, start_pos.y, target_pos.x, target_pos.y, grid);
 
