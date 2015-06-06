@@ -21,6 +21,7 @@
     <Content Include=".gitignore" />
     <Content Include="vs_main\app.css" />
     <Content Include="vs_main\index.js" />
+    <Content Include="vs_main\index_single.html" />
     <Content Include="vs_main\index_game.html" />
     <Content Include="Gruntfile.js" />
     <Content Include="index.html" />

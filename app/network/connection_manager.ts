@@ -42,6 +42,13 @@ module kisaragi {
             this.connList.push(conn);
             return conn;
         }
+        create_local(): ServerConnection {
+            var conn = ServerConnection.local();
+            conn.mgr = this;
+
+            this.connList.push(conn);
+            return conn;
+        }
         
         send(res: Response) {
             res.conn.sendImmediate(res.packet);

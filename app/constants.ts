@@ -6,6 +6,12 @@ module kisaragi {
 
     export var COOLTIME_MOVE: number = 0.1;
 
+    // for architecture
+    export enum GamePlayMode {
+        SinglePlay,
+        MultiPlay,
+    }
+
     // for server
 
     // for client
@@ -41,6 +47,8 @@ if (typeof exports !== 'undefined') {
     exports.COOLTIME_MOVE = kisaragi.COOLTIME_MOVE;
     exports.TILE_SIZE = kisaragi.TILE_SIZE;
     exports.ASSET_PATH = kisaragi.ASSET_PATH;
+
+    exports.GamePlayMode = kisaragi.GamePlayMode;
 
     exports.Role = kisaragi.Role;
     exports.Category = kisaragi.Category;

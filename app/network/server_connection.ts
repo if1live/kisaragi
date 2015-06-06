@@ -4,6 +4,7 @@
 module kisaragi {
     export enum ServerConnectionCategory {
         SocketIO,
+        Local,
         Mock,
     }
     
@@ -134,6 +135,9 @@ module kisaragi {
             var sock = new ServerConnection_SocketIO(uuid_val, socket, io);
             return sock;
         }
+        static local() {
+            return new ServerConnection_Local();
+        }
     }
 
     /*
@@ -197,6 +201,25 @@ module kisaragi {
         }
     }
 
+    export class ServerConnection_Local extends ServerConnection {
+        sendQueue: Queue<BasePacket>
+
+        constructor() {
+            // 싱글 플레이니까 uuid가 없어도된다
+            super(ServerConnectionCategory.Local, '');
+            this.sendQueue = new Queue<BasePacket>();
+        }
+        _sendImpl(packet: BasePacket) {
+            this.sendQueue.push(packet);
+        }
+        _broadcastImpl(packet: BasePacket) {
+            this.sendQueue.push(packet);
+        }
+        _globalBroadcastImpl(packet: BasePacket) {
+            this.sendQueue.push(packet);
+        }
+    }
+
     export class MockServerConnection extends ServerConnection {
         sendedPacket: BasePacket;
         broadcastedPacket: BasePacket;
@@ -227,4 +250,5 @@ if (typeof exports !== 'undefined') {
     exports.ServerConnection = kisaragi.ServerConnection;
     exports.MockServerConnection = kisaragi.MockServerConnection;
     exports.ServerConnection_SocketIO = kisaragi.ServerConnection_SocketIO;
+    exports.ServerConnection_Local = kisaragi.ServerConnection_Local;
 }

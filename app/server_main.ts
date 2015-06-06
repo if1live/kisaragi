@@ -19,11 +19,16 @@ module kisaragi {
         world: GameWorld;
 
         constructor() {
+            
+        }
+
+        initializeNodeServer() {
             this.app = express();
             this.http = http.Server(this.app);
             this.io_http = socketio(this.http);
 
             this.connMgr = new ConnectionManager(this.io_http);
+
             this.world = new GameWorld(Role.Server);
             this.world.zone(0).loadLevelFile(__dirname + '/../res/map-0.txt');
             this.world.zone(1).loadLevelFile(__dirname + '/../res/map-1.txt');
@@ -31,6 +36,13 @@ module kisaragi {
 
             this.registerView();
             this.registerSocketIO();
+        }
+
+        initializeLocalServer() {
+            this.connMgr = new ConnectionManager(null);
+
+            this.world = new GameWorld(Role.Server);
+            // TODO local은 파일을 열수없다. 적당히 때려박아야하나...
         }
 
         registerView() {
@@ -50,6 +62,9 @@ module kisaragi {
 
             this.app.get('/game', (req, res) => {
                 res.render('pages/game');
+            });
+            this.app.get('/single', (req, res) => {
+                res.render('pages/single');
             });
 
             this.app.get('/admin', (req, res) => {
@@ -88,7 +103,7 @@ module kisaragi {
             this.connMgr.flushSendQueue();
         }
 
-        run() {
+        runNodeServer() {
             var self = this;
 
             this.http.listen(self.app.get('port'), function () {
@@ -98,6 +113,11 @@ module kisaragi {
             var loopId = gameloop.setGameLoop(function (delta: number) {
                 self.update(delta);
             }, 1000.0 / TARGET_FPS);
+        }
+
+        updateLocalServer() {
+            var delta = 1000.0 / TARGET_FPS;
+            this.update(delta);
         }
     }
 }

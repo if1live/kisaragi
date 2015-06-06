@@ -6,8 +6,11 @@ module kisaragi {
     var height = 600;
 
     export class ClientMain extends Phaser.Game {
-        constructor() {
+        playMode: GamePlayMode;
+
+        constructor(playMode: GamePlayMode) {
             super(width, height, Phaser.AUTO, 'phaser-example', null);
+            this.playMode = playMode;
 
             this.state.add('MainState', MainState, false);
             this.state.start('MainState');

@@ -36,6 +36,10 @@ module kisaragi {
         ping: ClientPing;
         echoRunner: ClientEcho;
 
+        cliConn: ClientConnection_Local;
+        svrConn: ServerConnection_Local;
+        svrMain: ServerMain;
+
         registerSocketHandler(conn: ClientConnection) {
             var self = this;
             var factory = new PacketFactory();
@@ -194,17 +198,36 @@ module kisaragi {
             this.input.addMoveCallback(this.updateMarker, this);
 
             // create network after game context created
-            var host = window.location.hostname;
-            var url = 'http://' + host + ':' + HTTP_PORT;
-            var socket = io(url);
-            this.conn = ClientConnection.socketIO(socket);
-            this.registerSocketHandler(this.conn);
+            var game = <ClientMain> this.game;
+            if (game.playMode == GamePlayMode.SinglePlay) {
+                // create game server
+                this.svrMain = new ServerMain();
+                this.svrMain.initializeLocalServer();
+                this.svrMain.updateLocalServer();
 
-            //TODO
-            this.echoRunner = new ClientEcho(this.conn);
-            this.ping = new ClientPing(this.conn);
-            this.ping.renderer = new HtmlPingRenderer('ping-result');
-            this.ping.ping();
+                this.svrConn = <ServerConnection_Local> this.svrMain.connMgr.create_local();
+                this.svrConn.initializeHandler();
+
+                this.cliConn = ClientConnection.local();
+                this.conn = this.cliConn;
+
+                this.registerSocketHandler(this.conn);
+                var factory = new PacketFactory();
+                var connectPacket = factory.createConnect();
+                this.conn.send(connectPacket);
+
+            } else {
+                var host = window.location.hostname;
+                var url = 'http://' + host + ':' + HTTP_PORT;
+                var socket = io(url);
+                this.conn = ClientConnection.socketIO(socket);
+                this.registerSocketHandler(this.conn);
+
+                this.echoRunner = new ClientEcho(this.conn);
+                this.ping = new ClientPing(this.conn);
+                this.ping.renderer = new HtmlPingRenderer('ping-result');
+                this.ping.ping();
+            }
         }
 
         updateMarker() {
@@ -289,6 +312,24 @@ module kisaragi {
             }
             if(this.zone2Key.justDown) {
                 this.currUser.requestJumpZone(2);
+            }
+
+            var game = <ClientMain> this.game;
+            if (game.playMode == GamePlayMode.SinglePlay) {
+                // client -> server
+                while (this.cliConn.sendQueue.isEmpty() == false) {
+                    var packet = this.cliConn.sendQueue.pop();
+                    var req = new Request(packet, this.svrConn);
+                    this.svrConn.handle(req, this.svrMain.world);
+                }
+
+                this.svrMain.updateLocalServer();
+
+                // server -> client
+                while (this.svrConn.sendQueue.isEmpty() == false) {
+                    var packet = this.svrConn.sendQueue.pop();
+                    this.cliConn.handle(packet);
+                }
             }
         }
 

@@ -2,8 +2,9 @@
 ///<reference path="../app.d.ts"/>
 
 module kisaragi {
-    enum ClientConnectionCategory {
+    export enum ClientConnectionCategory {
         SocketIO,
+        Local,
         Mock
     }
 
@@ -44,6 +45,9 @@ module kisaragi {
         static socketIO(sock: SocketIOClient.Socket) {
             return new ClientConnection_SocketIO(sock);
         }
+        static local() {
+            return new ClientConnection_Local();
+        }
     }
 
     export class MockClientConnection extends ClientConnection {
@@ -80,10 +84,24 @@ module kisaragi {
             });
         }
     }
+
+    export class ClientConnection_Local extends ClientConnection {
+        sendQueue: Queue<BasePacket>;
+
+        constructor() {
+            super(ClientConnectionCategory.Local);
+            this.sendQueue = new Queue<BasePacket>();
+        }
+        send(packet: BasePacket) {
+            this.sendQueue.push(packet);
+        }
+    }
 }
 
 if (typeof exports !== 'undefined') {
+    exports.ClientConnectionCategory = kisaragi.ClientConnectionCategory;
     exports.ClientConnection = kisaragi.ClientConnection;
     exports.MockClientConnection = kisaragi.MockClientConnection;
+    exports.ClientConnection_Local = kisaragi.ClientConnection_Local;
 }
 
