@@ -71,7 +71,10 @@ module.exports = function (grunt) {
     },
     typescript: {
       app: {
-        src: ['app/**/*.ts'],
+        src: [
+          'app/**/*.ts',
+          'external/**/*.ts'
+        ],
         dest: 'app/kisaragi.js',
         options: {
           module: 'commonjs',

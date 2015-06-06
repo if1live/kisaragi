@@ -8,7 +8,7 @@
 ///<reference path="constants.ts"/>
 ///<reference path="level_data.ts"/>
 
-///<reference path="external/tsm/tsm.ts"/>
+///<reference path="../external/tsm/tsm.ts"/>
 
 ///<reference path="core/core.ts"/>
 ///<reference path="core/zone_id.ts"/>
