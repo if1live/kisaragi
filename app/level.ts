@@ -80,6 +80,26 @@ module kisaragi {
             }
         }
 
+        loadFromLevelData(levelData: string[]) {
+            this.height = levelData.length;
+            this.width = levelData[0].length;
+            this.data = [];
+
+            for (var i: number = this.height - 1; i >= 0 ; i -= 1) {
+                var cols = levelData[i].split('');
+                var line = [];
+                for (var j: number = 0; j < this.width; j += 1) {
+                    if (cols[j] === 'x') {
+                        line.push(TileCode.Obstacle);
+                    }
+                    else {
+                        line.push(TileCode.Empty);
+                    }
+                }
+                this.data.push(line);
+            }
+        }
+
         getObstacles(): Coord[] {
             var obstacles: Coord[] = [];
             for (var y: number = 0; y < this.height; y += 1) {

@@ -23,10 +23,6 @@ module kisaragi {
             }
         }
         
-        loadLevelFile(filename: string) {
-            this.level.loadFromFile(filename);
-        };
-        
         getObject(x: number, y: number): Entity {
             var found = this.entityMgr.find({
                 x: x,

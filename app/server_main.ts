@@ -19,7 +19,11 @@ module kisaragi {
         world: GameWorld;
 
         constructor() {
-            
+            this.world = new GameWorld(Role.Server);
+            for (var i = 0; i < LEVEL_DATA_LIST.length; i += 1) {
+                var levelData = LEVEL_DATA_LIST[i];
+                this.world.zone(i).level.loadFromLevelData(levelData);
+            }
         }
 
         initializeNodeServer() {
@@ -29,20 +33,12 @@ module kisaragi {
 
             this.connMgr = new ConnectionManager(this.io_http);
 
-            this.world = new GameWorld(Role.Server);
-            this.world.zone(0).loadLevelFile(__dirname + '/../res/map-0.txt');
-            this.world.zone(1).loadLevelFile(__dirname + '/../res/map-1.txt');
-            this.world.zone(2).loadLevelFile(__dirname + '/../res/map-2.txt');
-
             this.registerView();
             this.registerSocketIO();
         }
 
         initializeLocalServer() {
             this.connMgr = new ConnectionManager(null);
-
-            this.world = new GameWorld(Role.Server);
-            // TODO local은 파일을 열수없다. 적당히 때려박아야하나...
         }
 
         registerView() {

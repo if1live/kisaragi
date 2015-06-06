@@ -6,6 +6,7 @@
 ///<reference path="../bower-components/phaser/typescript/phaser.d.ts"/>
 
 ///<reference path="constants.ts"/>
+///<reference path="level_data.ts"/>
 
 ///<reference path="core/core.ts"/>
 ///<reference path="core/zone_id.ts"/>
