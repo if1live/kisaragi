@@ -4,8 +4,6 @@ module kisaragi {
     export var HTTP_PORT: number = 8001;
     export var TARGET_FPS = 60;
 
-    export var COOLTIME_MOVE: number = 0.1;
-
     // for architecture
     export enum GamePlayMode {
         SinglePlay,
@@ -63,7 +61,6 @@ declare var exports: any;
 if (typeof exports !== 'undefined') {
     exports.HTTP_PORT = kisaragi.HTTP_PORT;
     exports.TARGET_FPS = kisaragi.TARGET_FPS;
-    exports.COOLTIME_MOVE = kisaragi.COOLTIME_MOVE;
     exports.TILE_SIZE = kisaragi.TILE_SIZE;
     exports.ASSET_PATH = kisaragi.ASSET_PATH;
 

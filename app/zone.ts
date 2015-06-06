@@ -88,6 +88,19 @@ module kisaragi {
             }
             return true;
         }
+
+        update(delta: number) {
+            var playerList = this.entityMgr.findAll({ category: Category.Player });
+            var enemyList = this.entityMgr.findAll({ category: Category.Enemy })
+            
+            _.each(playerList, function (user: Entity) {
+                user.update(delta);
+            });
+
+            _.each(enemyList, function (enemy: Entity) {
+                enemy.update(delta);
+            });
+        }
     }
 }
 

@@ -6,12 +6,14 @@ if (typeof module !== 'undefined') {
 }
 
 module kisaragi {
+    var COOLTIME_MOVE: number = 0.1;
+
     export class Player extends Entity {
         svrConn: ServerConnection;
         cliConn: ClientConnection;
 
         constructor(id: number, role: Role) {
-            super(id);
+            super(id, COOLTIME_MOVE);
 
             this.category = Category.Player;
             this.role = role;

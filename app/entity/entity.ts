@@ -21,19 +21,22 @@ module kisaragi {
         // movable
         targetPos: Coord;
         moveCooltime: number;    
+        currMoveCooltime: number;
 
         // renderable
         sprite: Phaser.Sprite;
 
-        constructor(id: number) {
+        constructor(id: number, moveCooltime: number) {
             this.movableId = id;
             this.pos = new Coord(-1, -1);
             this._zone = null;
             this._zoneId = 0;
             this.targetPos = null;
             this.world = null;
-            this.moveCooltime = kisaragi.COOLTIME_MOVE;
             this.sprite = null;
+
+            this.moveCooltime = moveCooltime;
+            this.currMoveCooltime = 0;
         }
         get x(): number {
             return this.pos.x;
@@ -120,13 +123,13 @@ module kisaragi {
         updateMove(delta: number) {
             var self = this;
 
-            this.moveCooltime -= delta;
-            if (this.moveCooltime < 0) {
-                this.moveCooltime = 0;
+            this.currMoveCooltime -= delta;
+            if (this.currMoveCooltime < 0) {
+                this.currMoveCooltime = 0;
             }
 
             var zone  = this.zone;
-            if (this.targetPos !== null && this.moveCooltime === 0) {
+            if (this.targetPos !== null && this.currMoveCooltime === 0) {
                 var nextPos = zone.level.findNextPos(self.pos, self.targetPos, zone);
                 if (!nextPos) {
                     self.targetPos = null;
@@ -140,7 +143,7 @@ module kisaragi {
                     self.targetPos = null;
                 }
 
-                this.moveCooltime = COOLTIME_MOVE;
+                this.currMoveCooltime = this.moveCooltime;
             }
         }
 

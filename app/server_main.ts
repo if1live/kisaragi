@@ -24,6 +24,16 @@ module kisaragi {
                 var levelData = LEVEL_DATA_LIST[i];
                 this.world.zone(i).level.loadFromLevelData(levelData);
             }
+
+            // 특정 층에만 적을 배치해두기
+            for (var i = 1; i < LEVEL_DATA_LIST.length; i += 1) {
+                var world = this.world;
+                var zone = world.zone(i);
+                for (var j = 0; j < 3; j += 1) {
+                    world.generateEnemy(zone);
+                }
+            }
+            
         }
 
         initializeNodeServer() {
@@ -111,8 +121,7 @@ module kisaragi {
             }, 1000.0 / TARGET_FPS);
         }
 
-        updateLocalServer() {
-            var delta = 1000.0 / TARGET_FPS;
+        updateLocalServer(delta: number) {
             this.update(delta);
         }
     }

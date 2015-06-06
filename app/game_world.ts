@@ -155,21 +155,8 @@ module kisaragi {
             //console.log('Hi there! (frame=%s, delta=%s)', self.frameCount++, delta);
             
             _.each(this.zones, (zone: Zone) => {
-                var userList = zone.entityMgr.findAll({category: Category.Player});
-                _.each(userList, function (user: Entity) {
-                    user.update(delta);
-                });
-                
-                _.each(zone.entityMgr.findAll({category:Category.Enemy}), function (enemy: Entity) {
-                    enemy.update(delta);
-                });
+                zone.update(delta);
             });
-            
-            // fill enemy
-            var zone = this.zone(0);
-            while (zone.entityMgr.findAll({category:Category.Enemy}).length <= 2) {
-                self.generateEnemy(zone);
-            }
         }
     }
 }

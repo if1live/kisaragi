@@ -203,35 +203,43 @@ module kisaragi {
             // create network after game context created
             var game = <ClientMain> this.game;
             if (game.playMode == GamePlayMode.SinglePlay) {
-                // create game server
-                this.svrMain = new ServerMain();
-                this.svrMain.initializeLocalServer();
-                this.svrMain.updateLocalServer();
-
-                this.svrConn = <ServerConnection_Local> this.svrMain.connMgr.create_local();
-                this.svrConn.initializeHandler();
-
-                this.cliConn = ClientConnection.local();
-                this.conn = this.cliConn;
-
-                this.registerSocketHandler(this.conn);
-                var factory = new PacketFactory();
-                var connectPacket = factory.createConnect();
-                this.conn.send(connectPacket);
-
+                this.initializeNetwork_SinglePlay();
             } else {
-                var host = window.location.hostname;
-                var url = 'http://' + host + ':' + HTTP_PORT;
-                var socket = io(url);
-                this.conn = ClientConnection.socketIO(socket);
-                this.registerSocketHandler(this.conn);
-
-                this.echoRunner = new ClientEcho(this.conn);
-                this.ping = new ClientPing(this.conn);
-                this.ping.renderer = new HtmlPingRenderer('ping-result');
-                this.ping.ping();
+                this.initializeNetwork_MultiPlay();
             }
         }
+
+        initializeNetwork_SinglePlay() {
+            // create game server
+            this.svrMain = new ServerMain();
+            this.svrMain.initializeLocalServer();
+            this.svrMain.updateLocalServer(0);
+
+            this.svrConn = <ServerConnection_Local> this.svrMain.connMgr.create_local();
+            this.svrConn.initializeHandler();
+
+            this.cliConn = ClientConnection.local();
+            this.conn = this.cliConn;
+
+            this.registerSocketHandler(this.conn);
+            var factory = new PacketFactory();
+            var connectPacket = factory.createConnect();
+            this.conn.send(connectPacket);
+        }
+
+        initializeNetwork_MultiPlay() {
+            var host = window.location.hostname;
+            var url = 'http://' + host + ':' + HTTP_PORT;
+            var socket = io(url);
+            this.conn = ClientConnection.socketIO(socket);
+            this.registerSocketHandler(this.conn);
+
+            this.echoRunner = new ClientEcho(this.conn);
+            this.ping = new ClientPing(this.conn);
+            this.ping.renderer = new HtmlPingRenderer('ping-result');
+            this.ping.ping();
+        }
+
 
         updateMarker() {
             if (!this.tileLayer || !this.marker || !this.currUser || !this.currUser.zone) {
@@ -295,6 +303,15 @@ module kisaragi {
         }
 
         update() {
+            this.updateClient();
+
+            var game = <ClientMain> this.game;
+            if (game.playMode === GamePlayMode.SinglePlay) {
+                this.updateServer(this.time.elapsedMS);
+            }
+        }
+
+        updateClient() {
             // 이동처리는 동시에 눌리는거를 고려하지 않는다
             // 어차피 4-way 니까 하나씩만 처리하면된다
             if (this.cursors.up.justDown) {
@@ -306,39 +323,43 @@ module kisaragi {
             } else if (this.cursors.right.justDown) {
                 this.currUser.moveRight();
             }
-            
-            if(this.jumpZoneKey.justDown) {
+
+            if (this.jumpZoneKey.justDown) {
                 this.currUser.requestJumpZone()
             }
+        }
 
-            var game = <ClientMain> this.game;
-            if (game.playMode == GamePlayMode.SinglePlay) {
-                // client -> server
-                while (this.cliConn.sendQueue.isEmpty() == false) {
-                    var packet = this.cliConn.sendQueue.pop();
-                    var req = new Request(packet, this.svrConn);
-                    this.svrConn.handle(req, this.svrMain.world);
-                }
+        updateServer(elapsedMS: number) {
+            // client -> server
+            while (this.cliConn.sendQueue.isEmpty() == false) {
+                var packet = this.cliConn.sendQueue.pop();
+                var req = new Request(packet, this.svrConn);
+                this.svrConn.handle(req, this.svrMain.world);
+            }
 
-                this.svrMain.updateLocalServer();
+            var delta = elapsedMS / 1000.0;
+            this.svrMain.updateLocalServer(delta);
 
-                // server -> client
-                while (this.svrConn.sendQueue.isEmpty() == false) {
-                    var packet = this.svrConn.sendQueue.pop();
-                    this.cliConn.handle(packet);
-                }
+            // server -> client
+            while (this.svrConn.sendQueue.isEmpty() == false) {
+                var packet = this.svrConn.sendQueue.pop();
+                this.cliConn.handle(packet);
             }
         }
 
         render() {
+            this.renderDebugInfo();
+        }
+
+        renderDebugInfo() {
             this.game.debug.inputInfo(32, 32);
 
             var tileCoord = this.markerToTileCoord(this.marker);
             if (tileCoord) {
                 this.game.debug.text('Tile Coord : ' + tileCoord.x + ',' + tileCoord.y, 16, 550);
             }
-            
-            if(this.currUser && this.currUser.zone) {
+
+            if (this.currUser && this.currUser.zone) {
                 this.game.debug.text('zoneId : ' + this.currUser.zone.id, 16, 530);
             }
         }
