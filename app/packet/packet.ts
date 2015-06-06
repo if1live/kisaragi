@@ -363,12 +363,10 @@ module kisaragi {
     
     export class RequestJumpZonePacket extends BasePacket {
         
-        zoneId: number;
         
         constructor() {
             super(PacketType.RequestJumpZone);
 
-            this.zoneId = 0;
         }
         
         get command(): string {
@@ -377,12 +375,10 @@ module kisaragi {
         _generateJson(): any {
             return {
 
-                zoneId: this.zoneId, 
             };
         }
         loadJson(data: any) {
 
-            this.zoneId = data.zoneId; 
         }
     }
     

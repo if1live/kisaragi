@@ -129,20 +129,48 @@ module kisaragi {
             }
         };
         
-        requestJumpZone(zoneId: number) {
+        requestJumpZone() {
             var factory = new PacketFactory();
-            var packet = factory.requestJumpZone(zoneId);
+            var packet = factory.requestJumpZone();
             this.cliConn.send(packet);
         }
         
         c2s_requestJumpZone(world: GameWorld, packet: RequestJumpZonePacket) {
+            // jump 처리하는 함수
+            // 귀찮아서 서버/클라 검증 구분없이 전부 떄려박음. 나중에 분리할것
+            // 최초 구현은 zone id를 패킷으로 입력받았지만 유니티 구현때문에 인자 없이 서버에서 판정하게 변경
+
             var self = this;
-            if(this.zoneId == packet.zoneId) {
-                return;
-            }
             
             var prevZone = this.zone;
-            var nextZone = world.zone(packet.zoneId);
+
+            // 플레이어가 현재 서있는 위치가 점프 가능한 영역인가?
+            var prevZoneFloorUpPos = prevZone.level.getSpecialCoord(TileCode.FloorUp);
+            var prevZoneFloorDownPos = prevZone.level.getSpecialCoord(TileCode.FloorDown);
+            var prevZoneFloorLeftPos = prevZone.level.getSpecialCoord(TileCode.FloorLeft);
+            var prevZoneFloorRightPos = prevZone.level.getSpecialCoord(TileCode.FloorRight);
+            var prevZoneFloorTopPos = prevZone.level.getSpecialCoord(TileCode.FloorTop);
+            var prevZoneFloorBottomPos = prevZone.level.getSpecialCoord(TileCode.FloorBottom);
+            
+            var nextZoneId = 0;
+            if (prevZoneFloorUpPos && prevZoneFloorUpPos.encoded == this.pos.encoded) {
+                nextZoneId = ZoneID.buildId(prevZone.zoneId.x, prevZone.zoneId.y + 1, prevZone.zoneId.z);
+            } else if (prevZoneFloorDownPos && prevZoneFloorDownPos.encoded == this.pos.encoded) {
+                nextZoneId = ZoneID.buildId(prevZone.zoneId.x, prevZone.zoneId.y - 1, prevZone.zoneId.z);
+            } else if (prevZoneFloorLeftPos && prevZoneFloorLeftPos.encoded == this.pos.encoded) {
+                nextZoneId = ZoneID.buildId(prevZone.zoneId.x - 1, prevZone.zoneId.y, prevZone.zoneId.z);
+            } else if (prevZoneFloorRightPos && prevZoneFloorRightPos.encoded == this.pos.encoded) {
+                nextZoneId = ZoneID.buildId(prevZone.zoneId.x + 1, prevZone.zoneId.y, prevZone.zoneId.z);
+            } else if (prevZoneFloorTopPos && prevZoneFloorTopPos.encoded == this.pos.encoded) {
+                nextZoneId = ZoneID.buildId(prevZone.zoneId.x, prevZone.zoneId.y, prevZone.zoneId.z + 1);
+            } else if (prevZoneFloorBottomPos && prevZoneFloorBottomPos.encoded == this.pos.encoded) {
+                nextZoneId = ZoneID.buildId(prevZone.zoneId.x, prevZone.zoneId.y, prevZone.zoneId.z - 1);
+            } else {
+                return;
+            }
+
+
+            var nextZone = world.zone(nextZoneId);
 
             var dstPos: Coord;
             var srcPos: Coord;

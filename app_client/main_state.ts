@@ -27,9 +27,7 @@ module kisaragi {
         // input
         cursors: Phaser.CursorKeys;
         // for dev
-        zone0Key: Phaser.Key;
-        zone1Key: Phaser.Key;
-        zone2Key: Phaser.Key;
+        jumpZoneKey: Phaser.Key;
 
         // network
         conn: ClientConnection;
@@ -192,10 +190,7 @@ module kisaragi {
 
             // input
             this.cursors = this.input.keyboard.createCursorKeys();
-            
-            this.zone0Key = this.game.input.keyboard.addKey(Phaser.Keyboard.ONE);
-            this.zone1Key = this.game.input.keyboard.addKey(Phaser.Keyboard.TWO);
-            this.zone2Key = this.game.input.keyboard.addKey(Phaser.Keyboard.THREE);
+            this.jumpZoneKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
             // cursor + tile select
             //TODO
@@ -312,14 +307,8 @@ module kisaragi {
                 this.currUser.moveRight();
             }
             
-            if(this.zone0Key.justDown) {
-                this.currUser.requestJumpZone(0)
-            }
-            if(this.zone1Key.justDown) {
-                this.currUser.requestJumpZone(1);
-            }
-            if(this.zone2Key.justDown) {
-                this.currUser.requestJumpZone(2);
+            if(this.jumpZoneKey.justDown) {
+                this.currUser.requestJumpZone()
             }
 
             var game = <ClientMain> this.game;

@@ -10,6 +10,12 @@ module kisaragi {
             this.x = x;
             this.y = y;
         }
+
+        get encoded(): number {
+            var val = this.x;
+            val += (this.y << 16)
+            return val
+        }
     }
 }
 
