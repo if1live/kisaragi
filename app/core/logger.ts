@@ -53,7 +53,8 @@ module kisaragi {
                 return;
             }
 
-            el.textContent = message + "\n" + el.textContent;
+            el.textContent = el.textContent + "\n" + message;
+            el.scrollTop = el.scrollHeight;
         }
 
         createText(message: string, ...optionalParams: any[]) {

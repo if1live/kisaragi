@@ -43,7 +43,7 @@ module kisaragi {
             var factory = new PacketFactory();
 
             conn.registerHandler(PacketType.Login, function (packet: LoginPacket) {
-                console.log('Login : userId=' + packet.movableId);
+                logger.log('Login : userId=' + packet.movableId);
                 self.currUserId = packet.movableId;
                 self.currZoneId = packet.zoneId;
 
@@ -59,7 +59,7 @@ module kisaragi {
 
             conn.registerHandler(PacketType.ResponseMap, function(packet: ResponseMapPacket) {
                 //console.log(data);
-                console.log('Load Level data from server : zoneId=' + packet.zoneId);
+                logger.log('Load Level data from server : zoneId=' + packet.zoneId);
 
                 // 다른 zone에 속하는 객체는 클라에서 유지할 필요 없으니 파기한다
                 var allEntityList = self.gameWorld.entityMgr.all();
@@ -107,14 +107,14 @@ module kisaragi {
             });
 
             conn.registerHandler(PacketType.NewObject, function (packet: NewObjectPacket) {
-                console.log('New Object : id=' + packet.movableId);
+                logger.log('New Object : id=' + packet.movableId);
                 if (packet.movableId == self.currUserId) {
                     // 플레이어가 지역을 이동한 경우
                     self.currZoneId = packet.zoneId;
                 }
 
                 if (self.gameWorld.findObject(packet.movableId)) {
-                    console.log('Object id=' + packet.movableId + ' is already created');
+                    logger.log('Object id=' + packet.movableId + ' is already created');
                     return;
                 }
                 
@@ -142,7 +142,7 @@ module kisaragi {
             });
 
             conn.registerHandler(PacketType.RemoveObject, function (packet: RemoveObjectPacket) {
-                console.log('Remove Object : id=' + packet.movableId);
+                logger.log('Remove Object : id=' + packet.movableId);
                 self.gameWorld.removeId(packet.movableId);
                 if (packet.movableId == self.currUserId) {
                     self.currUser = null;
@@ -163,26 +163,25 @@ module kisaragi {
                 var attackerId = packet.attackerMovableId;
                 var attackedId = packet.attackedMovableId;
                 var damage = packet.damage;
-                console.log(`Attack notify : ${attackerId} -> ${attackedId} : ${damage}`)
 
-                var ent = self.gameWorld.findObject(attackedId);
-                if (!ent) {
+                var attacker = self.gameWorld.findObject(attackerId);
+                var attacked = self.gameWorld.findObject(attackedId);
+                if (!attacker || !attacked) {
                     return;
                 }
-                if (ent.category == Category.Player) {
-                    var player = <Player> ent;
+
+                logger.log(`Attack notify : [${attacker.simpleName}] -> [${attacked.simpleName}] : damage=${damage}`);
+
+                if (attacked.category == Category.Player) {
+                    var player = <Player> attacked;
                     player.hp -= damage;
-                    console.log('1');
                     if (player.hp <= 0) {
-                        console.log('3');
                         self.gameWorld.remove(player);
                     }
-                } else if (ent.category == Category.Enemy) {
-                    var enemy = <Enemy> ent;
+                } else if (attacked.category == Category.Enemy) {
+                    var enemy = <Enemy> attacked;
                     enemy.hp -= damage;
-                    console.log('2');
                     if (enemy.hp <= 0) {
-                        console.log('4');
                         self.gameWorld.remove(enemy);
                     }
                 }

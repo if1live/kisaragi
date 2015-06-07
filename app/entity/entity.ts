@@ -1,6 +1,16 @@
 ﻿// Ŭnicode please
 ///<reference path="../app.d.ts"/>
 module kisaragi {
+    export class EntityHelper {
+        static categoryToString(category: Category) {
+            var table = {};
+            table[Category.Enemy] = "enemy";
+            table[Category.Player] = "player";
+            table[Category.Item] = "item";
+            return table[category];
+        }
+    }
+
     export class Entity {
         // core attribute
         category: Category;
@@ -90,6 +100,12 @@ module kisaragi {
             } else {
                 return null;
             }
+        }
+
+        get simpleName(): string {
+            var categoryName = EntityHelper.categoryToString(this.category);
+            var text = `${categoryName}:${this.movableId}`;
+            return text;
         }
 
         moveNotify() {
@@ -259,5 +275,6 @@ module kisaragi {
 declare var exports: any;
 if (typeof exports !== 'undefined') {
     exports.Entity = kisaragi.Entity;
+    exports.EntityHelper = kisaragi.EntityHelper;
     exports.EntityManager = kisaragi.EntityManager;
 }
