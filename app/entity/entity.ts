@@ -44,7 +44,7 @@ module kisaragi {
             this.targetPos = null;
             this.world = null;
             this.sprite = null;
-
+            
             this.moveCooltime = moveCooltime;
             this.currMoveCooltime = 0;
         }
@@ -175,6 +175,50 @@ module kisaragi {
             this.sprite.position.x = x;
             this.sprite.position.y = y;
         }
+
+        updateMoveAnimation(delta: number) {
+            var tileX = this.pos.x;
+            var tileY = this.zone.level.height - this.pos.y - 1;
+            var targetX = tileX * TILE_SIZE;
+            var targetY = tileY * TILE_SIZE;
+
+            var currX = this.sprite.position.x;
+            var currY = this.sprite.position.y;
+
+            if (targetX == currX && targetY == currY) {
+                return;
+            }
+
+            var speed = 1 / this.moveCooltime * TILE_SIZE;
+            var diff = speed * delta;
+
+            var dx = targetX - currX;
+            var dy = targetY - currY;
+            var dirLength = Math.sqrt(dx * dx + dy * dy);
+            dx = dx / dirLength * diff;
+            dy = dy / dirLength * diff;
+
+            var nextX = currX + dx;
+            var nextY = currY + dy;
+
+            // 목적지 근처에서 진동하는거 방지
+            // 이전...목적지...계산된 목적지
+            // 와 같은 순서로 위치할 경우 강제로 목적지로 정렬
+            if (currX <= targetX && targetX <= nextX) {
+                nextX = targetX;
+            } else if (nextX <= targetX && targetX <= currX) {
+                nextX = targetX;
+            }
+            if (currY <= targetY && targetY <= nextY) {
+                nextY = targetY;
+            } else if (nextY <= targetY && targetY <= currY) {
+                nextY = targetY;
+            }
+
+            this.sprite.position.x = nextX;
+            this.sprite.position.y = nextY;
+
+        }
     };
 
     interface SearchOption {
@@ -266,7 +310,7 @@ module kisaragi {
             }
         }
         
-        all() {
+        all(): Entity[] {
             return _.values(this.table);
         }
     };

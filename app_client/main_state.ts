@@ -155,10 +155,9 @@ module kisaragi {
                 var ent = self.gameWorld.findObject(packet.movableId);
                 if(ent == null) { return; }
                 if(ent.zoneId != self.currUser.zoneId) { return; }
-                
+
                 ent.x = packet.x;
                 ent.y = packet.y;
-                ent.updateSpritePosition();
             });
             
             conn.registerHandler(PacketType.AttackNotify, function (packet: AttackNotifyPacket) {
@@ -355,6 +354,8 @@ module kisaragi {
         }
 
         updateClient() {
+            var self = this;
+
             if (this.currUser) {
                 // 이동처리는 동시에 눌리는거를 고려하지 않는다
                 // 어차피 4-way 니까 하나씩만 처리하면된다
@@ -370,7 +371,13 @@ module kisaragi {
 
                 if (this.jumpZoneKey.justDown) {
                     this.currUser.requestJumpZone()
-                }                
+                }
+                
+                var zone = this.currUser.zone;
+                var entityList = zone.entityMgr.all(); 
+                _.each(entityList, function (ent: Entity) {
+                    ent.updateMoveAnimation(self.time.elapsedMS / 1000.0);
+                })
             }
 
             if (this.restartKey.justDown) {
