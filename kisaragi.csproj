@@ -59,7 +59,7 @@
     <TypeScriptCompile Include="app_client\client_main.ts" />
     <TypeScriptCompile Include="app_client\main_state.ts" />
     <Content Include=".travis.yml" />
-    <None Include="external\packet_generator\tpl_base_packet_factory.ejs" />
+    <None Include="packet_generator\tpl_base_packet_factory.ejs" />
     <TypeScriptCompile Include="test\core\core_spec.ts" />
     <TypeScriptCompile Include="test\core\logger_spec.ts" />
     <TypeScriptCompile Include="test\core\zone_id_spec.ts" />
@@ -72,7 +72,7 @@
     <TypeScriptCompile Include="test\network\server_connection_spec.ts" />
     <TypeScriptCompile Include="test\entity\player_spec.ts" />
     <TypeScriptCompile Include="test\game_world_spec.ts" />
-    <Content Include="external\packet_generator\packet_generator.js" />
+    <Content Include="packet_generator\packet_generator.js" />
     <Content Include="run_server.js" />
     <Content Include="vs_main\index_test.html" />
     <Content Include="web.config" />
@@ -99,9 +99,9 @@
     <Content Include="views\pages\index.ejs" />
     <Content Include="views\partials\head.ejs" />
     <Content Include="bower.json" />
-    <Content Include="external\packet_generator\packet_def.json" />
-    <Content Include="external\packet_generator\tpl_packet.ejs" />
-    <Content Include="external\packet_generator\tpl_packet_type.ejs" />
+    <Content Include="packet_generator\packet_def.json" />
+    <Content Include="packet_generator\tpl_packet.ejs" />
+    <Content Include="packet_generator\tpl_packet_type.ejs" />
     <Content Include="tslint.json" />
     <Content Include="views\pages\single.ejs" />
     <Content Include="views\partials\debug_info.ejs" />

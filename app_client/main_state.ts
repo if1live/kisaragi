@@ -243,6 +243,11 @@ module kisaragi {
             this.ping = new ClientPing(this.conn);
             this.ping.renderer = new HtmlPingRenderer('ping-result');
             this.ping.ping();
+
+            // ie11의 경우 핸들러를 뭐라도 등록해야 클릭이 작동한다
+            this.input.mspointer.onPointerDown = function (event: MSPointerEvent) { }
+            this.input.mspointer.onPointerUp = function (event: MSPointerEvent) { }
+            this.input.mspointer.onPointerMove = function (event: MSPointerEvent) { }
         }
 
         initializeNetwork_SinglePlay() {
@@ -359,6 +364,10 @@ module kisaragi {
                 if (this.jumpZoneKey.justDown) {
                     this.currUser.requestJumpZone()
                 }
+
+                //if (this.input.pointer1.isDown) {
+                //if (this.input.pointer1.) {
+                
             }
         }
 
