@@ -1,0 +1,17 @@
+﻿///<reference path="app.d.ts"/>
+/*
+Auto generated code
+*/
+
+module kisaragi {
+<% for(var i = 0 ; i < constants.length ; i += 1) { %>
+    export var <%= constants[i].name %>: <%= constants[i].js_type() %> = <%= constants[i].value -%>;
+<% } %>
+}
+
+declare var exports: any;
+if (typeof exports !== 'undefined') {
+<% for(var i = 0 ; i < constants.length ; i += 1) { %>
+    exports.<%= constants[i].name -%> = kisaragi.<%= constants[i].name -%>;
+<% } %>
+}

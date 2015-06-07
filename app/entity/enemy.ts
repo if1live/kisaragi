@@ -6,11 +6,6 @@ if (typeof module !== 'undefined') {
 }
 
 module kisaragi {
-    var COOLTIME_THINK: number = 0.5;
-    var COOLTIME_MOVE: number = 0.3;
-
-    var ENEMY_HP: number = 2;
-
     enum EnemyFSMState {
         Idle,
         Move,
@@ -23,7 +18,7 @@ module kisaragi {
         state: EnemyFSMState;
 
         constructor(id: number, role: Role, pos: Coord) {
-            super(id, COOLTIME_MOVE);
+            super(id, ENEMY_COOLTIME_MOVE);
             this.category = Category.Enemy;
             this.role = role;
             this.pos = pos;
@@ -42,7 +37,7 @@ module kisaragi {
 
             if (this.thinkCooltime === 0) {
                 this.think();
-                this.thinkCooltime = COOLTIME_THINK;
+                this.thinkCooltime = ENEMY_COOLTIME_THINK;
             }
 
             var player = this.findTargetPlayer();

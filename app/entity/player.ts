@@ -6,12 +6,6 @@ if (typeof module !== 'undefined') {
 }
 
 module kisaragi {
-    var COOLTIME_MOVE: number = 0.1;
-    //var PLAYER_HP: number = 10;
-    var PLAYER_HP: number = 3;
-    var PLAYER_ATTACK = 1;
-    var PLAYER_ATTACK_RANGE = 5;
-
     export class Player extends Entity {
         svrConn: ServerConnection;
         cliConn: ClientConnection;
@@ -19,7 +13,7 @@ module kisaragi {
         hp: number;
 
         constructor(id: number, role: Role) {
-            super(id, COOLTIME_MOVE);
+            super(id, PLAYER_COOLTIME_MOVE);
 
             this.category = Category.Player;
             this.role = role;
