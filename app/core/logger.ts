@@ -6,7 +6,7 @@ if (typeof module !== 'undefined') {
 }
 
 module kisaragi {
-    class Logger {
+    export class Logger {
         elemId: string;
 
         constructor() {
@@ -49,6 +49,10 @@ module kisaragi {
             }
 
             var el = document.getElementById(this.elemId);
+            if (!el) {
+                return;
+            }
+
             el.textContent = message + "\n" + el.textContent;
         }
 
@@ -64,6 +68,7 @@ module kisaragi {
 
 declare var exports: any;
 if (typeof exports !== 'undefined') {
+    exports.Logger = kisaragi.Logger;
     exports.logger = kisaragi.logger;
 }
 
