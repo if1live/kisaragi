@@ -28,6 +28,7 @@ module kisaragi {
         cursors: Phaser.CursorKeys;
         // for dev
         jumpZoneKey: Phaser.Key;
+        restartKey: Phaser.Key;
 
         // network
         conn: ClientConnection;
@@ -223,6 +224,7 @@ module kisaragi {
             // input
             this.cursors = this.input.keyboard.createCursorKeys();
             this.jumpZoneKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+            this.restartKey = this.game.input.keyboard.addKey(Phaser.Keyboard.R);
 
             // cursor + tile select
             //TODO
@@ -368,11 +370,12 @@ module kisaragi {
 
                 if (this.jumpZoneKey.justDown) {
                     this.currUser.requestJumpZone()
-                }
+                }                
+            }
 
-                //if (this.input.pointer1.isDown) {
-                //if (this.input.pointer1.) {
-                
+            if (this.restartKey.justDown) {
+                var packet = new GameRestartPacket();
+                this.conn.send(packet);
             }
         }
 

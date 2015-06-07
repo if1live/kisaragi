@@ -95,6 +95,23 @@ module kisaragi {
                 console.log(`[User=${self.user.movableId}] connected`);
                 self.user.connect(world, packet);
             });
+
+            this.registerHandler(PacketType.GameRestart, (req: Request, packet: GameRestartPacket, world: GameWorld) => {
+                if (self.user) {
+                    // remove previous user
+                    var factory = new PacketFactory();
+                    var removeObjectPacket = factory.removeObject(self.user.movableId);
+                    self.broadcast(removeObjectPacket);
+                    world.remove(self.user);
+                    self.user = null;
+                }
+
+                var user = world.createUser(self);
+                self.user = user;
+                world.addUser(user);
+                console.log(`[User=${self.user.movableId}] restart`);
+                self.user.connect(world, packet);
+            });
             
             this.registerHandler(PacketType.Disconnect, (req: Request, packet: DisconnectPacket, world: GameWorld) => {
                 self.user.disconnect(world, packet);

@@ -134,5 +134,10 @@
     "command": "c2s_requestJumpZone",
     "content": [
     ]
+  },
+  {
+    "name": "GameRestart",
+    "command": "c2s_gameRestart",
+    "content": [ ]
   }
 ]

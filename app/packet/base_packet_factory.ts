@@ -41,6 +41,7 @@ module kisaragi {
                 RequestMapPacket,
                 ResponseMapPacket,
                 RequestJumpZonePacket,
+                GameRestartPacket,
             ];
             for (var i = 0; i < packetClassList.length; ++i) {
                 var packetClass = packetClassList[i];
@@ -102,6 +103,9 @@ module kisaragi {
         }
         createRequestJumpZone(): RequestJumpZonePacket {
             return new RequestJumpZonePacket();
+        }
+        createGameRestart(): GameRestartPacket {
+            return new GameRestartPacket();
         }
     }
 }

@@ -506,6 +506,27 @@ module kisaragi {
         }
     }
     
+    export class GameRestartPacket extends BasePacket {
+        
+        
+        constructor() {
+            super(PacketType.GameRestart);
+
+        }
+        
+        get command(): string {
+            return 'c2s_gameRestart';
+        }
+        _generateJson(): any {
+            return {
+
+            };
+        }
+        loadJson(data: any) {
+
+        }
+    }
+    
 }
 
 declare var exports: any;
@@ -528,5 +549,6 @@ if (typeof exports !== 'undefined') {
     exports.RequestMapPacket = kisaragi.RequestMapPacket;
     exports.ResponseMapPacket = kisaragi.ResponseMapPacket;
     exports.RequestJumpZonePacket = kisaragi.RequestJumpZonePacket;
+    exports.GameRestartPacket = kisaragi.GameRestartPacket;
 }
 
