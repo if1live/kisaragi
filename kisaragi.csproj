@@ -31,6 +31,7 @@
     <TypeScriptCompile Include="app\core\zone_id.ts" />
     <TypeScriptCompile Include="app\entity\entity.ts" />
     <TypeScriptCompile Include="app\entity\entity_factory.ts" />
+    <TypeScriptCompile Include="app\core\logger.ts" />
     <TypeScriptCompile Include="external\tsm\common.ts" />
     <TypeScriptCompile Include="external\tsm\mat2.ts" />
     <TypeScriptCompile Include="external\tsm\mat3.ts" />
@@ -102,6 +103,8 @@
     <Content Include="packet_generator\tpl_packet_type.ejs" />
     <Content Include="tslint.json" />
     <Content Include="views\pages\single.ejs" />
+    <Content Include="views\partials\debug_info.ejs" />
+    <Content Include="views\partials\game_core.ejs" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

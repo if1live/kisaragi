@@ -239,6 +239,11 @@ module kisaragi {
             } else {
                 this.initializeNetwork_MultiPlay();
             }
+
+            this.echoRunner = new ClientEcho(this.conn);
+            this.ping = new ClientPing(this.conn);
+            this.ping.renderer = new HtmlPingRenderer('ping-result');
+            this.ping.ping();
         }
 
         initializeNetwork_SinglePlay() {
@@ -265,11 +270,6 @@ module kisaragi {
             var socket = io(url);
             this.conn = ClientConnection.socketIO(socket);
             this.registerSocketHandler(this.conn);
-
-            this.echoRunner = new ClientEcho(this.conn);
-            this.ping = new ClientPing(this.conn);
-            this.ping.renderer = new HtmlPingRenderer('ping-result');
-            this.ping.ping();
         }
 
 

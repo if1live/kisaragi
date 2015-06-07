@@ -13,6 +13,7 @@
 ///<reference path="core/core.ts"/>
 ///<reference path="core/zone_id.ts"/>
 ///<reference path="core/queue.ts"/>
+///<reference path="core/logger.ts"/>
 
 ///<reference path="packet/base_packet.ts"/>
 ///<reference path="packet/packet.ts"/>

@@ -2,8 +2,8 @@
 /// <reference path="app_client.d.ts" />
 
 module kisaragi {
-    var width = 800;
-    var height = 600;
+    var width = 640;
+    var height = 480;
 
     export class ClientMain extends Phaser.Game {
         playMode: GamePlayMode;
