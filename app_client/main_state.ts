@@ -103,6 +103,7 @@ module kisaragi {
                 // 레이어 생성후 z를 다시 정렬
                 self.tileLayer.z = GROUND_DEPTH;
                 self.characterGroup.z = CHARACTER_DEPTH;
+                self.marker.z = MARKER_DEPTH;
                 self.world.sort();
             });
 
@@ -320,11 +321,15 @@ module kisaragi {
             this.marker.lineStyle(2, color, 1);
             this.marker.drawRect(0, 0, TILE_SIZE, TILE_SIZE);
 
-            // TODO why double clicked?
             if (this.input.mousePointer.isDown) {
-                // TODO implement move to
                 console.log("selected tile coord : " + tileCoord.x + "," + tileCoord.y);
-                this.currUser.requestMoveTo(tileCoord.x, tileCoord.y);
+
+                if (color == ENEMY_MARKER_COLOR) {
+                    var enemy = <Enemy> tileObj;
+                    this.currUser.requestAttack(enemy);
+                } else if (color == EMPTY_MARKER_COLOR) {
+                    this.currUser.requestMoveTo(tileCoord.x, tileCoord.y);
+                }
             }
         }
 

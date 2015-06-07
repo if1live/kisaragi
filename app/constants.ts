@@ -18,6 +18,7 @@ module kisaragi {
 
     export var GROUND_DEPTH = 1;
     export var CHARACTER_DEPTH = 2;
+    export var MARKER_DEPTH = 3;
 
     export enum Role {
         Server,

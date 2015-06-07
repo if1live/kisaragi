@@ -9,6 +9,8 @@ module kisaragi {
     var COOLTIME_MOVE: number = 0.1;
     //var PLAYER_HP: number = 10;
     var PLAYER_HP: number = 3;
+    var PLAYER_ATTACK = 1;
+    var PLAYER_ATTACK_RANGE = 5;
 
     export class Player extends Entity {
         svrConn: ServerConnection;
@@ -136,11 +138,48 @@ module kisaragi {
             self.cliConn.send(packet);
         };
 
+        requestAttack(enemy: Enemy) {
+            var factory = new PacketFactory();
+            var packet = factory.requestAttack(enemy.movableId);
+            this.cliConn.send(packet);
+        }
+
         c2s_requestMove(world: GameWorld, packet: RequestMovePacket) {
             if (this.zone.isMovablePos(packet.x, packet.y)) {
                 this.targetPos = new Coord(packet.x, packet.y);
             }
-        };
+        }
+
+        c2s_requestAttack(world: GameWorld, packet: RequestAttackPacket) {
+            var target = this.zoneEntityMgr.find({ id: packet.movableId });
+            if (!target) {
+                return;
+            }
+
+            if (target.category != Category.Enemy) {
+                return;
+            }
+
+            var enemy = <Enemy> target;
+            if (this.pos.distance(enemy.pos) >= PLAYER_ATTACK_RANGE) {
+                return;
+            }
+
+
+            enemy.hp -= PLAYER_ATTACK;
+
+            var factory = new PacketFactory();
+            var attackNotifyPacket = factory.attackNotify(this.movableId, enemy.movableId, PLAYER_ATTACK);
+            this.svrConn.broadcast(attackNotifyPacket);
+
+            if (enemy.hp <= 0) {
+                enemy.hp = 0
+
+                var removeObjectPacket = factory.removeObject(enemy.movableId);
+                this.svrConn.broadcast(removeObjectPacket);
+                this.world.remove(enemy);
+            }
+        }
         
         requestJumpZone() {
             var factory = new PacketFactory();
