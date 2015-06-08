@@ -6,11 +6,14 @@ auto-generated code
 */
 module kisaragi {
 <% for(var i = 0 ; i < levels.length ; i += 1) { %>
-    var <%= levels[i].name %> = [
+    var <%= levels[i].name %> = {
+        data: [
 <% for(var j = 0 ; j < levels[i].height ; j += 1) { %>
-        '<%= levels[i].data[j] %>',
+            '<%= levels[i].data[j] %>',
 <% } %>
-    ];
+        ],
+        "enemy": <%= levels[i].enemy %>
+    };
 <% } %>
 
     export var LEVEL_DATA_LIST = {};

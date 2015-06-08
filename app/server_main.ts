@@ -20,20 +20,27 @@ module kisaragi {
 
         constructor() {
             this.world = new GameWorld(Role.Server);
-            for (var i = 0; i < LEVEL_DATA_LIST.length; i += 1) {
-                var levelData = LEVEL_DATA_LIST[i];
+            var zoneKeys = _.keys(LEVEL_DATA_LIST);
+            for(var i = 0 ; i < zoneKeys.length ; i += 1) {
+                var zoneId = parseInt(zoneKeys[i], 10);
+                var levelData = LEVEL_DATA_LIST[zoneId].data;
                 this.world.zone(i).level.loadFromLevelData(levelData);
             }
 
             // 특정 층에만 적을 배치해두기
-            for (var i = 1; i < LEVEL_DATA_LIST.length; i += 1) {
+            for(var i = 0 ; i < zoneKeys.length ; i += 1) {
+                var zoneId = parseInt(zoneKeys[i], 10);
+                if(zoneId === 0) {
+                    continue;
+                }
+                
                 var world = this.world;
-                var zone = world.zone(i);
-                for (var j = 0; j < 3; j += 1) {
+                var zone = world.zone(zoneId);
+                var enemyCount = LEVEL_DATA_LIST[zoneId].enemy;
+                for(var j = 0 ; j < enemyCount ; j += 1) {
                     world.generateEnemy(zone);
                 }
             }
-            
         }
 
         initializeNodeServer() {

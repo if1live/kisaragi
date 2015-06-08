@@ -64,9 +64,10 @@ ConstantDefine.prototype.js_type = function () {
   }
 }
 
-function LevelData(zone) {
+function LevelData(def) {
   var self = this;
   
+  var zone = def.zone;
   self.zone = (zone[0] << 22) + (zone[1] << 11) + (zone[2] << 0);
   self.x = zone[0];
   self.y = zone[1];
@@ -85,6 +86,7 @@ function LevelData(zone) {
   self.width = rows[0].length;
   self.height = rows.length;
   self.data = rows;
+  self.enemy = def.enemy;
 }
 
 function writePacketCode(template_file, output_path) {
@@ -128,8 +130,8 @@ function writeConstantCode(template_file, output_path) {
 }
 
 function writeLevelCode(template_file, output_path) {
-  var levels = _.map(levelDefList, function(zone) {
-    var level = new LevelData(zone);
+  var levels = _.map(levelDefList, function(def) {
+    var level = new LevelData(def);
     return level;
   });
   
