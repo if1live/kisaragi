@@ -1,0 +1,26 @@
+// Ŭnicode please
+///<reference path="app.d.ts"/>
+
+/*
+auto-generated code
+*/
+module kisaragi {
+<% for(var i = 0 ; i < levels.length ; i += 1) { %>
+    var <%= levels[i].name %> = [
+<% for(var j = 0 ; j < levels[i].height ; j += 1) { %>
+        '<%= levels[i].data[j] %>',
+<% } %>
+    ];
+<% } %>
+
+    export var LEVEL_DATA_LIST = {};
+<% for(var i = 0 ; i < levels.length ; i += 1) { %>
+    LEVEL_DATA_LIST[<%= levels[i].zone %>] = <%= levels[i].name %>;
+<% } %>
+
+}
+
+declare var exports: any;
+if (typeof exports !== 'undefined') {
+    exports.LEVEL_DATA_LIST = kisaragi.LEVEL_DATA_LIST;
+}

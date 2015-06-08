@@ -6,6 +6,7 @@ var fs = require('fs');
 var _ = require('underscore');
 var packetDefList = require(__dirname + '/packet_def.json');
 var constantDefList = require(__dirname + '/constant_def.json');
+var levelDefList = require(__dirname + '/level/level_def.json');
 
 function PacketAttribute(data) {
   var self = this;
@@ -63,6 +64,29 @@ ConstantDefine.prototype.js_type = function () {
   }
 }
 
+function LevelData(zone) {
+  var self = this;
+  
+  self.zone = (zone[0] << 22) + (zone[1] << 11) + (zone[2] << 0);
+  self.x = zone[0];
+  self.y = zone[1];
+  self.z = zone[2];
+  
+  self.name = "LEVEL_DATA_" + self.zone;
+  
+  var filename = __dirname + '/level/level-' + zone[0] + '-' + zone[1] + '-' + zone[2] + '.txt';
+    
+  var text = fs.readFileSync(filename, 'utf-8');
+  var rows = text.split('\n');
+  rows = _.select(rows, function(line) {
+    return line.trim().length > 0;
+  });
+  
+  self.width = rows[0].length;
+  self.height = rows.length;
+  self.data = rows;
+}
+
 function writePacketCode(template_file, output_path) {
   fs.readFile(__dirname + '/' + template_file, 'utf8', function (err, data) {
     if (err) {
@@ -103,8 +127,33 @@ function writeConstantCode(template_file, output_path) {
   });
 }
 
+function writeLevelCode(template_file, output_path) {
+  var levels = _.map(levelDefList, function(zone) {
+    var level = new LevelData(zone);
+    return level;
+  });
+  
+  fs.readFile(__dirname + '/' + template_file, 'utf8', function (err, data) {
+    if (err) {
+      return console.log(err);
+    }
+    
+    var output = ejs.render(data, { levels: levels }, { rmWhitespace: true });
+
+    fs.writeFile(output_path, output, function (err) {
+      if (err) {
+        return console.log(err);
+      }
+      console.log("write : " + output_path);
+    });
+  });
+}
+
 writePacketCode('tpl_packet.ejs', __dirname + '/../app/packet/packet.ts');
 writePacketCode('tpl_packet_type.ejs', __dirname + '/../app/packet/packet_type.ts');
 writePacketCode('tpl_base_packet_factory.ejs', __dirname + '/../app/packet/base_packet_factory.ts');
 
 writeConstantCode('tpl_generated_constants.ejs', __dirname + '/../app/generated_constants.ts')
+
+writeLevelCode('tpl_level_data.ejs', __dirname + '/../app/level_data.ts');
+
