@@ -97,7 +97,7 @@ module kisaragi {
             });
 
             this.registerHandler(PacketType.GameRestart, (req: Request, packet: GameRestartPacket, world: GameWorld) => {
-                if (self.user) {
+                if (self.user && self.user.zone) {
                     // remove previous user
                     var factory = new PacketFactory();
                     var removeObjectPacket = factory.removeObject(self.user.movableId);
