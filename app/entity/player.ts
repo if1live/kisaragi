@@ -145,7 +145,11 @@ module kisaragi {
         }
 
         c2s_requestAttack(world: GameWorld, packet: RequestAttackPacket) {
-            var target = this.zoneEntityMgr.find({ id: packet.movableId });
+            var target;
+            if(this.zoneEntityMgr) {
+                target = this.zoneEntityMgr.find({ id: packet.movableId });
+            }
+            
             if (!target) {
                 return;
             }
