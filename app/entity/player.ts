@@ -139,8 +139,10 @@ module kisaragi {
         }
 
         c2s_requestMove(world: GameWorld, packet: RequestMovePacket) {
-            if (this.zone.isMovablePos(packet.x, packet.y)) {
-                this.targetPos = new Coord(packet.x, packet.y);
+            if(this.zone) {
+                if (this.zone.isMovablePos(packet.x, packet.y)) {
+                    this.targetPos = new Coord(packet.x, packet.y);
+                }
             }
         }
 
