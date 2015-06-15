@@ -9,7 +9,7 @@ module kisaragi {
     export var ENEMY_COOLTIME_MOVE: number = 0.3;
     export var ENEMY_HP: number = 2;
     export var PLAYER_COOLTIME_MOVE: number = 0.1;
-    export var PLAYER_HP: number = 3;
+    export var PLAYER_HP: number = 20;
     export var PLAYER_ATTACK: number = 1;
     export var PLAYER_ATTACK_RANGE: number = 5;
 }

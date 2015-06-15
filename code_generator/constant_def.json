@@ -22,7 +22,7 @@
   {
     "name": "PLAYER_HP",
     "type": "int",
-    "value": 3
+    "value": 20
   },
   {
     "name": "PLAYER_ATTACK",
