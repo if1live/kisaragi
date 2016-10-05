@@ -8,6 +8,9 @@ node_js:
 
 sudo: false
 
+env:
+  - CXX=g++-5.4
+
 before_script:
   - npm install -g bower
   - npm install -g grunt-cli
@@ -24,3 +27,11 @@ script:
 
 notifications:
   - email: false
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-5.4
+
