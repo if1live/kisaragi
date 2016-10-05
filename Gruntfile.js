@@ -129,7 +129,7 @@ module.exports = function (grunt) {
       },
       coverage: {
         options: {
-          reporter: 'html-cov',
+//        reporter: 'html-cov',
           quiet: true,
           captureFile: 'build/coverage.html'
         },
