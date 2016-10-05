@@ -1,7 +1,10 @@
 language: node_js
 
 node_js:
-  - "iojs"
+  - "node"
+  - "6"
+  - "5"
+  - "4"
 
 sudo: false
 
